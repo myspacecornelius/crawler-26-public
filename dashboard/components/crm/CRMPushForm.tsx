@@ -2,7 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { CircleDot, Cloud, X } from 'lucide-react';
+import { CircleDot, Cloud, X, ArrowRight } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { pushToCRM, getCRMFields, getDefaultFieldMapping } from '@/lib/api';
 
 interface Campaign {
@@ -151,43 +155,59 @@ export default function CRMPushForm({
     <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
       <h2 className="text-lg font-semibold text-gray-900 mb-5">Push Leads to CRM</h2>
 
+    <Card className="mb-8">
+      <CardHeader>
+        <CardTitle>Push Leads to CRM</CardTitle>
+        <CardDescription>Select a campaign and configure targeting options to sync.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
       {/* Provider Toggle */}
       <div className="mb-5">
+      <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Provider</label>
         <div className="flex gap-3">
           <button
+        <div className="flex gap-2">
+          <Button
             onClick={() => setSelectedProvider('hubspot')}
             className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
               selectedProvider === 'hubspot'
                 ? 'bg-orange-100 text-orange-700 ring-1 ring-orange-300'
                 : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
             }`}
+            variant={selectedProvider === 'hubspot' ? 'default' : 'outline'}
           >
             <CircleDot className="w-4 h-4" />
             HubSpot
           </button>
           <button
+          </Button>
+          <Button
             onClick={() => setSelectedProvider('salesforce')}
             className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
               selectedProvider === 'salesforce'
                 ? 'bg-blue-100 text-blue-700 ring-1 ring-blue-300'
                 : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
             }`}
+            variant={selectedProvider === 'salesforce' ? 'default' : 'outline'}
           >
             <Cloud className="w-4 h-4" />
             Salesforce
           </button>
+          </Button>
         </div>
       </div>
 
       {/* Source Campaign */}
       <div className="mb-5">
+      <div>
         <label htmlFor="crm-campaign" className="block text-sm font-medium text-gray-700 mb-2">Source Campaign</label>
         <select
           id="crm-campaign"
           value={campaignId}
           onChange={(e) => setCampaignId(e.target.value)}
           className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-white"
+          className="flex h-9 w-full rounded-md border border-[hsl(var(--input))] bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:ring-offset-1"
         >
           <option value="">Select a campaign...</option>
           {campaigns.map((c) => (
@@ -200,6 +220,7 @@ export default function CRMPushForm({
 
       {/* Targeting */}
       <div className="mb-5">
+      <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Targeting</label>
         <div className="bg-gray-50 rounded-lg p-4 space-y-4">
           <div>
@@ -244,6 +265,7 @@ export default function CRMPushForm({
 
       {/* Advanced — Field Mapping + Custom Fields */}
       <div className="mb-5">
+      <div>
         <CollapsibleSection
           title="Advanced Settings"
           badge={`${Object.keys(fieldMapping).length} fields`}
@@ -271,6 +293,7 @@ export default function CRMPushForm({
                             onChange={(e) => setFieldMapping({ ...fieldMapping, [lfField]: e.target.value })}
                             aria-label={`CRM field mapping for ${lfField}`}
                             className="w-full px-2 py-1 border border-gray-200 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-brand-500"
+                            className="flex h-8 w-full rounded-md border border-[hsl(var(--input))] bg-transparent px-2 py-1 text-xs shadow-sm"
                           >
                             <option value="">— unmapped —</option>
                             {crmFields.map((f) => (
@@ -279,6 +302,7 @@ export default function CRMPushForm({
                           </select>
                         ) : (
                           <input
+                          <Input
                             type="text"
                             value={crmField}
                             onChange={(e) => setFieldMapping({ ...fieldMapping, [lfField]: e.target.value })}
@@ -304,6 +328,7 @@ export default function CRMPushForm({
                   <button
                     onClick={() => setFieldMapping({ ...defaultMapping })}
                     className="text-xs text-brand-600 hover:text-brand-700 font-medium"
+                    className="text-xs text-blue-600 hover:text-blue-700 font-medium"
                   >
                     Reset to defaults
                   </button>
@@ -318,13 +343,16 @@ export default function CRMPushForm({
             {customFields.map((cf, idx) => (
               <div key={idx} className="flex gap-2 mb-2">
                 <input
+                <Input
                   type="text"
                   value={cf.key}
                   onChange={(e) => updateCustomField(idx, 'key', e.target.value)}
                   placeholder="Field name"
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+                  className="font-mono"
                 />
                 <input
+                <Input
                   type="text"
                   value={cf.value}
                   onChange={(e) => updateCustomField(idx, 'value', e.target.value)}
@@ -332,15 +360,20 @@ export default function CRMPushForm({
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
                 />
                 <button
+                <Button
                   onClick={() => removeCustomField(idx)}
                   className="px-3 py-2 text-sm text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                  variant="ghost"
+                  size="icon"
                   title="Remove field"
                 >
                   <X className="w-4 h-4" />
                 </button>
+                </Button>
               </div>
             ))}
             <button
+            <button // Using a raw button for simple text action
               onClick={addCustomField}
               className="text-sm text-brand-600 hover:text-brand-700 font-medium"
             >
@@ -350,8 +383,10 @@ export default function CRMPushForm({
         </CollapsibleSection>
       </div>
 
+      </CardContent>
       {/* Footer: test mode + push button */}
       <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+      <CardFooter className="flex-col items-stretch gap-4">
         <label className="flex items-center gap-3 cursor-pointer">
           <div className="relative">
             <input
@@ -387,14 +422,34 @@ export default function CRMPushForm({
         }`}>
           <div className="font-medium mb-1">
             {pushResult.failed === 0 ? 'Push Successful' : pushResult.created > 0 || pushResult.updated > 0 ? 'Push Completed with Errors' : 'Push Failed'}
+        {/* Error / Success */}
+        {pushError && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+            {pushError}
           </div>
           <div className="flex gap-6 text-xs">
             <span><strong>{pushResult.created}</strong> created</span>
             <span><strong>{pushResult.updated}</strong> updated</span>
             <span><strong>{pushResult.failed}</strong> failed</span>
+        )}
+        {pushResult && (
+          <div className={`p-4 rounded-lg border text-sm ${
+            pushResult.failed === 0 ? 'bg-emerald-50 border-emerald-200 text-emerald-700' :
+            (pushResult.created > 0 || pushResult.updated > 0) ? 'bg-amber-50 border-amber-200 text-amber-700' :
+            'bg-red-50 border-red-200 text-red-600'
+          }`}>
+            <div className="font-medium mb-1">
+              {pushResult.failed === 0 ? 'Push Successful' : (pushResult.created > 0 || pushResult.updated > 0) ? 'Push Completed with Errors' : 'Push Failed'}
+            </div>
+            <div className="flex gap-6 text-xs">
+              <span><strong>{pushResult.created}</strong> created</span>
+              <span><strong>{pushResult.updated}</strong> updated</span>
+              <span><strong>{pushResult.failed}</strong> failed</span>
+            </div>
           </div>
         </div>
       )}
+        )}
 
       <button
         onClick={handlePush}
@@ -409,5 +464,11 @@ export default function CRMPushForm({
         ) : testMode ? 'Validate Mapping (Test Mode)' : 'Push to CRM'}
       </button>
     </div>
+        <Button onClick={handlePush} disabled={pushing || !campaignId} loading={pushing} size="lg" className="w-full">
+          {testMode ? 'Validate Mapping (Test Mode)' : 'Push to CRM'}
+          {!pushing && <ArrowRight className="w-4 h-4" />}
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }
