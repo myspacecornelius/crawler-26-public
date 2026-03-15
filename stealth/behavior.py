@@ -172,3 +172,55 @@ class HumanBehavior:
                     await self.micro_pause(page)
                 except Exception:
                     pass
+
+    # ── Reading Simulation ───────────────────────────
+
+    async def simulate_reading(self, page: Page, word_count: int = 200):
+        """
+        Simulate reading a page by pausing for a duration proportional
+        to the estimated word count. Average reading speed: ~250 wpm.
+        """
+        reading_time = (word_count / 250.0) * self.speed_factor
+        # Add variance (some paragraphs are skimmed, others read carefully)
+        actual_time = self._gaussian_delay(reading_time, reading_time * 0.3, 0.5)
+        await page.wait_for_timeout(int(actual_time * 1000))
+
+    async def typing_simulation(self, page: Page, selector: str, text: str):
+        """
+        Type text into an input field with human-like timing.
+        Each character has a variable delay to mimic real typing.
+        """
+        element = page.locator(selector)
+        await element.click()
+        await self.micro_pause(page)
+
+        for char in text:
+            await element.type(char, delay=random.randint(50, 180))
+            # Occasional longer pause (thinking about next character)
+            if random.random() < 0.05:
+                await page.wait_for_timeout(random.randint(200, 600))
+
+    async def browsing_session(self, page: Page):
+        """
+        Run a sequence of natural human behaviors to build a believable
+        browsing session before the actual scraping begins.
+        """
+        actions = random.sample(
+            ["mouse", "scroll", "hover", "read", "tab_switch"],
+            k=random.randint(2, 4),
+        )
+
+        for action in actions:
+            if action == "mouse":
+                await self.random_mouse_movement(page, movements=random.randint(1, 3))
+            elif action == "scroll":
+                await self.human_scroll(page, "down")
+                if random.random() < 0.3:
+                    await self.human_scroll(page, "up")
+            elif action == "hover":
+                await self.random_interaction(page)
+            elif action == "read":
+                await self.simulate_reading(page, word_count=random.randint(50, 200))
+            elif action == "tab_switch":
+                if random.random() < 0.3:
+                    await self.simulate_tab_switch(page)

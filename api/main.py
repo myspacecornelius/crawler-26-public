@@ -7,12 +7,16 @@ Run with: uvicorn api.main:app --reload --port 8000
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 from .database import init_db
+from .settings import settings
 from .routers import users, campaigns, leads, verticals, outreach, billing, crm, portfolio, config
+from .routers import metrics, notifications
 
 logger = logging.getLogger("leadfactory.api")
 
@@ -20,11 +24,11 @@ logger = logging.getLogger("leadfactory.api")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Initialize DB on startup."""
-    logger.info("🚀 Starting LeadFactory API...")
+    logger.info("Starting LeadFactory API...")
     await init_db()
-    logger.info("✅ Database initialized")
+    logger.info("Database initialized")
     yield
-    logger.info("👋 Shutting down LeadFactory API")
+    logger.info("Shutting down LeadFactory API")
 
 
 app = FastAPI(
@@ -36,15 +40,17 @@ app = FastAPI(
     redoc_url="/api/redoc",
 )
 
-# CORS — allow dashboard origin
+# ── Rate limiting ──────────────────────────────
+app.state.limiter = users.limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# ── CORS — configurable via CORS_ORIGINS env var ─
+# To add origins for staging or production, set the CORS_ORIGINS
+# environment variable to a comma-separated list of allowed origins.
+# Example: CORS_ORIGINS=https://app.leadfactory.io,https://staging.leadfactory.io
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=settings.cors_origin_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -60,6 +66,8 @@ app.include_router(billing.router, prefix="/api")
 app.include_router(portfolio.router, prefix="/api")
 app.include_router(crm.router, prefix="/api")
 app.include_router(config.router, prefix="/api")
+app.include_router(metrics.router, prefix="/api")
+app.include_router(notifications.router, prefix="/api")
 
 
 @app.get("/api/health")

@@ -10,6 +10,7 @@ import os
 import random
 import re
 import logging
+import time
 from urllib.parse import urlparse, urljoin
 from typing import List, Dict, Optional
 from datetime import datetime
@@ -22,6 +23,9 @@ from enrichment.email_validator import EmailValidator
 from enrichment.email_guesser import EmailGuesser
 from enrichment.scoring import LeadScorer
 from output.csv_writer import CSVWriter
+from scraping.circuit_breaker import DomainCircuitBreakerManager
+from scraping.domain_limiter import DomainConcurrencyLimiter
+from scraping.metrics import ScrapeMetrics
 
 logging.basicConfig(
     level=logging.INFO,
@@ -578,6 +582,10 @@ class DeepCrawler:
         seen_file: str = "data/seen_domains.txt",
         skip_enrichment: bool = False,
         stale_days: int = 7,
+        max_per_domain: int = 2,
+        circuit_failure_threshold: int = 3,
+        circuit_cooldown_seconds: float = 300.0,
+        max_retries: int = 3,
     ):
         self.target_file = target_file
         self.output_file = output_file
@@ -586,12 +594,24 @@ class DeepCrawler:
         self.force_recrawl = force_recrawl
         self.seen_file = seen_file
         self.stale_days = stale_days
+        self.max_retries = max_retries
         self.all_contacts: List[InvestorLead] = []
         self.skip_enrichment = skip_enrichment
         self.email_validator = EmailValidator()
         self.email_guesser = EmailGuesser(concurrency=10)
         self.scorer = LeadScorer("config/scoring.yaml")
         self.csv_writer = CSVWriter("data")
+
+        # Resilience: per-domain concurrency, circuit breakers, metrics
+        self.domain_limiter = DomainConcurrencyLimiter(
+            max_per_domain=max_per_domain,
+            global_max=max_concurrent,
+        )
+        self.circuit_breakers = DomainCircuitBreakerManager(
+            failure_threshold=circuit_failure_threshold,
+            cooldown_seconds=circuit_cooldown_seconds,
+        )
+        self.metrics = ScrapeMetrics()
 
     def _checkpoint_path(self) -> str:
         return self.output_file.replace('.csv', '_checkpoint.csv')
@@ -1111,10 +1131,52 @@ class DeepCrawler:
 
         return new_contacts
 
+    async def _crawl_fund_with_retry(self, browser: Browser, fund_url: str) -> List[InvestorLead]:
+        """Crawl a fund with exponential backoff retry and circuit breaker protection."""
+        # Circuit breaker check
+        if not self.circuit_breakers.allow_request(fund_url):
+            logger.info(f"  Circuit open for {fund_url}, skipping")
+            self.metrics.record_circuit_trip(fund_url)
+            return []
+
+        self.metrics.record_request(fund_url)
+        start_time = time.monotonic()
+
+        for attempt in range(self.max_retries):
+            try:
+                async with self.domain_limiter.acquire(fund_url):
+                    contacts = await self._crawl_fund(browser, fund_url)
+
+                extraction_time = time.monotonic() - start_time
+                self.circuit_breakers.record_success(fund_url)
+                self.metrics.record_success(
+                    fund_url,
+                    leads_found=len(contacts),
+                    extraction_time_s=extraction_time,
+                )
+                return contacts
+
+            except Exception as e:
+                backoff = min(2 ** attempt * 2.0, 30.0) + random.uniform(0, 1)
+                if attempt < self.max_retries - 1:
+                    logger.warning(
+                        f"  Attempt {attempt + 1}/{self.max_retries} failed for "
+                        f"{fund_url}: {e}. Retrying in {backoff:.1f}s..."
+                    )
+                    await asyncio.sleep(backoff)
+                else:
+                    logger.error(f"  All {self.max_retries} attempts failed for {fund_url}: {e}")
+                    self.circuit_breakers.record_failure(fund_url)
+                    blocked = "403" in str(e) or "429" in str(e)
+                    self.metrics.record_failure(fund_url, blocked=blocked)
+                    return []
+
+        return []
+
     async def _crawl_fund(self, browser: Browser, fund_url: str) -> List[InvestorLead]:
         """Crawl a single VC fund website with a hard timeout."""
         fund_name = urlparse(fund_url).netloc.replace("www.", "").split(".")[0].title()
-        contacts = []  # ← shared with _do_crawl so partial results survive timeout
+        contacts = []  # shared with _do_crawl so partial results survive timeout
 
         async def _do_crawl():
             nonlocal contacts
@@ -1125,11 +1187,11 @@ class DeepCrawler:
             )
             page = await ctx.new_page()
 
-            logger.info(f"  🌐 Visiting {fund_url}")
+            logger.info(f"  Visiting {fund_url}")
             try:
                 await page.goto(fund_url, wait_until="domcontentloaded", timeout=15000)
             except Exception:
-                logger.warning(f"  ⏳ Timeout on {fund_url}, continuing...")
+                logger.warning(f"  Timeout on {fund_url}, continuing...")
                 await ctx.close()
                 return []
 
@@ -1338,7 +1400,7 @@ class DeepCrawler:
                     f"(concurrency: {batch_size})"
                 )
 
-                tasks = [self._crawl_fund(browser, url) for url in batch]
+                tasks = [self._crawl_fund_with_retry(browser, url) for url in batch]
                 try:
                     results = await asyncio.wait_for(
                         asyncio.gather(*tasks, return_exceptions=True),
@@ -1380,9 +1442,18 @@ class DeepCrawler:
                 self._save_checkpoint()
 
             logger.info(
-                f"  🏁 Crawl complete: {total_succeeded} succeeded, {total_failed} failed "
+                f"  Crawl complete: {total_succeeded} succeeded, {total_failed} failed "
                 f"out of {total} total"
             )
+
+            # Log scraping metrics
+            self.metrics.log_summary()
+            cb_stats = self.circuit_breakers.stats
+            if cb_stats["open_circuits"] > 0:
+                logger.warning(
+                    f"  Circuit breakers open for {cb_stats['open_circuits']} domains: "
+                    f"{', '.join(cb_stats['domains_open'][:10])}"
+                )
 
             await browser.close()
 

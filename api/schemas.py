@@ -12,14 +12,14 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 class UserCreate(BaseModel):
     email: EmailStr
-    password: str = Field(min_length=8)
+    password: str = Field(min_length=8, max_length=128)
     name: str = Field(min_length=1, max_length=255)
-    company: str = ""
+    company: str = Field(default="", max_length=255)
 
 
 class UserLogin(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(min_length=1, max_length=128)
 
 
 class UserResponse(BaseModel):
@@ -46,7 +46,11 @@ class TokenResponse(BaseModel):
 
 class CampaignCreate(BaseModel):
     name: str = Field(min_length=1, max_length=255)
-    vertical: str = Field(description="Vertical slug: vc, pe, family_office, corp_dev")
+    vertical: str = Field(
+        min_length=1, max_length=50,
+        pattern=r"^[a-z][a-z0-9_]*$",
+        description="Vertical slug: vc, pe, family_office, corp_dev",
+    )
     config: Dict[str, Any] = Field(default_factory=dict, description="Optional config overrides")
 
 
@@ -161,7 +165,7 @@ class CreditTransaction(BaseModel):
 # ── API Keys ────────────────────────────────────
 
 class ApiKeyCreate(BaseModel):
-    name: str = "Default"
+    name: str = Field(default="Default", min_length=1, max_length=100)
 
 
 class ApiKeyResponse(BaseModel):

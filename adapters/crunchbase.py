@@ -18,6 +18,11 @@ class CrunchbaseAdapter(BaseSiteAdapter):
     the paid tier — this adapter focuses on freely accessible profiles.
     """
 
+    ADAPTER_NAME = "crunchbase"
+    VERTICALS = ["vc", "pe", "angel"]
+    RATE_LIMIT_RPM = 10
+    REQUIRES_AUTH = False
+
     def parse_card(self, card) -> Optional[InvestorLead]:
         """Parse a Crunchbase person card into a lead."""
 

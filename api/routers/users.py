@@ -1,13 +1,17 @@
 """
 User registration, login, and profile management.
+
+Includes rate limiting on login and register endpoints.
 """
 
 from uuid import UUID
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from ..database import get_db
 from ..models import User, ApiKey
@@ -18,14 +22,23 @@ from ..schemas import (
 from ..auth import (
     hash_password, verify_password, create_access_token,
     get_current_user_id, generate_api_key, hash_api_key,
+    validate_password_complexity,
 )
+from ..settings import settings
 
 router = APIRouter(prefix="/users", tags=["users"])
+limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post("/register", response_model=TokenResponse, status_code=201)
-async def register(body: UserCreate, db: AsyncSession = Depends(get_db)):
+@limiter.limit(settings.rate_limit_register)
+async def register(request: Request, body: UserCreate, db: AsyncSession = Depends(get_db)):
     """Register a new user account."""
+    # Validate password complexity
+    complexity_error = validate_password_complexity(body.password)
+    if complexity_error:
+        raise HTTPException(status_code=400, detail=complexity_error)
+
     existing = await db.execute(select(User).where(User.email == body.email))
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=409, detail="Email already registered")
@@ -48,7 +61,8 @@ async def register(body: UserCreate, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(body: UserLogin, db: AsyncSession = Depends(get_db)):
+@limiter.limit(settings.rate_limit_login)
+async def login(request: Request, body: UserLogin, db: AsyncSession = Depends(get_db)):
     """Authenticate and receive a JWT token."""
     result = await db.execute(select(User).where(User.email == body.email))
     user = result.scalar_one_or_none()
