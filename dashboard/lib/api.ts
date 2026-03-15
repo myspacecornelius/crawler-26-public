@@ -223,3 +223,87 @@ export async function getCRMFields(provider: string, testMode = true) {
 export async function getDefaultFieldMapping() {
   return fetchAPI('/crm/field-mapping/defaults');
 }
+
+// Config — Scoring & Scraping Rules
+export interface ScoringWeights {
+  stage_match: number;
+  sector_match: number;
+  check_size_fit: number;
+  portfolio_relevance: number;
+  recency: number;
+}
+
+export interface TierThresholds {
+  hot: number;
+  warm: number;
+  cool: number;
+}
+
+export interface ScoringConfig {
+  weights: ScoringWeights;
+  tiers: TierThresholds;
+}
+
+export interface ScrapingRule {
+  domain: string;
+  team_page_selector: string;
+  name_selector: string;
+  role_selector: string;
+  email_selector: string;
+  pagination_type: string;
+  pagination_selector: string;
+  enabled: boolean;
+}
+
+export async function getScoringConfig(): Promise<ScoringConfig> {
+  return fetchAPI('/config/scoring');
+}
+
+export async function updateScoringConfig(config: ScoringConfig): Promise<ScoringConfig> {
+  return fetchAPI('/config/scoring', {
+    method: 'PUT',
+    body: JSON.stringify(config),
+  });
+}
+
+export async function getScrapingRules(): Promise<{ rules: ScrapingRule[] }> {
+  return fetchAPI('/config/scraping-rules');
+}
+
+export async function addScrapingRule(rule: ScrapingRule): Promise<ScrapingRule> {
+  return fetchAPI('/config/scraping-rules', {
+    method: 'POST',
+    body: JSON.stringify(rule),
+  });
+}
+
+// API Keys
+export interface ApiKeyInfo {
+  id: string;
+  name: string;
+  is_active: boolean;
+  created_at: string;
+  last_used?: string;
+}
+
+export interface ApiKeyCreated {
+  id: string;
+  name: string;
+  key: string;
+  created_at: string;
+}
+
+export async function listApiKeys(): Promise<ApiKeyInfo[]> {
+  return fetchAPI('/users/api-keys');
+}
+
+export async function createApiKey(name: string): Promise<ApiKeyCreated> {
+  return fetchAPI('/users/api-keys', {
+    method: 'POST',
+    body: JSON.stringify({ name }),
+  });
+}
+
+export async function revokeApiKey(keyId: string): Promise<void> {
+  return fetchAPI(`/users/api-keys/${keyId}`, { method: 'DELETE' });
+}
