@@ -1,6 +1,10 @@
 """
 CRAWL — Email Validator
-Validates email addresses via format checks and MX record lookups.
+Validates email addresses via cascading checks:
+  format → disposable → role-based → MX record → SMTP verification.
+
+Configuration is loaded from config/email_validation.yaml so that disposable
+domains and role prefixes can be updated without redeploying code.
 """
 
 import re
@@ -11,32 +15,65 @@ import socket
 import subprocess
 import time
 from collections import defaultdict
+from pathlib import Path
 from typing import Optional
+
+import yaml
 
 logger = logging.getLogger(__name__)
 
+_CONFIG_PATH = Path(__file__).resolve().parent.parent / "config" / "email_validation.yaml"
 
-# ── Known disposable/temporary email domains ──
-DISPOSABLE_DOMAINS = {
+
+def _load_email_config() -> dict:
+    """Load email validation config from YAML, with sensible defaults."""
+    try:
+        if _CONFIG_PATH.exists():
+            with open(_CONFIG_PATH) as f:
+                return yaml.safe_load(f) or {}
+    except Exception as e:
+        logger.warning("Failed to load email validation config: %s", e)
+    return {}
+
+
+def _load_set_from_config(key: str, defaults: set) -> set:
+    """Load a set from YAML config, falling back to built-in defaults."""
+    cfg = _load_email_config()
+    items = cfg.get(key, [])
+    if items:
+        return set(items)
+    return defaults
+
+
+# ── Defaults (used when config file is missing) ──
+_DEFAULT_DISPOSABLE_DOMAINS = {
     "tempmail.com", "throwaway.email", "guerrillamail.com", "mailinator.com",
     "yopmail.com", "trashmail.com", "fakeinbox.com", "sharklasers.com",
     "grr.la", "dispostable.com", "10minutemail.com",
 }
 
-# ── Known generic/role-based prefixes (lower priority) ──
-ROLE_PREFIXES = {
+_DEFAULT_ROLE_PREFIXES = {
     "info", "contact", "hello", "admin", "support", "team", "office",
     "press", "media", "sales", "marketing", "noreply", "no-reply",
 }
 
+# ── Load from config (centralised, updatable without code changes) ──
+DISPOSABLE_DOMAINS = _load_set_from_config("disposable_domains", _DEFAULT_DISPOSABLE_DOMAINS)
+ROLE_PREFIXES = _load_set_from_config("role_prefixes", _DEFAULT_ROLE_PREFIXES)
+
 
 class EmailValidator:
     """
-    Multi-layer email validation:
+    Multi-layer email validation with cascading strategy:
     1. Format validation (regex)
     2. Disposable domain detection
     3. Role-based address detection
     4. MX record verification (async DNS lookup)
+    5. SMTP deliverability check (optional)
+
+    MX checks are integrated directly into validate() — unknown or
+    unreachable domains degrade quality rather than defaulting to "high".
+    DNS/network errors result in "medium" quality and flag for retry.
     """
 
     def __init__(self):
@@ -44,6 +81,7 @@ class EmailValidator:
         self._mx_host_cache: dict[str, str] = {}  # domain → best MX host
         self._smtp_cache: dict[str, dict] = {}  # email → smtp result
         self._catch_all_cache: dict[str, bool] = {}  # domain → is_catch_all
+        self._dns_error_domains: set[str] = set()  # domains with DNS errors (for retry)
         self._pattern = re.compile(
             r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         )
@@ -57,16 +95,26 @@ class EmailValidator:
         self._smtp_proxy_port = int(os.environ.get("SMTP_PROXY_PORT", "25"))
         self._smtp_available: Optional[bool] = None  # None = not tested yet
 
+        # Load validation settings from config
+        cfg = _load_email_config()
+        val_cfg = cfg.get("validation", {})
+        self._mx_timeout = val_cfg.get("mx_check_timeout", 10)
+        self._max_retries = val_cfg.get("max_retries", 2)
+        self._retry_on_dns_error = val_cfg.get("retry_on_dns_error", True)
+
     def validate(self, email: str) -> dict:
         """
-        Validate an email address.
-        
+        Validate an email address using cascading checks.
+
         Returns:
             {
                 "email": str,
                 "valid_format": bool,
                 "is_disposable": bool,
                 "is_role_based": bool,
+                "has_mx": bool | None,
+                "dns_error": bool,
+                "needs_retry": bool,
                 "quality": "high" | "medium" | "low" | "invalid"
             }
         """
@@ -75,6 +123,9 @@ class EmailValidator:
             "valid_format": False,
             "is_disposable": False,
             "is_role_based": False,
+            "has_mx": None,
+            "dns_error": False,
+            "needs_retry": False,
             "quality": "invalid",
         }
 
@@ -82,28 +133,74 @@ class EmailValidator:
             return result
 
         email = email.strip().lower()
+        result["email"] = email
 
-        # Format check
+        # Step 1: Format check
         if not self._pattern.match(email):
             return result
         result["valid_format"] = True
 
         local, domain = email.rsplit("@", 1)
 
-        # Disposable check
+        # Step 2: Disposable domain check
         if domain in DISPOSABLE_DOMAINS:
             result["is_disposable"] = True
             result["quality"] = "low"
             return result
 
-        # Role-based check
+        # Step 3: Role-based prefix check
         if local in ROLE_PREFIXES:
             result["is_role_based"] = True
             result["quality"] = "medium"
             return result
 
+        # Step 4: MX record check (synchronous, using cache)
+        mx_result = self._check_mx_sync(domain)
+        result["has_mx"] = mx_result["has_mx"]
+        result["dns_error"] = mx_result["dns_error"]
+
+        if mx_result["dns_error"]:
+            # DNS/network error → medium quality, flag for retry
+            result["quality"] = "medium"
+            result["needs_retry"] = self._retry_on_dns_error
+            self._dns_error_domains.add(domain)
+            return result
+
+        if mx_result["has_mx"] is False:
+            # No MX records → domain can't receive email → low quality
+            result["quality"] = "low"
+            return result
+
+        # All checks passed
         result["quality"] = "high"
         return result
+
+    def _check_mx_sync(self, domain: str) -> dict:
+        """
+        Synchronous MX check with caching.
+        Returns {"has_mx": bool|None, "dns_error": bool}
+        """
+        # Check cache first
+        if domain in self._mx_cache:
+            return {"has_mx": self._mx_cache[domain], "dns_error": False}
+
+        try:
+            import dns.resolver
+            answers = dns.resolver.resolve(domain, "MX", lifetime=self._mx_timeout)
+            has_mx = len(answers) > 0
+            self._mx_cache[domain] = has_mx
+            return {"has_mx": has_mx, "dns_error": False}
+        except ImportError:
+            # dnspython not installed — can't check MX, assume valid
+            self._mx_cache[domain] = True
+            return {"has_mx": True, "dns_error": False}
+        except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer, dns.resolver.NoNameservers):
+            # Domain doesn't exist or has no MX records
+            self._mx_cache[domain] = False
+            return {"has_mx": False, "dns_error": False}
+        except Exception:
+            # DNS timeout, network error — treat as "medium" quality
+            return {"has_mx": None, "dns_error": True}
 
     async def verify_mx(self, email: str) -> bool:
         """
@@ -121,15 +218,13 @@ class EmailValidator:
 
         try:
             import dns.resolver
-            
+
             loop = asyncio.get_running_loop()
             answers = await loop.run_in_executor(
                 None, lambda: dns.resolver.resolve(domain, "MX")
             )
             has_mx = len(answers) > 0
         except Exception:
-            # If dns.resolver not available or lookup fails, assume valid
-            # (we don't want to reject emails just because DNS is slow)
             has_mx = True
 
         self._mx_cache[domain] = has_mx
@@ -159,7 +254,6 @@ class EmailValidator:
             best_host = None
             for line in out.stdout.splitlines():
                 line = line.strip()
-                # e.g. "example.com	mail exchanger = 10 mx.example.com."
                 if "mail exchanger" in line.lower():
                     parts = line.split("=", 1)
                     if len(parts) == 2:
@@ -202,15 +296,10 @@ class EmailValidator:
         return mx_host
 
     async def smtp_self_test(self) -> bool:
-        """Test if outbound SMTP (port 25) is available from this network.
-
-        Performs a real SMTP handshake (not just TCP connect) to avoid
-        false positives from firewalls that accept TCP but drop SMTP.
-        """
+        """Test if outbound SMTP (port 25) is available from this network."""
         if self._smtp_available is not None:
             return self._smtp_available
 
-        # If using a proxy, test the proxy host instead
         if self._smtp_proxy_host:
             test_host = self._smtp_proxy_host
             test_port = self._smtp_proxy_port
@@ -271,11 +360,7 @@ class EmailValidator:
     async def verify_smtp(self, email: str) -> dict:
         """
         SMTP-level deliverability check using RCPT TO.
-        Connects to the domain's MX server and checks if the mailbox exists.
         Returns {"deliverable": bool, "smtp_code": int, "catch_all": bool}.
-
-        Note: Many servers will accept all addresses (catch-all), so a positive
-        result doesn't guarantee delivery, but a negative result (550) is reliable.
         """
         result = {"deliverable": None, "smtp_code": 0, "catch_all": False}
 
@@ -285,12 +370,10 @@ class EmailValidator:
 
         domain = email.rsplit("@", 1)[1].lower()
 
-        # Check SMTP cache
         cache_key = f"smtp:{email}"
         if cache_key in self._smtp_cache:
             return self._smtp_cache[cache_key]
 
-        # Skip if self-test already determined SMTP is blocked
         if self._smtp_available is False:
             logger.debug("SMTP %s → skipped (SMTP blocked)", email)
             self._smtp_cache[cache_key] = result
@@ -301,7 +384,6 @@ class EmailValidator:
 
             loop = asyncio.get_running_loop()
 
-            # Determine target host/port
             if self._smtp_proxy_host:
                 connect_host = self._smtp_proxy_host
                 connect_port = self._smtp_proxy_port
@@ -317,12 +399,10 @@ class EmailValidator:
 
             helo_domain = self._smtp_helo_domain
 
-            # SMTP conversation with per-step logging
             def _smtp_check():
                 try:
                     smtp = self._smtp_connect(connect_host, connect_port)
 
-                    # EHLO (preferred) with HELO fallback
                     code_ehlo, msg_ehlo = smtp.ehlo(helo_domain)
                     if code_ehlo != 250:
                         logger.debug("SMTP %s → EHLO rejected (%d), trying HELO", email, code_ehlo)
@@ -336,12 +416,10 @@ class EmailValidator:
                             pass
                         return 0
 
-                    # MAIL FROM — check the response
                     sender = f"verify@{helo_domain}"
                     code_mail, msg_mail = smtp.mail(sender)
                     logger.debug("SMTP %s → MAIL FROM <%s> → %d", email, sender, code_mail)
                     if code_mail != 250:
-                        # Try with empty sender (common for verification)
                         smtp.rset()
                         code_mail, msg_mail = smtp.mail("")
                         logger.debug("SMTP %s → MAIL FROM <> (retry) → %d", email, code_mail)
@@ -353,7 +431,6 @@ class EmailValidator:
                             pass
                         return 0
 
-                    # RCPT TO — the actual deliverability check
                     code, msg = smtp.rcpt(email)
                     logger.debug("SMTP %s → RCPT TO → %d %s", email, code, msg)
                     try:
@@ -376,7 +453,6 @@ class EmailValidator:
 
             if code == 250:
                 result["deliverable"] = True
-                # Use cached catch-all status if available
                 if domain in self._catch_all_cache:
                     result["catch_all"] = self._catch_all_cache[domain]
                 else:
@@ -403,10 +479,10 @@ class EmailValidator:
                 result["deliverable"] = False
                 logger.debug("SMTP %s → deliverable=False (code %d)", email, code)
             elif code == -1:
-                result["deliverable"] = None  # Timeout / connection refused
+                result["deliverable"] = None
                 logger.debug("SMTP %s → deliverable=None (timeout)", email)
             else:
-                result["deliverable"] = None  # Indeterminate
+                result["deliverable"] = None
                 logger.debug("SMTP %s → deliverable=None (code %d)", email, code)
 
         except ImportError as e:
@@ -422,17 +498,7 @@ class EmailValidator:
     async def verify_smtp_batch(self, emails: list[str], concurrency: int = 20) -> dict[str, dict]:
         """
         Batch SMTP verification with concurrency control and per-MX rate limiting.
-        Groups emails by domain, enforces 1-second delay between checks to the same
-        MX server, and limits overall concurrency via semaphore.
-
-        Args:
-            emails: List of email addresses to verify.
-            concurrency: Max parallel SMTP connections.
-
-        Returns:
-            {email: {"deliverable": bool|None, "smtp_code": int, "catch_all": bool}}
         """
-        # Run self-test on first batch call
         smtp_ok = await self.smtp_self_test()
         if not smtp_ok:
             print("  ⚠️  SMTP blocked — skipping verification, all emails tagged 'unknown'")
@@ -446,7 +512,6 @@ class EmailValidator:
         checked = 0
         total = len(emails)
 
-        # Group emails by domain for rate limiting
         by_domain: dict[str, list[str]] = defaultdict(list)
         for email in emails:
             if not email or "@" not in email:
@@ -455,14 +520,12 @@ class EmailValidator:
             domain = email.rsplit("@", 1)[1].lower()
             by_domain[domain].append(email)
 
-        # Track last check time per MX host for rate limiting (max 5/sec → 0.2s gap)
         mx_last_check: dict[str, float] = {}
         lock = asyncio.Lock()
 
         async def _check_one(email: str, domain: str):
             nonlocal checked
             async with sem:
-                # Rate limit: enforce 0.2s gap per MX host
                 mx_host = await self._resolve_mx_host(domain)
                 mx_key = mx_host or domain
                 async with lock:
@@ -479,7 +542,6 @@ class EmailValidator:
                 if checked % 100 == 0:
                     print(f"  📬  SMTP progress: {checked}/{total} emails checked...")
 
-        # Process domain groups — add 1s delay between domains sharing an MX
         tasks = []
         for domain, domain_emails in by_domain.items():
             for email in domain_emails:
@@ -507,12 +569,12 @@ class EmailValidator:
     async def validate_batch_deep(self, emails: list[str], smtp_check: bool = False) -> list[dict]:
         """
         Enhanced validation with optional SMTP deliverability check.
-        Use this for final output validation.
         """
         results = await self.validate_batch(emails)
 
         if smtp_check:
-            sem = asyncio.Semaphore(5)  # Limit concurrent SMTP connections
+            sem = asyncio.Semaphore(5)
+
             async def _check(result):
                 if result["valid_format"] and result.get("has_mx"):
                     async with sem:
@@ -526,9 +588,15 @@ class EmailValidator:
         return results
 
     @property
+    def dns_error_domains(self) -> set[str]:
+        """Domains that encountered DNS errors (candidates for retry)."""
+        return set(self._dns_error_domains)
+
+    @property
     def cache_stats(self) -> dict:
         return {
             "domains_cached": len(self._mx_cache),
             "domains_with_mx": sum(1 for v in self._mx_cache.values() if v),
             "smtp_checks_cached": len(self._smtp_cache),
+            "dns_error_domains": len(self._dns_error_domains),
         }

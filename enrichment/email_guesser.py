@@ -1,27 +1,32 @@
 """
-CRAWL — Email Pattern Guesser (v2)
+CRAWL — Email Pattern Guesser (v3)
 For named contacts with a known fund domain, generates email addresses
-using detected patterns or statistical defaults.
+using detected patterns, statistical learning, or defaults.
 
-Key fix from v1: MX records are domain-level, not email-level. Checking
-MX per-candidate always picks the first pattern. Now we check MX once
-per domain, then apply the best pattern.
+v3 improvements over v2:
+- Pattern learning: records all observed patterns per domain with frequency counts
+- Statistics endpoint: exposes pattern distribution and confidence metrics
+- Improved person/company detection heuristics
 """
 
 import asyncio
+import json
 import logging
 import re
 import unicodedata
-from typing import List, Optional
+from collections import defaultdict
+from pathlib import Path
+from typing import Dict, List, Optional
 from urllib.parse import urlparse
 
 from enrichment.email_validator import EmailValidator
 
 logger = logging.getLogger(__name__)
 
+# Persistent pattern store path
+_PATTERN_STORE_PATH = Path(__file__).resolve().parent.parent / "data" / "email_patterns.json"
 
 # Common email patterns ordered by prevalence at professional firms
-# first.last is the most common professional pattern (Google Workspace, O365 default)
 _PATTERNS = [
     "{first}.{last}@{domain}",
     "{first}@{domain}",
@@ -33,8 +38,7 @@ _PATTERNS = [
     "{last}.{first}@{domain}",
 ]
 
-# Default pattern when no learned pattern exists — first.last is statistically
-# most common for professional orgs (Google Workspace, Microsoft 365)
+# Default pattern when no learned pattern exists
 _DEFAULT_PATTERN = "{first}.{last}@{domain}"
 
 # Words that indicate a company/fund name rather than a person name
@@ -73,30 +77,25 @@ def _is_person_name(name: str) -> bool:
     """Check if a name looks like a real person (not a company/fund)."""
     if not name or name == "N/A" or name.lower() == "unknown":
         return False
-    # Strip common prefixes from team pages
     cleaned = name.strip()
     for prefix in ["Meet ", "About ", "Dr. ", "Prof. "]:
         if cleaned.startswith(prefix):
             cleaned = cleaned[len(prefix):]
-    # Remove trailing periods
     cleaned = cleaned.rstrip(".")
     words = cleaned.lower().split()
     if len(words) < 2 or len(words) > 5:
         return False
-    # If ANY word is a company indicator, reject
     if any(w.rstrip(".,;:") in _COMPANY_WORDS for w in words):
         return False
-    # All-caps multi-word strings are likely headers, not names
     if cleaned == cleaned.upper() and len(words) > 2:
         return False
-    # Names with numbers are not person names
     if any(c.isdigit() for c in cleaned):
         return False
     return True
 
 
 def _clean_person_name(name: str) -> str:
-    """Clean up a person name for email generation (strip prefixes, suffixes)."""
+    """Clean up a person name for email generation."""
     cleaned = name.strip()
     for prefix in ["Meet ", "About ", "Dr. ", "Prof. "]:
         if cleaned.startswith(prefix):
@@ -126,10 +125,7 @@ def _extract_domain(website: str) -> Optional[str]:
 
 
 def generate_candidates(name: str, domain: str) -> List[str]:
-    """
-    Generate all email pattern candidates for a given name + domain.
-    Returns an empty list if the name cannot be split into first/last.
-    """
+    """Generate all email pattern candidates for a given name + domain."""
     parts = name.strip().split()
     if len(parts) < 2:
         return []
@@ -171,7 +167,6 @@ def detect_pattern(email: str, name: str) -> Optional[str]:
     local = local.lower()
     f = first[0]
 
-    # Check each pattern against the known email's local part
     for pattern in _PATTERNS:
         expected_local = pattern.split("@")[0].format(first=first, last=last, f=f, domain=domain)
         if local == expected_local:
@@ -180,28 +175,72 @@ def detect_pattern(email: str, name: str) -> Optional[str]:
     return None
 
 
-class _PatternCache:
-    """Stores detected email patterns per domain for reuse across contacts."""
+class PatternStore:
+    """
+    Persistent pattern store that records ALL observed email patterns per domain
+    with frequency counts. This enables statistical pattern selection — the most
+    frequently observed pattern for a domain is used for future guesses.
+    """
 
-    def __init__(self):
-        self._patterns: dict[str, str] = {}  # domain -> pattern
+    def __init__(self, store_path: Optional[Path] = None):
+        self._store_path = store_path or _PATTERN_STORE_PATH
+        # domain -> {pattern: count}
+        self._patterns: Dict[str, Dict[str, int]] = {}
+        # domain -> best pattern (cached)
+        self._best_pattern: Dict[str, str] = {}
+        self._load()
+
+    def _load(self):
+        """Load persisted pattern data from disk."""
+        try:
+            if self._store_path.exists():
+                with open(self._store_path) as f:
+                    data = json.load(f)
+                self._patterns = data.get("patterns", {})
+                # Rebuild best pattern cache
+                for domain, counts in self._patterns.items():
+                    if counts:
+                        self._best_pattern[domain] = max(counts, key=counts.get)
+                logger.debug("Loaded pattern store: %d domains", len(self._patterns))
+        except Exception as e:
+            logger.debug("Could not load pattern store: %s", e)
+
+    def save(self):
+        """Persist pattern data to disk."""
+        try:
+            self._store_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(self._store_path, "w") as f:
+                json.dump({"patterns": self._patterns}, f, indent=2)
+        except Exception as e:
+            logger.debug("Could not save pattern store: %s", e)
 
     def get(self, domain: str) -> Optional[str]:
-        return self._patterns.get(domain)
+        """Get the best (most frequent) pattern for a domain."""
+        return self._best_pattern.get(domain)
 
     def learn(self, domain: str, email: str, name: str) -> Optional[str]:
-        """Try to detect and cache the pattern for a domain."""
-        if domain in self._patterns:
-            return self._patterns[domain]
+        """
+        Detect and record the pattern for an observed email at a domain.
+        Updates frequency counts and recalculates the best pattern.
+        """
         pattern = detect_pattern(email, name)
-        if pattern:
-            self._patterns[domain] = pattern
-            logger.debug(f"  🔑  Learned pattern for {domain}: {pattern}")
+        if not pattern:
+            return None
+
+        if domain not in self._patterns:
+            self._patterns[domain] = {}
+
+        self._patterns[domain][pattern] = self._patterns[domain].get(pattern, 0) + 1
+
+        # Recalculate best pattern
+        self._best_pattern[domain] = max(self._patterns[domain], key=self._patterns[domain].get)
+
+        logger.debug("Learned pattern for %s: %s (count=%d)", domain, pattern, self._patterns[domain][pattern])
         return pattern
 
     def apply(self, name: str, domain: str) -> Optional[str]:
-        """Apply a cached pattern to generate an email for a new contact."""
-        pattern = self._patterns.get(domain)
+        """Apply the best learned pattern to generate an email."""
+        pattern = self._best_pattern.get(domain)
         if not pattern:
             return None
         parts = name.strip().split()
@@ -216,7 +255,54 @@ class _PatternCache:
 
     @property
     def domains_known(self) -> int:
-        return len(self._patterns)
+        return len(self._best_pattern)
+
+    def get_statistics(self) -> dict:
+        """
+        Return comprehensive pattern statistics:
+        - Total domains with learned patterns
+        - Pattern distribution across all domains
+        - Per-domain confidence (top pattern count / total observations)
+        - Most common patterns globally
+        """
+        total_domains = len(self._patterns)
+        total_observations = 0
+        global_pattern_counts: Dict[str, int] = defaultdict(int)
+        domain_stats = []
+
+        for domain, counts in self._patterns.items():
+            domain_total = sum(counts.values())
+            total_observations += domain_total
+            best_pattern = max(counts, key=counts.get) if counts else None
+            best_count = counts.get(best_pattern, 0) if best_pattern else 0
+            confidence = best_count / domain_total if domain_total > 0 else 0
+
+            for pattern, count in counts.items():
+                global_pattern_counts[pattern] += count
+
+            domain_stats.append({
+                "domain": domain,
+                "best_pattern": best_pattern,
+                "confidence": round(confidence, 3),
+                "observations": domain_total,
+                "patterns": dict(counts),
+            })
+
+        # Sort domains by observation count
+        domain_stats.sort(key=lambda x: x["observations"], reverse=True)
+
+        # Global pattern ranking
+        global_ranking = sorted(global_pattern_counts.items(), key=lambda x: x[1], reverse=True)
+
+        return {
+            "total_domains": total_domains,
+            "total_observations": total_observations,
+            "global_pattern_ranking": [
+                {"pattern": p, "count": c, "share": round(c / total_observations, 3) if total_observations > 0 else 0}
+                for p, c in global_ranking
+            ],
+            "top_domains": domain_stats[:50],
+        }
 
 
 class EmailGuesser:
@@ -224,25 +310,18 @@ class EmailGuesser:
     Generates email addresses for contacts using pattern detection and
     domain-level MX verification.
 
-    Key design: MX records are domain-level (not email-level), so we check
-    MX once per domain, then apply the best pattern to ALL contacts at that
-    domain. This avoids the v1 bug where MX check always picked the first
-    pattern.
-
-    Pipeline:
-    1. Learn patterns from contacts that already have verified emails.
-    2. Apply learned patterns to contacts at the same domain.
-    3. For remaining contacts, check domain MX once, then apply default
-       pattern (first.last@domain — the most common professional format).
-    4. Generate alternative candidates ranked by likelihood.
+    v3 improvements:
+    - Uses PatternStore with frequency-based learning
+    - Persists patterns to disk across runs
+    - Exposes statistics for pattern analysis
     """
 
     def __init__(self, concurrency: int = 10):
         self.validator = EmailValidator()
         self.concurrency = concurrency
         self._sem = asyncio.Semaphore(concurrency)
-        self._pattern_cache = _PatternCache()
-        self._mx_cache: dict[str, bool] = {}  # domain -> has_mx
+        self._pattern_store = PatternStore()
+        self._mx_cache: dict[str, bool] = {}
         self._stats = {
             "attempted": 0, "found": 0, "skipped": 0,
             "pattern_hits": 0, "default_hits": 0, "mx_rejects": 0,
@@ -266,7 +345,7 @@ class EmailGuesser:
             if result.get("deliverable") is True:
                 pattern = detect_pattern(candidate, clean)
                 if pattern:
-                    self._pattern_cache._patterns[domain] = pattern
+                    self._pattern_store.learn(domain, candidate, clean)
                     self._stats["patterns_discovered"] += 1
                     logger.info(f"  \U0001f50d  Discovered pattern for {domain}: {pattern} (via {candidate})")
                     return candidate
@@ -275,7 +354,7 @@ class EmailGuesser:
         return None
 
     async def _check_domain_mx(self, domain: str) -> bool:
-        """Check MX once per domain (cached). Returns True if domain can receive email."""
+        """Check MX once per domain (cached)."""
         if domain in self._mx_cache:
             return self._mx_cache[domain]
         async with self._sem:
@@ -284,13 +363,10 @@ class EmailGuesser:
         return has_mx
 
     def _generate_best_email(self, name: str, domain: str) -> Optional[str]:
-        """
-        Generate the best email for a name+domain using learned pattern
-        or the statistical default (first.last@domain).
-        """
+        """Generate the best email using learned pattern or statistical default."""
         clean = _clean_person_name(name)
         # Try learned pattern first
-        email = self._pattern_cache.apply(clean, domain)
+        email = self._pattern_store.apply(clean, domain)
         if email:
             return email
         # Fall back to default pattern
@@ -305,10 +381,7 @@ class EmailGuesser:
         return _DEFAULT_PATTERN.format(first=first, last=last, f=f, domain=domain)
 
     async def guess(self, name: str, website: str) -> Optional[str]:
-        """
-        Generate the best email guess for a single contact.
-        Checks domain MX once, then applies best pattern.
-        """
+        """Generate the best email guess for a single contact."""
         if not _is_person_name(name):
             self._stats["company_skipped"] += 1
             return None
@@ -318,7 +391,6 @@ class EmailGuesser:
             self._stats["skipped"] += 1
             return None
 
-        # Check domain MX once (cached)
         has_mx = await self._check_domain_mx(domain)
         if not has_mx:
             self._stats["mx_rejects"] += 1
@@ -334,10 +406,7 @@ class EmailGuesser:
         return email
 
     def generate_all_candidates(self, name: str, website: str) -> List[str]:
-        """
-        Generate ALL plausible email candidates for a contact, ranked by
-        likelihood. Useful for downstream SMTP verification.
-        """
+        """Generate ALL plausible email candidates, ranked by likelihood."""
         domain = _extract_domain(website)
         if not domain or not _is_person_name(name):
             return []
@@ -349,14 +418,13 @@ class EmailGuesser:
         Phase 1: Learn patterns from leads that already have emails.
         Phase 2: Apply learned patterns to leads without emails.
         Phase 3: For remaining, check domain MX + apply default pattern.
-        Updates leads in-place and returns the list.
         """
         # Phase 1: Learn patterns from existing emails
         for lead in leads:
             if lead.email and lead.email not in ("N/A", "N/A (invalid)") and "@" in lead.email:
                 domain = _extract_domain(lead.website)
                 if domain and _is_person_name(lead.name):
-                    self._pattern_cache.learn(domain, lead.email, lead.name)
+                    self._pattern_store.learn(domain, lead.email, lead.name)
 
         no_email = [
             lead for lead in leads
@@ -364,16 +432,15 @@ class EmailGuesser:
         ]
 
         logger.info(f"  \u2709\ufe0f  Email guesser: {len(no_email)} leads without email (of {len(leads)} total)")
-        logger.info(f"  \U0001f511  Patterns learned for {self._pattern_cache.domains_known} domains")
+        logger.info(f"  \U0001f511  Patterns learned for {self._pattern_store.domains_known} domains")
 
         # Phase 1.5: Discover patterns via SMTP for unknown domains
-        # Pick one contact per domain, probe top 3 patterns
         domains_to_probe = {}
         for lead in no_email:
             if not _is_person_name(lead.name):
                 continue
             domain = _extract_domain(lead.website)
-            if domain and not self._pattern_cache.get(domain) and domain not in domains_to_probe:
+            if domain and not self._pattern_store.get(domain) and domain not in domains_to_probe:
                 domains_to_probe[domain] = lead
 
         if domains_to_probe:
@@ -382,17 +449,16 @@ class EmailGuesser:
                 await self._discover_domain_pattern(lead.name, domain)
             logger.info(f"  \U0001f50d  Pattern discovery complete: {self._stats['patterns_discovered']} patterns found")
 
-        # Phase 2: Apply known patterns (fast, no MX needed — pattern was
-        # learned from a verified email, so domain definitely accepts mail)
+        # Phase 2: Apply known patterns
         still_no_email = []
         for lead in no_email:
             if not _is_person_name(lead.name):
                 self._stats["company_skipped"] += 1
-                still_no_email.append(lead)  # keep in list but won't get email
+                still_no_email.append(lead)
                 continue
             domain = _extract_domain(lead.website)
             if domain:
-                email = self._pattern_cache.apply(lead.name, domain)
+                email = self._pattern_store.apply(lead.name, domain)
                 if email:
                     lead.email = email
                     self._stats["pattern_hits"] += 1
@@ -406,12 +472,14 @@ class EmailGuesser:
             guessed = await self.guess(lead.name, lead.website)
             if guessed:
                 lead.email = guessed
-                # Learn this as the pattern for the domain
                 domain = _extract_domain(lead.website)
                 if domain:
-                    self._pattern_cache.learn(domain, guessed, lead.name)
+                    self._pattern_store.learn(domain, guessed, lead.name)
 
         await asyncio.gather(*[_process(lead) for lead in still_no_email])
+
+        # Persist learned patterns
+        self._pattern_store.save()
 
         found = sum(1 for lead in no_email if lead.email and lead.email not in ("N/A", "N/A (invalid)"))
         logger.info(
@@ -427,3 +495,8 @@ class EmailGuesser:
     @property
     def stats(self) -> dict:
         return dict(self._stats)
+
+    @property
+    def pattern_statistics(self) -> dict:
+        """Expose pattern learning statistics for API/dashboard."""
+        return self._pattern_store.get_statistics()

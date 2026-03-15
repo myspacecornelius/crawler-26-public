@@ -16,7 +16,7 @@ from slowapi.errors import RateLimitExceeded
 from .database import init_db
 from .settings import settings
 from .routers import users, campaigns, leads, verticals, outreach, billing, crm, portfolio
-from .routers import metrics, notifications
+from .routers import metrics, notifications, analytics
 
 logger = logging.getLogger("leadfactory.api")
 
@@ -67,6 +67,7 @@ app.include_router(portfolio.router, prefix="/api")
 app.include_router(crm.router, prefix="/api")
 app.include_router(metrics.router, prefix="/api")
 app.include_router(notifications.router, prefix="/api")
+app.include_router(analytics.router, prefix="/api")
 
 
 @app.get("/api/health")

@@ -1,0 +1,137 @@
+# ──────────────────────────────────────────────────
+#  LeadFactory — Email Validation Configuration
+#  Centralised lists for disposable domains and role prefixes.
+#  Update these lists without redeploying code.
+# ──────────────────────────────────────────────────
+
+# Known disposable/temporary email domains
+# Emails from these domains are classified as "low" quality.
+disposable_domains:
+  - tempmail.com
+  - throwaway.email
+  - guerrillamail.com
+  - mailinator.com
+  - yopmail.com
+  - trashmail.com
+  - fakeinbox.com
+  - sharklasers.com
+  - grr.la
+  - dispostable.com
+  - 10minutemail.com
+  - temp-mail.org
+  - guerrillamailblock.com
+  - tempail.com
+  - mohmal.com
+  - getnada.com
+  - emailondeck.com
+  - maildrop.cc
+  - harakirimail.com
+  - mailnesia.com
+  - inboxkitten.com
+  - burnermail.io
+  - temp-mail.io
+  - mailcatch.com
+  - mytemp.email
+  - mintemail.com
+  - trashmail.me
+  - trashmail.net
+  - armyspy.com
+  - cuvox.de
+  - dayrep.com
+  - einrot.com
+  - fleckens.hu
+  - gustr.com
+  - jourrapide.com
+  - rhyta.com
+  - superrito.com
+  - teleworm.us
+
+# Known generic/role-based email prefixes
+# Emails with these local parts are classified as "medium" quality.
+role_prefixes:
+  - info
+  - contact
+  - hello
+  - admin
+  - support
+  - team
+  - office
+  - press
+  - media
+  - sales
+  - marketing
+  - noreply
+  - no-reply
+  - webmaster
+  - postmaster
+  - abuse
+  - security
+  - billing
+  - help
+  - feedback
+  - inquiries
+  - enquiries
+  - general
+  - hr
+  - jobs
+  - careers
+  - recruitment
+  - legal
+  - compliance
+  - partnerships
+  - investors
+  - ir
+  - pr
+  - communications
+
+# Validation pipeline settings
+validation:
+  # Timeouts for external checks (seconds)
+  mx_check_timeout: 10
+  smtp_check_timeout: 15
+
+  # Concurrency limits
+  max_concurrent_mx_checks: 20
+  max_concurrent_smtp_checks: 5
+
+  # Retry configuration for DNS/network errors
+  retry_on_dns_error: true
+  max_retries: 2
+  retry_delay_seconds: 3
+
+  # Quality classification thresholds
+  quality_rules:
+    # Emails that pass all checks
+    high:
+      - valid_format
+      - not_disposable
+      - not_role_based
+      - has_mx
+    # Emails that fail MX or have DNS errors
+    medium:
+      - valid_format
+      - not_disposable
+      - dns_error_or_no_mx
+    # Disposable or role-based emails
+    low:
+      - disposable_domain
+      - role_based_prefix
+
+# External verification API configuration
+# API keys are loaded from environment variables:
+#   HUNTER_API_KEY, ZEROBOUNCE_API_KEY, MILLIONVERIFIER_API_KEY
+external_verification:
+  enabled: true
+  providers:
+    - name: hunter
+      env_key: HUNTER_API_KEY
+      priority: 1
+      monthly_limit: 25
+    - name: zerobounce
+      env_key: ZEROBOUNCE_API_KEY
+      priority: 2
+      monthly_limit: 100
+    - name: millionverifier
+      env_key: MILLIONVERIFIER_API_KEY
+      priority: 3
+      monthly_limit: 200
