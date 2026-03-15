@@ -11,6 +11,7 @@ import CommandPalette from '@/components/layout/CommandPalette';
 import NotificationBell from '@/components/layout/NotificationBell';
 import UserMenu from '@/components/layout/UserMenu';
 import { Toaster } from '@/components/ui/Toast';
+import SkipLink from '@/components/ui/SkipLink';
 import { getProfile } from '@/lib/api';
 
 type User = { name: string; email: string; plan: string; credits_remaining: number };
@@ -35,8 +36,9 @@ function DashboardShell({ children, user }: { children: React.ReactNode; user: U
     <div className="min-h-screen bg-gray-50">
       <AppSidebar />
       <MobileNav />
+      <SkipLink targetId="main-content" />
       <main className="transition-all duration-200 max-md:!ml-0" style={{ marginLeft: collapsed ? '4rem' : '15rem' }}>
-        <header className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-gray-200 px-6 py-3 flex items-center justify-between">
+        <header className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-gray-200 px-6 py-3 flex items-center justify-between" role="banner">
           <div className="flex items-center gap-4">
             <MobileMenuButton />
             <Breadcrumbs />
@@ -46,7 +48,7 @@ function DashboardShell({ children, user }: { children: React.ReactNode; user: U
             <UserMenu user={user} />
           </div>
         </header>
-        <div className="p-6 lg:p-8">{children}</div>
+        <div id="main-content" className="p-4 sm:p-6 lg:p-8" tabIndex={-1}>{children}</div>
       </main>
       <CommandPalette />
     </div>
