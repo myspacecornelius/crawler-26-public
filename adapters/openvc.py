@@ -10,10 +10,15 @@ from .base import BaseSiteAdapter, InvestorLead
 class OpenVCAdapter(BaseSiteAdapter):
     """
     Adapter for OpenVC (https://openvc.app/investors)
-    
+
     OpenVC is an open investor directory with no login required.
     Uses infinite scroll pagination and card-based layouts.
     """
+
+    ADAPTER_NAME = "openvc"
+    VERTICALS = ["vc", "angel"]
+    RATE_LIMIT_RPM = 30
+    REQUIRES_AUTH = False
 
     def parse_card(self, card) -> Optional[InvestorLead]:
         """Parse an OpenVC investor card into a lead."""

@@ -42,6 +42,11 @@ def _first_attr(card: Tag, attr: str, *selectors: str, default: str = "N/A") -> 
 class VisibleVCAdapter(BaseSiteAdapter):
     """Adapter for visible.vc/investors — public investor directory."""
 
+    ADAPTER_NAME = "visible_vc"
+    VERTICALS = ["vc"]
+    RATE_LIMIT_RPM = 30
+    REQUIRES_AUTH = False
+
     def parse_card(self, card: Tag) -> Optional[InvestorLead]:
         name = _first_text(
             card,

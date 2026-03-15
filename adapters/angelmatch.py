@@ -10,10 +10,15 @@ from .base import BaseSiteAdapter, InvestorLead
 class AngelMatchAdapter(BaseSiteAdapter):
     """
     Adapter for AngelMatch (https://angelmatch.io/investors)
-    
+
     AngelMatch is a freemium angel investor matching platform.
     Uses 'Load More' button pagination.
     """
+
+    ADAPTER_NAME = "angelmatch"
+    VERTICALS = ["angel", "vc"]
+    RATE_LIMIT_RPM = 20
+    REQUIRES_AUTH = False
 
     def parse_card(self, card) -> Optional[InvestorLead]:
         """Parse an AngelMatch investor listing into a lead."""
