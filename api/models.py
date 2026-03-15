@@ -152,6 +152,8 @@ class Lead(Base):
         Index("ix_leads_campaign_score", "campaign_id", "score"),
         Index("ix_leads_email", "email"),
         Index("ix_leads_fund", "fund"),
+        Index("ix_leads_name_fund", "name", "fund"),
+        Index("ix_leads_email_fund", "email", "fund", unique=True),
     )
 
 
@@ -204,3 +206,73 @@ class CrawlState(Base):
     __table_args__ = (
         Index("ix_crawl_state_last_crawled", "last_crawled_at"),
     )
+
+
+class PipelineLead(Base):
+    """
+    Streaming lead storage for the pipeline.
+
+    Leads are written incrementally as they are discovered (rather than
+    held in memory) and deduplicated via a unique constraint on
+    (name_normalized, fund_normalized).
+    """
+    __tablename__ = "pipeline_leads"
+
+    id = Column(GUID(), primary_key=True, default=uuid.uuid4)
+    run_id = Column(String(50), nullable=False, index=True)
+
+    # Raw + normalized identity (for dedup)
+    name = Column(String(255), nullable=False)
+    name_normalized = Column(String(255), nullable=False)
+    fund = Column(String(255), default="N/A")
+    fund_normalized = Column(String(255), default="")
+
+    # Contact info
+    email = Column(String(255), default="N/A")
+    email_status = Column(String(50), default="unknown")
+    role = Column(String(255), default="N/A")
+    linkedin = Column(String(500), default="N/A")
+    website = Column(String(500), default="")
+
+    # Investment profile
+    location = Column(String(255), default="")
+    stage = Column(String(100), default="")
+    check_size = Column(String(100), default="")
+    focus_areas = Column(Text, default="")
+
+    # Scoring
+    lead_score = Column(Integer, default=0)
+    tier = Column(String(20), default="")
+
+    # Metadata
+    source = Column(String(500), default="")
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc),
+                        onupdate=lambda: datetime.now(timezone.utc))
+
+    __table_args__ = (
+        Index("ix_pipeline_leads_name_fund", "name_normalized", "fund_normalized", unique=True),
+        Index("ix_pipeline_leads_email", "email"),
+        Index("ix_pipeline_leads_run", "run_id"),
+        Index("ix_pipeline_leads_email_fund", "email", "fund_normalized"),
+    )
+
+
+class PipelineRun(Base):
+    """
+    Tracks each pipeline execution for observability.
+    Records start/end times, stage results, and error counts.
+    """
+    __tablename__ = "pipeline_runs"
+
+    id = Column(GUID(), primary_key=True, default=uuid.uuid4)
+    run_id = Column(String(50), unique=True, nullable=False)
+    status = Column(String(50), default="running")  # running, completed, failed
+    started_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    completed_at = Column(DateTime(timezone=True), nullable=True)
+    total_leads = Column(Integer, default=0)
+    total_emails = Column(Integer, default=0)
+    total_errors = Column(Integer, default=0)
+    stages_completed = Column(Text, default="")  # comma-separated stage names
+    error_message = Column(Text, nullable=True)
+    config_snapshot = Column(JSON, default=dict)  # args used for this run
