@@ -32,6 +32,12 @@ def _first_list(card: Tag, *selectors: str) -> list:
 class WellfoundAdapter(BaseSiteAdapter):
     """Adapter for wellfound.com/investors — large angel/VC investor database."""
 
+    ADAPTER_NAME = "wellfound"
+    VERTICALS = ["vc", "angel"]
+    RATE_LIMIT_RPM = 15
+    REQUIRES_AUTH = True
+    REQUIRED_CREDENTIALS = ["wellfound_session"]
+
     def parse_card(self, card: Tag) -> Optional[InvestorLead]:
         name = _first_text(
             card,

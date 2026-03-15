@@ -5,7 +5,6 @@ Handles checkout session creation, webhook processing, and customer portal.
 Requires STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET environment variables.
 """
 
-import os
 import logging
 from datetime import datetime, timezone
 
@@ -14,16 +13,17 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import User, CreditTransaction
+from .settings import settings
 
 logger = logging.getLogger("leadfactory.billing")
 
-# ── Stripe config ──────────────────────────────
+# ── Stripe config (from centralised settings) ─
 
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "")
-STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
-STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY", "")
+stripe.api_key = settings.stripe_secret_key
+STRIPE_WEBHOOK_SECRET = settings.stripe_webhook_secret
+STRIPE_PUBLISHABLE_KEY = settings.stripe_publishable_key
 
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+FRONTEND_URL = settings.frontend_url
 
 # ── Plan definitions ───────────────────────────
 
@@ -32,19 +32,19 @@ PLANS = {
         "name": "Starter",
         "price_cents": 0,
         "credits_monthly": 500,
-        "stripe_price_id": os.getenv("STRIPE_PRICE_STARTER", ""),
+        "stripe_price_id": settings.stripe_price_starter,
     },
     "pro": {
         "name": "Pro",
         "price_cents": 4900,
         "credits_monthly": 5000,
-        "stripe_price_id": os.getenv("STRIPE_PRICE_PRO", ""),
+        "stripe_price_id": settings.stripe_price_pro,
     },
     "scale": {
         "name": "Scale",
         "price_cents": 14900,
         "credits_monthly": 25000,
-        "stripe_price_id": os.getenv("STRIPE_PRICE_SCALE", ""),
+        "stripe_price_id": settings.stripe_price_scale,
     },
 }
 
@@ -53,19 +53,19 @@ CREDIT_PACKS = {
         "name": "1,000 Credits",
         "credits": 1000,
         "price_cents": 1900,
-        "stripe_price_id": os.getenv("STRIPE_PRICE_CREDITS_1K", ""),
+        "stripe_price_id": settings.stripe_price_credits_1k,
     },
     "5k": {
         "name": "5,000 Credits",
         "credits": 5000,
         "price_cents": 7900,
-        "stripe_price_id": os.getenv("STRIPE_PRICE_CREDITS_5K", ""),
+        "stripe_price_id": settings.stripe_price_credits_5k,
     },
     "10k": {
         "name": "10,000 Credits",
         "credits": 10000,
         "price_cents": 12900,
-        "stripe_price_id": os.getenv("STRIPE_PRICE_CREDITS_10K", ""),
+        "stripe_price_id": settings.stripe_price_credits_10k,
     },
 }
 

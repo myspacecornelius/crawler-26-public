@@ -35,13 +35,7 @@ logging.basicConfig(
 logger = logging.getLogger("crawl")
 
 # ── Internal modules ──
-from adapters.openvc import OpenVCAdapter
-from adapters.angelmatch import AngelMatchAdapter
-from adapters.visible_vc import VisibleVCAdapter
-from adapters.landscape_vc import LandscapeVCAdapter
-from adapters.wellfound import WellfoundAdapter
-from adapters.signal_nfx import SignalNFXAdapter
-from adapters.crunchbase import CrunchbaseAdapter
+from adapters.registry import get_registry
 from stealth.fingerprint import FingerprintManager
 from stealth.behavior import HumanBehavior
 from stealth.proxy import ProxyManager
@@ -73,21 +67,6 @@ from enrichment.email_waterfall import EmailWaterfall  # fix: was used at line 5
 
 
 # ──────────────────────────────────────────────────
-#  Adapter Registry
-# ──────────────────────────────────────────────────
-
-ADAPTER_MAP = {
-    "openvc": OpenVCAdapter,
-    "angelmatch": AngelMatchAdapter,
-    "visible_vc": VisibleVCAdapter,
-    "landscape_vc": LandscapeVCAdapter,
-    "wellfound": WellfoundAdapter,
-    "signal_nfx": SignalNFXAdapter,
-    "crunchbase": CrunchbaseAdapter,
-}
-
-
-# ──────────────────────────────────────────────────
 #  Engine
 # ──────────────────────────────────────────────────
 
@@ -103,6 +82,7 @@ class CrawlEngine:
     def __init__(self, args):
         self.args = args
         self.config = self._load_config("config/sites.yaml")
+        self.adapter_registry = get_registry()
         self.fingerprint_mgr = FingerprintManager()
         self.behavior = HumanBehavior(speed_factor=1.0)
         self.proxy_mgr = ProxyManager("config/proxies.yaml")
@@ -393,7 +373,7 @@ class CrawlEngine:
                     continue
 
                 adapter_name = site_config.get("adapter", "")
-                adapter_class = ADAPTER_MAP.get(adapter_name)
+                adapter_class = self.adapter_registry.get(adapter_name)
 
                 if not adapter_class:
                     print(f"\n  ⚠️  No adapter found for '{adapter_name}', skipping {site_name}")
