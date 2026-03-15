@@ -1,0 +1,82 @@
+# ──────────────────────────────────────────────────
+#  LeadFactory — Tool Configuration
+# ──────────────────────────────────────────────────
+
+[tool.black]
+line-length = 120
+target-version = ["py311", "py312"]
+extend-exclude = '''
+/(
+    \.git
+  | \.venv
+  | node_modules
+  | dashboard
+  | landing
+  | data
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 120
+skip_glob = ["dashboard/*", "landing/*", "node_modules/*"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+check_untyped_defs = true
+exclude = [
+    "dashboard/",
+    "landing/",
+    "tests/",
+    "scripts/",
+    "data/",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-v --tb=short"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning",
+]
+
+[tool.flake8]
+max-line-length = 120
+extend-ignore = ["E203", "W503", "E501"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "dashboard",
+    "landing",
+    "node_modules",
+    "data",
+    ".venv",
+]
+per-file-ignores = [
+    "tests/*:E501,F401,F811",
+    "__init__.py:F401",
+]
+
+[tool.coverage.run]
+source = ["enrichment", "api", "adapters"]
+omit = [
+    "tests/*",
+    "scripts/*",
+    "dashboard/*",
+    "landing/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 30
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.",
+    "raise NotImplementedError",
+    "pass",
+]

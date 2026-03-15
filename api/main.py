@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from .database import init_db
-from .routers import users, campaigns, leads, verticals, outreach, billing, crm, portfolio
+from .routers import users, campaigns, leads, verticals, outreach, billing, crm, portfolio, analytics
 
 logger = logging.getLogger("leadfactory.api")
 
@@ -59,6 +59,7 @@ app.include_router(outreach.router, prefix="/api")
 app.include_router(billing.router, prefix="/api")
 app.include_router(portfolio.router, prefix="/api")
 app.include_router(crm.router, prefix="/api")
+app.include_router(analytics.router, prefix="/api")
 
 
 @app.get("/api/health")
