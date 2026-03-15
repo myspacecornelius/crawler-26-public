@@ -39,13 +39,7 @@ from pipeline.lead_store import LeadStore
 from config.settings import settings
 
 # ── Internal modules ──
-from adapters.openvc import OpenVCAdapter
-from adapters.angelmatch import AngelMatchAdapter
-from adapters.visible_vc import VisibleVCAdapter
-from adapters.landscape_vc import LandscapeVCAdapter
-from adapters.wellfound import WellfoundAdapter
-from adapters.signal_nfx import SignalNFXAdapter
-from adapters.crunchbase import CrunchbaseAdapter
+from adapters.registry import get_registry
 from stealth.fingerprint import FingerprintManager
 from stealth.behavior import HumanBehavior
 from stealth.proxy import ProxyManager
@@ -79,21 +73,6 @@ logger = get_logger("crawl.engine")
 
 
 # ──────────────────────────────────────────────────
-#  Adapter Registry
-# ──────────────────────────────────────────────────
-
-ADAPTER_MAP = {
-    "openvc": OpenVCAdapter,
-    "angelmatch": AngelMatchAdapter,
-    "visible_vc": VisibleVCAdapter,
-    "landscape_vc": LandscapeVCAdapter,
-    "wellfound": WellfoundAdapter,
-    "signal_nfx": SignalNFXAdapter,
-    "crunchbase": CrunchbaseAdapter,
-}
-
-
-# ──────────────────────────────────────────────────
 #  Engine
 # ──────────────────────────────────────────────────
 
@@ -111,6 +90,7 @@ class CrawlEngine:
         self.args = args
         self.run_id = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
         self.config = self._load_config(str(settings.sites_config))
+        self.adapter_registry = get_registry()
         self.fingerprint_mgr = FingerprintManager()
         self.behavior = HumanBehavior(speed_factor=1.0)
         self.proxy_mgr = ProxyManager(str(settings.proxies_config))
@@ -510,7 +490,7 @@ class CrawlEngine:
                         continue
 
                     adapter_name = site_config.get("adapter", "")
-                    adapter_class = ADAPTER_MAP.get(adapter_name)
+                    adapter_class = self.adapter_registry.get(adapter_name)
 
                     if not adapter_class:
                         print(f"\n  No adapter found for '{adapter_name}', skipping {site_name}")

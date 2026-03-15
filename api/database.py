@@ -1,43 +1,44 @@
 """
-Async database setup for PostgreSQL via SQLAlchemy + asyncpg.
+Async database setup for PostgreSQL / SQLite via SQLAlchemy.
 
-Falls back to SQLite for local development if DATABASE_URL is not set.
+Uses centralised settings for configuration and supports connection pooling
+for PostgreSQL. Falls back to NullPool for SQLite.
 """
 
-import os
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.pool import NullPool
+from sqlalchemy.pool import NullPool, QueuePool
 
 from .models import Base
+from .settings import settings
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "sqlite+aiosqlite:///./data/leadfactory.db"
-)
+# Build engine kwargs based on backend
+_engine_kwargs: dict = {"echo": settings.debug}
 
-# For PostgreSQL: replace postgres:// with postgresql+asyncpg://
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
-elif DATABASE_URL.startswith("postgresql://"):
-    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+if settings.is_sqlite:
+    _engine_kwargs["poolclass"] = NullPool
+else:
+    _engine_kwargs["poolclass"] = QueuePool
+    _engine_kwargs["pool_size"] = settings.db_pool_size
+    _engine_kwargs["max_overflow"] = settings.db_max_overflow
+    _engine_kwargs["pool_recycle"] = settings.db_pool_recycle
+    _engine_kwargs["pool_pre_ping"] = True
 
-engine = create_async_engine(
-    DATABASE_URL,
-    echo=False,
-    poolclass=NullPool if "sqlite" in DATABASE_URL else None,
-)
+engine = create_async_engine(settings.async_database_url, **_engine_kwargs)
 
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
 async def init_db():
-    """Create all tables (for development — use Alembic in production)."""
+    """Create all tables (for development — use Alembic migrations in production)."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
 
 async def get_db() -> AsyncSession:
-    """FastAPI dependency for database sessions."""
+    """FastAPI dependency for database sessions.
+
+    Uses an async context manager to ensure the session is properly closed.
+    """
     async with async_session() as session:
         try:
             yield session

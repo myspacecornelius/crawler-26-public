@@ -3,10 +3,13 @@ Incremental Crawl — freshness tracking and stale domain filtering.
 
 Provides:
 - CrawlStateManager: tracks per-domain crawl timestamps in the database
+- Content hashing for change detection
+- HTTP Last-Modified / ETag support for conditional requests
 - filter_stale_domains: returns only domains that haven't been crawled recently
 - update_lead_freshness: stamps last_verified / last_crawled_at on leads
 """
 
+import hashlib
 import logging
 import time
 from datetime import datetime, timezone, timedelta
@@ -24,11 +27,19 @@ class CrawlStateManager:
     """
     Manages per-domain crawl state using the CrawlState DB table.
     Falls back to a local JSON file if the DB is unavailable.
+
+    Supports:
+    - Per-domain crawl timestamps
+    - Content hashing for change detection
+    - HTTP Last-Modified / ETag for conditional requests
     """
 
     def __init__(self, stale_days: int = DEFAULT_STALE_DAYS):
         self.stale_days = stale_days
         self._cache: Dict[str, datetime] = {}
+        self._content_hashes: Dict[str, str] = {}
+        self._last_modified: Dict[str, str] = {}
+        self._etags: Dict[str, str] = {}
         self._db_available = False
 
     @staticmethod
@@ -140,6 +151,97 @@ class CrawlStateManager:
                 status=item.get("status", "completed"),
                 duration_s=item.get("duration_s", 0.0),
             )
+
+    @staticmethod
+    def compute_content_hash(html: str) -> str:
+        """
+        Compute a hash of the meaningful content on a page.
+        Strips whitespace and common dynamic elements to detect real changes.
+        """
+        import re
+        # Remove script and style tags
+        cleaned = re.sub(r'<script[^>]*>.*?</script>', '', html, flags=re.DOTALL | re.IGNORECASE)
+        cleaned = re.sub(r'<style[^>]*>.*?</style>', '', cleaned, flags=re.DOTALL | re.IGNORECASE)
+        # Remove HTML tags
+        cleaned = re.sub(r'<[^>]+>', ' ', cleaned)
+        # Normalize whitespace
+        cleaned = re.sub(r'\s+', ' ', cleaned).strip().lower()
+        return hashlib.sha256(cleaned.encode('utf-8')).hexdigest()[:16]
+
+    def has_content_changed(self, url: str, new_html: str) -> bool:
+        """
+        Check if a page's content has changed since the last crawl.
+        Returns True if changed or if no previous hash exists.
+        """
+        domain = self._normalize_domain(url)
+        new_hash = self.compute_content_hash(new_html)
+        old_hash = self._content_hashes.get(domain)
+        if old_hash is None:
+            return True
+        return new_hash != old_hash
+
+    def update_content_hash(self, url: str, html: str):
+        """Store the content hash for a domain."""
+        domain = self._normalize_domain(url)
+        self._content_hashes[domain] = self.compute_content_hash(html)
+
+    def get_conditional_headers(self, url: str) -> dict:
+        """
+        Return HTTP headers for conditional requests (If-Modified-Since, If-None-Match).
+        Use these when making requests to detect unchanged content.
+        """
+        domain = self._normalize_domain(url)
+        headers = {}
+        last_mod = self._last_modified.get(domain)
+        if last_mod:
+            headers["If-Modified-Since"] = last_mod
+        etag = self._etags.get(domain)
+        if etag:
+            headers["If-None-Match"] = etag
+        return headers
+
+    def update_http_headers(self, url: str, last_modified: Optional[str] = None, etag: Optional[str] = None):
+        """Store Last-Modified and ETag headers from a response."""
+        domain = self._normalize_domain(url)
+        if last_modified:
+            self._last_modified[domain] = last_modified
+        if etag:
+            self._etags[domain] = etag
+
+    async def check_last_modified(self, url: str) -> Optional[bool]:
+        """
+        Make a HEAD request to check if content has changed using HTTP headers.
+        Returns:
+          True  — content has changed (or no conditional headers available)
+          False — content is unchanged (304 Not Modified)
+          None  — check failed (network error, etc.)
+        """
+        conditional_headers = self.get_conditional_headers(url)
+        if not conditional_headers:
+            return True  # No cached headers, assume changed
+
+        try:
+            import aiohttp
+            async with aiohttp.ClientSession() as session:
+                async with session.head(
+                    url,
+                    headers={
+                        "User-Agent": "Mozilla/5.0",
+                        **conditional_headers,
+                    },
+                    timeout=aiohttp.ClientTimeout(total=10),
+                    allow_redirects=True,
+                ) as resp:
+                    if resp.status == 304:
+                        return False  # Not modified
+                    # Update stored headers from new response
+                    new_last_mod = resp.headers.get("Last-Modified")
+                    new_etag = resp.headers.get("ETag")
+                    self.update_http_headers(url, new_last_mod, new_etag)
+                    return True  # Changed or not cacheable
+        except Exception as e:
+            logger.debug(f"  [incremental] HEAD check failed for {url}: {e}")
+            return None
 
     def summary(self) -> dict:
         """Return a summary of crawl state."""
