@@ -16,6 +16,11 @@ class SignalNFXAdapter(BaseSiteAdapter):
     location, focus areas, and LinkedIn. Uses load-more pagination.
     """
 
+    ADAPTER_NAME = "signal_nfx"
+    VERTICALS = ["vc"]
+    RATE_LIMIT_RPM = 20
+    REQUIRES_AUTH = False
+
     def parse_card(self, card) -> Optional[InvestorLead]:
         """Parse a Signal investor card into a lead."""
 

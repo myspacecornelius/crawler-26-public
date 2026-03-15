@@ -31,6 +31,11 @@ def _first_list(card: Tag, *selectors: str) -> list:
 class LandscapeVCAdapter(BaseSiteAdapter):
     """Adapter for landscape.vc/investors — filterable VC directory."""
 
+    ADAPTER_NAME = "landscape_vc"
+    VERTICALS = ["vc"]
+    RATE_LIMIT_RPM = 30
+    REQUIRES_AUTH = False
+
     def parse_card(self, card: Tag) -> Optional[InvestorLead]:
         name = _first_text(
             card,
