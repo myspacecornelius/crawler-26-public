@@ -12,6 +12,7 @@ import {
   Building2,
   Briefcase,
   Settings,
+  Settings2,
   ChevronsLeft,
   ChevronsRight,
   Search,
@@ -33,6 +34,7 @@ const mainNav: NavItem[] = [
   { href: '/dashboard/crm', label: 'CRM', icon: LinkIcon },
   { href: '/dashboard/verticals', label: 'Verticals', icon: Building2 },
   { href: '/dashboard/portfolio', label: 'Portfolio', icon: Briefcase },
+  { href: '/dashboard/config', label: 'Configuration', icon: Settings2 },
 ];
 
 const bottomNav: NavItem[] = [
