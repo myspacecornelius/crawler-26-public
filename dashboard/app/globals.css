@@ -84,3 +84,56 @@ body {
 [data-state='closed'].animate-out { animation: fadeOut 150ms ease-in; }
 [data-state='open'].slide-in-from-left { animation: slideInFromLeft 200ms ease-out; }
 [data-state='closed'].slide-out-to-left { animation: slideOutToLeft 150ms ease-in; }
+
+/* High contrast mode */
+html.high-contrast {
+  --foreground: 0 0% 100%;
+  --card-foreground: 0 0% 100%;
+  --border: 0 0% 40%;
+}
+
+html.high-contrast .glass-card {
+  @apply bg-black border-gray-400;
+}
+
+html.high-contrast .hive-border {
+  @apply border-brand-400/60 hover:border-brand-300;
+}
+
+/* Reduced motion mode */
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* Respect OS reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus visible ring for keyboard navigation */
+:focus-visible {
+  @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-gray-900;
+}
+
+/* Screen reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
