@@ -16,7 +16,7 @@ from slowapi.errors import RateLimitExceeded
 from .database import init_db
 from .settings import settings
 from .routers import users, campaigns, leads, verticals, outreach, billing, crm, portfolio
-from .routers import metrics, notifications, analytics
+from .routers import metrics, notifications, analytics, config
 
 logger = logging.getLogger("leadfactory.api")
 

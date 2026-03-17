@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { CircleDot, Cloud, X } from 'lucide-react';
 import { CircleDot, Cloud, X, ArrowRight } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
@@ -152,120 +151,108 @@ export default function CRMPushForm({
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
-      <h2 className="text-lg font-semibold text-gray-900 mb-5">Push Leads to CRM</h2>
-
     <Card className="mb-8">
       <CardHeader>
         <CardTitle>Push Leads to CRM</CardTitle>
         <CardDescription>Select a campaign and configure targeting options to sync.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-      {/* Provider Toggle */}
-      <div className="mb-5">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Provider</label>
-        <div className="flex gap-3">
-          <button
-        <div className="flex gap-2">
-          <Button
-            onClick={() => setSelectedProvider('hubspot')}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              selectedProvider === 'hubspot'
-                ? 'bg-orange-100 text-orange-700 ring-1 ring-orange-300'
-                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-            }`}
-            variant={selectedProvider === 'hubspot' ? 'default' : 'outline'}
-          >
-            <CircleDot className="w-4 h-4" />
-            HubSpot
-          </button>
-          <button
-          </Button>
-          <Button
-            onClick={() => setSelectedProvider('salesforce')}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              selectedProvider === 'salesforce'
-                ? 'bg-blue-100 text-blue-700 ring-1 ring-blue-300'
-                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-            }`}
-            variant={selectedProvider === 'salesforce' ? 'default' : 'outline'}
-          >
-            <Cloud className="w-4 h-4" />
-            Salesforce
-          </button>
-          </Button>
-        </div>
-      </div>
-
-      {/* Source Campaign */}
-      <div className="mb-5">
-      <div>
-        <label htmlFor="crm-campaign" className="block text-sm font-medium text-gray-700 mb-2">Source Campaign</label>
-        <select
-          id="crm-campaign"
-          value={campaignId}
-          onChange={(e) => setCampaignId(e.target.value)}
-          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-white"
-          className="flex h-9 w-full rounded-md border border-[hsl(var(--input))] bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:ring-offset-1"
-        >
-          <option value="">Select a campaign...</option>
-          {campaigns.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name} — {c.total_leads} leads ({c.status})
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Targeting */}
-      <div className="mb-5">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Targeting</label>
-        <div className="bg-gray-50 rounded-lg p-4 space-y-4">
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-sm text-gray-600">Minimum Score</span>
-              <span className="text-sm font-medium text-gray-900">{minScore}</span>
-            </div>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={minScore}
-              onChange={(e) => setMinScore(Number(e.target.value))}
-              className="w-full accent-brand-600"
-              aria-label="Minimum Score"
-            />
+        {/* Provider Toggle */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Provider</label>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setSelectedProvider('hubspot')}
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                selectedProvider === 'hubspot'
+                  ? 'bg-orange-100 text-orange-700 ring-1 ring-orange-300'
+                  : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+              }`}
+              variant={selectedProvider === 'hubspot' ? 'default' : 'outline'}
+            >
+              <CircleDot className="w-4 h-4" />
+              HubSpot
+            </Button>
+            <Button
+              onClick={() => setSelectedProvider('salesforce')}
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                selectedProvider === 'salesforce'
+                  ? 'bg-blue-100 text-blue-700 ring-1 ring-blue-300'
+                  : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+              }`}
+              variant={selectedProvider === 'salesforce' ? 'default' : 'outline'}
+            >
+              <Cloud className="w-4 h-4" />
+              Salesforce
+            </Button>
           </div>
-          <div>
-            <span className="text-sm text-gray-600 block mb-2">Tiers</span>
-            <div className="flex gap-2">
-              {TIERS.map((tier) => (
-                <button
-                  key={tier}
-                  onClick={() => handleTierToggle(tier)}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
-                    selectedTiers.includes(tier)
-                      ? tier === 'HOT'
-                        ? 'bg-red-100 text-red-700 ring-1 ring-red-300'
-                        : tier === 'WARM'
-                        ? 'bg-amber-100 text-amber-700 ring-1 ring-amber-300'
-                        : 'bg-blue-100 text-blue-700 ring-1 ring-blue-300'
-                      : 'bg-gray-100 text-gray-500'
-                  }`}
-                >
-                  {tier}
-                </button>
-              ))}
+        </div>
+
+        {/* Source Campaign */}
+        <div>
+          <label htmlFor="crm-campaign" className="block text-sm font-medium text-gray-700 mb-2">
+            Source Campaign
+          </label>
+          <select
+            id="crm-campaign"
+            value={campaignId}
+            onChange={(e) => setCampaignId(e.target.value)}
+            className="flex h-9 w-full rounded-md border border-[hsl(var(--input))] bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:ring-offset-1"
+          >
+            <option value="">Select a campaign...</option>
+            {campaigns.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name} — {c.total_leads} leads ({c.status})
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Targeting */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Targeting</label>
+          <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-sm text-gray-600">Minimum Score</span>
+                <span className="text-sm font-medium text-gray-900">{minScore}</span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={minScore}
+                onChange={(e) => setMinScore(Number(e.target.value))}
+                className="w-full accent-brand-600"
+                aria-label="Minimum Score"
+              />
+            </div>
+            <div>
+              <span className="text-sm text-gray-600 block mb-2">Tiers</span>
+              <div className="flex gap-2">
+                {TIERS.map((tier) => (
+                  <button
+                    key={tier}
+                    onClick={() => handleTierToggle(tier)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+                      selectedTiers.includes(tier)
+                        ? tier === 'HOT'
+                          ? 'bg-red-100 text-red-700 ring-1 ring-red-300'
+                          : tier === 'WARM'
+                          ? 'bg-amber-100 text-amber-700 ring-1 ring-amber-300'
+                          : 'bg-blue-100 text-blue-700 ring-1 ring-blue-300'
+                        : 'bg-gray-100 text-gray-500'
+                    }`}
+                  >
+                    {tier}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Advanced — Field Mapping + Custom Fields */}
-      <div className="mb-5">
-      <div>
+        {/* Advanced — Field Mapping + Custom Fields */}
         <CollapsibleSection
           title="Advanced Settings"
           badge={`${Object.keys(fieldMapping).length} fields`}
@@ -292,7 +279,6 @@ export default function CRMPushForm({
                             value={crmField}
                             onChange={(e) => setFieldMapping({ ...fieldMapping, [lfField]: e.target.value })}
                             aria-label={`CRM field mapping for ${lfField}`}
-                            className="w-full px-2 py-1 border border-gray-200 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-brand-500"
                             className="flex h-8 w-full rounded-md border border-[hsl(var(--input))] bg-transparent px-2 py-1 text-xs shadow-sm"
                           >
                             <option value="">— unmapped —</option>
@@ -301,14 +287,13 @@ export default function CRMPushForm({
                             ))}
                           </select>
                         ) : (
-                          <input
                           <Input
                             type="text"
                             value={crmField}
                             onChange={(e) => setFieldMapping({ ...fieldMapping, [lfField]: e.target.value })}
                             placeholder="CRM field name"
                             aria-label={`CRM field mapping for ${lfField}`}
-                            className="w-full px-2 py-1 border border-gray-200 rounded text-xs font-mono focus:ring-1 focus:ring-brand-500"
+                            className="w-full px-2 py-1 text-xs font-mono"
                           />
                         )}
                       </td>
@@ -327,7 +312,6 @@ export default function CRMPushForm({
                 <div className="px-4 py-2 border-t border-gray-200 bg-gray-50">
                   <button
                     onClick={() => setFieldMapping({ ...defaultMapping })}
-                    className="text-xs text-brand-600 hover:text-brand-700 font-medium"
                     className="text-xs text-blue-600 hover:text-blue-700 font-medium"
                   >
                     Reset to defaults
@@ -342,51 +326,69 @@ export default function CRMPushForm({
             <h4 className="text-sm font-medium text-gray-700 mb-2">Custom Fields</h4>
             {customFields.map((cf, idx) => (
               <div key={idx} className="flex gap-2 mb-2">
-                <input
                 <Input
                   type="text"
                   value={cf.key}
                   onChange={(e) => updateCustomField(idx, 'key', e.target.value)}
                   placeholder="Field name"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
                   className="font-mono"
                 />
-                <input
                 <Input
                   type="text"
                   value={cf.value}
                   onChange={(e) => updateCustomField(idx, 'value', e.target.value)}
                   placeholder="Value"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
                 />
-                <button
                 <Button
                   onClick={() => removeCustomField(idx)}
-                  className="px-3 py-2 text-sm text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
                   variant="ghost"
                   size="icon"
                   title="Remove field"
                 >
                   <X className="w-4 h-4" />
-                </button>
                 </Button>
               </div>
             ))}
             <button
-            <button // Using a raw button for simple text action
               onClick={addCustomField}
-              className="text-sm text-brand-600 hover:text-brand-700 font-medium"
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
             >
               + Add field
             </button>
           </div>
         </CollapsibleSection>
-      </div>
 
+        {/* Error / Success */}
+        {pushError && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+            {pushError}
+          </div>
+        )}
+        {pushResult && (
+          <div className={`p-4 rounded-lg border text-sm ${
+            pushResult.failed === 0
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+              : (pushResult.created > 0 || pushResult.updated > 0)
+              ? 'bg-amber-50 border-amber-200 text-amber-700'
+              : 'bg-red-50 border-red-200 text-red-600'
+          }`}>
+            <div className="font-medium mb-1">
+              {pushResult.failed === 0
+                ? 'Push Successful'
+                : (pushResult.created > 0 || pushResult.updated > 0)
+                ? 'Push Completed with Errors'
+                : 'Push Failed'}
+            </div>
+            <div className="flex gap-6 text-xs">
+              <span><strong>{pushResult.created}</strong> created</span>
+              <span><strong>{pushResult.updated}</strong> updated</span>
+              <span><strong>{pushResult.failed}</strong> failed</span>
+            </div>
+          </div>
+        )}
       </CardContent>
-      {/* Footer: test mode + push button */}
-      <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-      <CardFooter className="flex-col items-stretch gap-4">
+
+      <CardFooter className="flex items-center justify-between gap-4 border-t">
         <label className="flex items-center gap-3 cursor-pointer">
           <div className="relative">
             <input
@@ -395,7 +397,7 @@ export default function CRMPushForm({
               onChange={(e) => setTestMode(e.target.checked)}
               className="sr-only peer"
             />
-            <div className="w-10 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-600"></div>
+            <div className="w-10 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-600" />
           </div>
           <span className="text-sm font-medium text-gray-700">Test Mode</span>
           {testMode && (
@@ -404,67 +406,12 @@ export default function CRMPushForm({
             </span>
           )}
         </label>
-      </div>
-
-      {/* Error / Success */}
-      {pushError && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
-          {pushError}
-        </div>
-      )}
-      {pushResult && (
-        <div className={`mt-4 p-4 rounded-lg border text-sm ${
-          pushResult.failed === 0
-            ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-            : pushResult.created > 0 || pushResult.updated > 0
-            ? 'bg-amber-50 border-amber-200 text-amber-700'
-            : 'bg-red-50 border-red-200 text-red-600'
-        }`}>
-          <div className="font-medium mb-1">
-            {pushResult.failed === 0 ? 'Push Successful' : pushResult.created > 0 || pushResult.updated > 0 ? 'Push Completed with Errors' : 'Push Failed'}
-        {/* Error / Success */}
-        {pushError && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
-            {pushError}
-          </div>
-          <div className="flex gap-6 text-xs">
-            <span><strong>{pushResult.created}</strong> created</span>
-            <span><strong>{pushResult.updated}</strong> updated</span>
-            <span><strong>{pushResult.failed}</strong> failed</span>
-        )}
-        {pushResult && (
-          <div className={`p-4 rounded-lg border text-sm ${
-            pushResult.failed === 0 ? 'bg-emerald-50 border-emerald-200 text-emerald-700' :
-            (pushResult.created > 0 || pushResult.updated > 0) ? 'bg-amber-50 border-amber-200 text-amber-700' :
-            'bg-red-50 border-red-200 text-red-600'
-          }`}>
-            <div className="font-medium mb-1">
-              {pushResult.failed === 0 ? 'Push Successful' : (pushResult.created > 0 || pushResult.updated > 0) ? 'Push Completed with Errors' : 'Push Failed'}
-            </div>
-            <div className="flex gap-6 text-xs">
-              <span><strong>{pushResult.created}</strong> created</span>
-              <span><strong>{pushResult.updated}</strong> updated</span>
-              <span><strong>{pushResult.failed}</strong> failed</span>
-            </div>
-          </div>
-        </div>
-      )}
-        )}
-
-      <button
-        onClick={handlePush}
-        disabled={pushing || !campaignId}
-        className="w-full mt-4 px-4 py-3 bg-brand-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {pushing ? (
-          <span className="flex items-center justify-center gap-2">
-            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-            Pushing leads...
-          </span>
-        ) : testMode ? 'Validate Mapping (Test Mode)' : 'Push to CRM'}
-      </button>
-    </div>
-        <Button onClick={handlePush} disabled={pushing || !campaignId} loading={pushing} size="lg" className="w-full">
+        <Button
+          onClick={handlePush}
+          disabled={pushing || !campaignId}
+          loading={pushing}
+          size="lg"
+        >
           {testMode ? 'Validate Mapping (Test Mode)' : 'Push to CRM'}
           {!pushing && <ArrowRight className="w-4 h-4" />}
         </Button>
