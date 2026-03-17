@@ -193,14 +193,32 @@ class GoogleSerpAPIEngine(SearchEngine):
 # ── Bing Engine ──────────────────────────────────
 
 class BingSearchEngine(SearchEngine):
-    """Bing Web Search API (free tier: 1,000 calls/month)."""
+    """Bing Web Search — two modes:
+    1. API mode (requires BING_API_KEY): Bing Web Search API v7, 1,000 free/month.
+    2. HTML scrape mode (no key): queries bing.com/search, parses result anchors.
+       Rate-limited to 1 request per 2-3 seconds to avoid blocks.
+    """
 
     name = "bing"
-    requires_key = True
+    requires_key = False  # HTML scrape works without a key
+
+    _USER_AGENTS = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_3) AppleWebKit/605.1.15 "
+        "(KHTML, like Gecko) Version/17.2 Safari/605.1.15",
+        "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0",
+    ]
 
     async def search(self, session: aiohttp.ClientSession, query: str) -> List[str]:
-        if not self.api_key:
-            return []
+        # Prefer API if key is available
+        if self.api_key:
+            return await self._search_api(session, query)
+        return await self._search_html(session, query)
+
+    async def _search_api(self, session: aiohttp.ClientSession, query: str) -> List[str]:
+        """Bing Web Search API v7."""
         headers = {"Ocp-Apim-Subscription-Key": self.api_key}
         params = {"q": query, "count": 30, "mkt": "en-US"}
         try:
@@ -211,14 +229,64 @@ class BingSearchEngine(SearchEngine):
                 timeout=aiohttp.ClientTimeout(total=15),
             ) as resp:
                 if resp.status != 200:
-                    logger.debug(f"  [{self.name}] HTTP {resp.status}")
+                    logger.debug(f"  [{self.name}] API HTTP {resp.status}")
                     return []
                 data = await resp.json()
                 pages = data.get("webPages", {}).get("value", [])
                 return [p["url"] for p in pages if "url" in p]
         except Exception as e:
-            logger.debug(f"  [{self.name}] Query failed: {e}")
+            logger.debug(f"  [{self.name}] API query failed: {e}")
             return []
+
+    async def _search_html(self, session: aiohttp.ClientSession, query: str) -> List[str]:
+        """Bing HTML scrape — no API key required."""
+        encoded = urllib.parse.quote_plus(query)
+        url = f"https://www.bing.com/search?q={encoded}&count=20&setlang=en-US"
+        headers = {
+            "User-Agent": random.choice(self._USER_AGENTS),
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Referer": "https://www.bing.com/",
+            "DNT": "1",
+        }
+        try:
+            # Polite rate limiting: 2-3 second random delay before each request
+            await asyncio.sleep(random.uniform(2.0, 3.5))
+            async with session.get(url, headers=headers, timeout=aiohttp.ClientTimeout(total=20)) as resp:
+                if resp.status != 200:
+                    logger.debug(f"  [{self.name}] HTML HTTP {resp.status}")
+                    return []
+                html = await resp.text()
+                if "captcha" in html.lower() or "blocked" in html.lower():
+                    logger.warning(f"  [{self.name}] Possible block/captcha, backing off 60s")
+                    await asyncio.sleep(60)
+                    return []
+                return self._extract_urls_html(html)
+        except Exception as e:
+            logger.debug(f"  [{self.name}] HTML query failed: {e}")
+            return []
+
+    @staticmethod
+    def _extract_urls_html(html: str) -> List[str]:
+        """Extract result URLs from Bing HTML response."""
+        urls = []
+        # Primary: Bing wraps organic results in <a> tags with class "tilk" or href starting http
+        # Pattern 1: data-href or href inside .b_algo result blocks
+        for match in re.finditer(r'<a[^>]+href="(https?://[^"]+)"[^>]*class="[^"]*tilk[^"]*"', html):
+            urls.append(match.group(1))
+        # Pattern 2: cite tags contain the displayed URL
+        for match in re.finditer(r'<cite[^>]*>(https?://[^<]+)</cite>', html):
+            u = match.group(1).strip()
+            if u.startswith("http"):
+                urls.append(u)
+        # Pattern 3: generic href extraction for result links (skip bing internal links)
+        for match in re.finditer(r'href="(https?://(?!www\.bing\.com)[^"]+)"', html):
+            u = match.group(1)
+            # Skip tracking redirects and Bing internals
+            if "/ck/a?" not in u and "bing.com" not in u and "microsoft.com" not in u:
+                urls.append(u)
+        return urls
 
 
 # ── Brave Engine ─────────────────────────────────

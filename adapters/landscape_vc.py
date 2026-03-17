@@ -1,6 +1,16 @@
 """
 CRAWL — Landscape.vc Adapter
-Scrapes the filterable VC investor directory at landscape.vc/investors.
+Scrapes investor data from landscape.vc.
+
+STATUS (2026-03): landscape.vc/investors returns a 404 — the /investors path
+no longer exists. The site is currently a VC news and analysis publication.
+config/sites.yaml has been updated with enabled: false and url: "https://landscape.vc"
+until a valid investor directory path is identified.
+
+When re-enabling: verify the correct URL path first (e.g. /directory, /database)
+and update both the url field in config/sites.yaml and the selectors below.
+The parse_card() logic uses multi-selector fallback chains that should work
+against most table-row or card-grid layouts common to VC directories.
 """
 
 from bs4 import Tag
@@ -29,7 +39,14 @@ def _first_list(card: Tag, *selectors: str) -> list:
 
 
 class LandscapeVCAdapter(BaseSiteAdapter):
-    """Adapter for landscape.vc/investors — filterable VC directory."""
+    """
+    Adapter for landscape.vc — VC news/analysis site.
+
+    NOTE: The /investors directory path returned 404 as of 2026-03.
+    This adapter is kept for when the path is rediscovered or restored.
+    Selectors use broad fallback chains to handle both table-row and
+    card-grid layouts.
+    """
 
     ADAPTER_NAME = "landscape_vc"
     VERTICALS = ["vc"]
@@ -37,38 +54,62 @@ class LandscapeVCAdapter(BaseSiteAdapter):
     REQUIRES_AUTH = False
 
     def parse_card(self, card: Tag) -> Optional[InvestorLead]:
-        name = _first_text(
-            card,
-            ".name", "td:nth-child(1) a", "td:nth-child(1)", "h3",
-            "[class*='name']", "[class*='Name']",
-        )
+        # Name — try config selector, then broad fallbacks
+        name_sel = self.selectors.get("name", "")
+        name = self._safe_text(card, name_sel) if name_sel else "N/A"
+        if not name or name == "N/A":
+            name = _first_text(
+                card,
+                "h2", "h3", "h4",
+                ".name", "[class*='name']", "[class*='Name']",
+                "td:nth-child(1) a", "td:nth-child(1)",
+            )
         if not name or name == "N/A":
             return None
 
         role = _first_text(
             card,
-            ".title", ".role", "td:nth-child(2)",
-            "[class*='title']", "[class*='role']",
+            ".title", ".role",
+            "[class*='title']", "[class*='Title']",
+            "[class*='role']", "[class*='Role']",
+            "td:nth-child(2)",
         )
         fund = _first_text(
             card,
-            ".firm", ".fund", "td:nth-child(3)",
-            "[class*='firm']", "[class*='fund']",
+            ".firm", ".fund", ".organization",
+            "[class*='firm']", "[class*='Firm']",
+            "[class*='fund']", "[class*='Fund']",
+            "td:nth-child(3)",
         )
+
         focus_areas = _first_list(
             card,
-            ".sectors span", ".focus span", "td:nth-child(4) span",
-            "[class*='sector']", "[class*='focus']",
+            ".sectors span", ".focus span",
+            "[class*='sector']", "[class*='Sector']",
+            "[class*='focus']", "[class*='Focus']",
+            "[class*='tag']", "[class*='Tag']",
+            "td:nth-child(4) span",
         )
-        # Fallback: single cell text split by comma
+        # Fallback: single-cell text split by comma
         if not focus_areas:
             raw = _first_text(card, ".sectors", ".focus", "td:nth-child(4)")
             if raw and raw != "N/A":
                 focus_areas = [s.strip() for s in raw.split(",") if s.strip()]
 
-        stage = _first_text(card, ".stage", "td:nth-child(5)", "[class*='stage']")
-        check_size = _first_text(card, ".check", "td:nth-child(6)", "[class*='check']")
-        location = _first_text(card, ".location", "td:nth-child(7)", "[class*='location']")
+        stage = _first_text(
+            card,
+            ".stage", "[class*='stage']", "[class*='Stage']", "td:nth-child(5)",
+        )
+        check_size = _first_text(
+            card,
+            ".check", "[class*='check']", "[class*='Check']", "td:nth-child(6)",
+        )
+        location = _first_text(
+            card,
+            ".location", "[class*='location']", "[class*='Location']",
+            "[class*='city']", "[class*='City']",
+            "td:nth-child(7)",
+        )
 
         linkedin = "N/A"
         li_tag = card.select_one("a[href*='linkedin.com/in/']")

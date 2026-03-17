@@ -44,8 +44,9 @@ def _run_campaign_sync(campaign_id: str, user_id: str):
     # Import here to avoid circular imports
     from sqlalchemy import create_engine
     from sqlalchemy.orm import Session
-    from .models import Campaign, Lead, User, CreditTransaction, Base
-    from .database import DATABASE_URL
+    from .models import Campaign, Lead, User, CreditTransaction
+    from .settings import settings as _settings
+    DATABASE_URL = _settings.database_url
     from verticals import load_vertical
 
     # Use sync engine for task execution
@@ -86,16 +87,18 @@ def _run_campaign_sync(campaign_id: str, user_id: str):
             finally:
                 loop.close()
 
-            # Store leads in database
-            leads_stored = 0
+            # Build lead objects in memory first so credit deduction
+            # only happens after all objects are ready (no partial commits).
+            lead_objects = []
             emails_found = 0
             for lead_data in all_leads:
-                lead = Lead(
+                email = getattr(lead_data, "email", "N/A")
+                lead_objects.append(Lead(
                     campaign_id=campaign.id,
                     name=getattr(lead_data, "name", "Unknown"),
-                    email=getattr(lead_data, "email", "N/A"),
+                    email=email,
                     email_verified=False,
-                    email_source="scraped" if getattr(lead_data, "email", "N/A") != "N/A" else "none",
+                    email_source="scraped" if email != "N/A" else "none",
                     linkedin=getattr(lead_data, "linkedin", "N/A"),
                     fund=getattr(lead_data, "fund", "N/A"),
                     role=getattr(lead_data, "role", "N/A"),
@@ -107,13 +110,15 @@ def _run_campaign_sync(campaign_id: str, user_id: str):
                     score=float(getattr(lead_data, "lead_score", 0)),
                     tier=getattr(lead_data, "tier", "COOL"),
                     source=getattr(lead_data, "source", "N/A"),
-                )
-                db.add(lead)
-                leads_stored += 1
-                if lead.email and lead.email != "N/A":
+                ))
+                if email and email != "N/A":
                     emails_found += 1
 
-            # Deduct credits (1 credit per lead with email)
+            leads_stored = len(lead_objects)
+            db.add_all(lead_objects)
+
+            # Deduct credits only after all lead objects are built — if anything
+            # above raised an exception the session will roll back untouched.
             credits_used = min(emails_found, user.credits_remaining)
             user.credits_remaining -= credits_used
 

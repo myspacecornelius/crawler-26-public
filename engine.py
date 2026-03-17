@@ -68,6 +68,7 @@ from enrichment.gravatar_oracle import GravatarOracle
 from enrichment.pgp_keyserver import PGPKeyserverScraper
 from enrichment.dedup import LeadDeduplicator
 from enrichment.email_waterfall import EmailWaterfall
+from enrichment.edgar_bulk import run_edgar_bulk_discovery
 
 logger = get_logger("crawl.engine")
 
@@ -179,6 +180,88 @@ class CrawlEngine:
             self.metrics.stage_end("discovery", error_count=1)
             print(f"  Discovery failed: {e}")
             return []
+
+    @staticmethod
+    def _fund_name_to_domain(fund_name: str) -> str:
+        """
+        Heuristically derive a probable website domain from a fund name.
+        Strips legal suffixes, punctuation, and converts to lowercase bare domain.
+        Returns '' if the name is too short or generic.
+        """
+        import re as _re
+        # Strip common legal entity suffixes
+        name = _re.sub(
+            r'\b(llc|lp|l\.p\.|ltd|limited|inc|corp|fund\s+[ixv]+|fund\s+\d+|gp|llp|plc|co\.?)\b',
+            '', fund_name, flags=_re.IGNORECASE
+        ).strip()
+        # Remove punctuation except hyphens
+        name = _re.sub(r'[,.\'"!?()&@]', '', name).strip()
+        # Collapse whitespace, convert to lowercase, strip trailing hyphens/spaces
+        slug = _re.sub(r'\s+', '', name).lower().strip('-')
+        if len(slug) < 4:
+            return ''
+        return slug + '.com'
+
+    async def _run_edgar_bulk(self):
+        """Pull Form D fund officers from SEC EDGAR at bulk scale."""
+        self.metrics.stage_start("edgar_bulk")
+        edgar_years = getattr(self.args, "edgar_years", None) or [2022, 2023, 2024]
+        max_filings = getattr(self.args, "edgar_max", 50000)
+        print(f"\n  EDGAR BULK — pulling Form D officers (years={edgar_years}, max={max_filings})...")
+        try:
+            edgar_leads = await run_edgar_bulk_discovery(
+                output_file="data/edgar_form_d.csv",
+                years=edgar_years,
+                max_filings=max_filings,
+            )
+            # Assign probable fund domains to leads so email_guesser can run.
+            # Form D XML has no website field, so we derive it from the fund name.
+            for lead in edgar_leads:
+                if not lead.website or lead.website in ("N/A", ""):
+                    guessed = self._fund_name_to_domain(lead.fund or "")
+                    if guessed:
+                        lead.website = guessed
+
+            existing_emails = {lead.email for lead in self.all_leads if lead.email and lead.email != "N/A"}
+            new_count = 0
+            for lead in edgar_leads:
+                if lead.email not in existing_emails:
+                    self.all_leads.append(lead)
+                    if lead.email and lead.email != "N/A":
+                        existing_emails.add(lead.email)
+                    new_count += 1
+            await self.lead_store.add_leads(edgar_leads, source="edgar_bulk")
+            print(f"  EDGAR: {new_count} new leads added (total {len(edgar_leads)} extracted)")
+
+            # Derive probable fund domains from extracted fund names and append to
+            # target_funds.txt so the deep crawl can find their team pages.
+            target_file = Path("data/target_funds.txt")
+            existing_domains: set[str] = set()
+            if target_file.exists():
+                existing_domains = {l.strip() for l in target_file.read_text().splitlines() if l.strip()}
+            fund_domains: list[str] = []
+            seen: set[str] = set()
+            for lead in edgar_leads:
+                fund = lead.fund or ""
+                if not fund or fund == "N/A":
+                    continue
+                d = self._fund_name_to_domain(fund)
+                if d and d not in existing_domains and d not in seen:
+                    seen.add(d)
+                    fund_domains.append(d)
+            if fund_domains:
+                with open(target_file, "a") as fh:
+                    for d in fund_domains:
+                        fh.write(d + "\n")
+                print(f"  EDGAR: {len(fund_domains)} probable fund domains added to target_funds.txt")
+
+            self.metrics.stage_end("edgar_bulk", lead_count=new_count)
+            self._stages_completed.append("edgar_bulk")
+        except Exception as e:
+            self._error_count += 1
+            self.metrics.stage_end("edgar_bulk", error_count=1)
+            print(f"  EDGAR bulk failed (continuing): {e}")
+            logger.error(f"EDGAR bulk failed: {e}", extra={"phase": "edgar_bulk"}, exc_info=self.args.verbose)
 
     async def _run_aggregator(self):
         """Run the Source Aggregator to collect leads from deterministic sources."""
@@ -457,7 +540,8 @@ class CrawlEngine:
             self.args.deep = True
             self.args.discover = True
             self.args.headless = True
-            logger.info("SCALE MODE: auto-enabling --deep --discover --headless")
+            self.args.edgar = True
+            logger.info("SCALE MODE: auto-enabling --deep --discover --headless --edgar")
 
         self._print_banner()
 
@@ -469,6 +553,10 @@ class CrawlEngine:
             # ── Stage 2: Discovery ──
             if self.args.discover:
                 await self._run_discovery()
+
+            # ── Stage 2.5: SEC EDGAR Form D bulk extraction ──
+            if getattr(self.args, 'edgar', False):
+                await self._run_edgar_bulk()
 
             # ── Stage 3: Adapter-based site crawling ──
             sites = self.config.get("sites", {})
@@ -1175,6 +1263,19 @@ def parse_args():
     parser.add_argument(
         "--scale", action="store_true",
         help="Scale mode: auto-enables --deep --discover --headless for maximum volume",
+    )
+    parser.add_argument(
+        "--edgar", action="store_true",
+        help="Pull Form D fund officers from SEC EDGAR at bulk scale (no API key required)",
+    )
+    parser.add_argument(
+        "--edgar-years", nargs="+", type=int, default=None,
+        metavar="YEAR",
+        help="Calendar years to pull EDGAR Form D filings (default: 2022 2023 2024)",
+    )
+    parser.add_argument(
+        "--edgar-max", type=int, default=50000,
+        help="Max Form D filings to process per EDGAR run (default: 50000)",
     )
     parser.add_argument(
         "--log-format", type=str, default=settings.log_format,

@@ -3,6 +3,7 @@ Configuration management endpoints — scoring weights, scraping rules.
 """
 
 import os
+import tempfile
 from pathlib import Path
 
 import yaml
@@ -50,6 +51,17 @@ class ScrapingRule(BaseModel):
 
 class ScrapingRulesResponse(BaseModel):
     rules: list[ScrapingRule]
+
+
+# ── Helpers ────────────────────────────
+
+def _atomic_yaml_write(path: Path, data: dict) -> None:
+    """Write YAML to a temp file then rename so readers never see a partial write."""
+    dir_ = path.parent
+    with tempfile.NamedTemporaryFile("w", dir=dir_, delete=False, suffix=".tmp") as tmp:
+        yaml.dump(data, tmp, default_flow_style=False, sort_keys=False)
+        tmp_path = Path(tmp.name)
+    tmp_path.replace(path)
 
 
 # ── Scoring endpoints ──────────────────────────
@@ -135,8 +147,7 @@ async def update_scoring_config(
         "COLD": 0,
     }
 
-    with open(scoring_path, "w") as f:
-        yaml.dump(existing, f, default_flow_style=False, sort_keys=False)
+    _atomic_yaml_write(scoring_path, existing)
 
     return body
 
@@ -214,7 +225,6 @@ async def add_scraping_rule(
 
     existing["sites"][body.domain] = rule_config
 
-    with open(sites_path, "w") as f:
-        yaml.dump(existing, f, default_flow_style=False, sort_keys=False)
+    _atomic_yaml_write(sites_path, existing)
 
     return body

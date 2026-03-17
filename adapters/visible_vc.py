@@ -1,7 +1,19 @@
 """
 CRAWL — Visible.vc Adapter
-Scrapes the public investor directory at visible.vc/investors.
-Uses multi-selector fallback since the site's CSS classes vary by build.
+Scrapes the investor database at connect.visible.vc/investors.
+
+STATUS (2026-03): visible.vc/investors now permanently redirects to
+visible.vc/monitor/ (a product marketing page). The actual investor database
+is at connect.visible.vc/investors and appears to require login.
+
+config/sites.yaml has been updated:
+  - url: "https://connect.visible.vc/investors"
+  - enabled: false (login wall not bypassed)
+
+Re-enable this adapter only if connect.visible.vc/investors is confirmed
+publicly accessible without authentication. The selectors below use
+[class*='...'] substring matching because connect.visible.vc is a
+React/Next.js app with CSS module hashing.
 """
 
 from bs4 import Tag
@@ -40,47 +52,73 @@ def _first_attr(card: Tag, attr: str, *selectors: str, default: str = "N/A") -> 
 
 
 class VisibleVCAdapter(BaseSiteAdapter):
-    """Adapter for visible.vc/investors — public investor directory."""
+    """
+    Adapter for connect.visible.vc/investors — investor database.
+
+    NOTE: visible.vc/investors redirects to the marketing site as of 2026-03.
+    The database lives at connect.visible.vc/investors and may require auth.
+    Selectors use data-testid attributes (where available) and [class*='...']
+    substring matching for the React CSS modules used on the connect subdomain.
+    """
 
     ADAPTER_NAME = "visible_vc"
     VERTICALS = ["vc"]
     RATE_LIMIT_RPM = 30
-    REQUIRES_AUTH = False
+    REQUIRES_AUTH = False  # May need to change to True if login is enforced
 
     def parse_card(self, card: Tag) -> Optional[InvestorLead]:
         name = _first_text(
             card,
-            ".investor-name", "h3", "h2", "[class*='name']", "[class*='Name']",
+            # data-testid attributes (React test ids survive minification)
+            "[data-testid='investor-name']",
+            # class substring matches for CSS modules
+            "[class*='InvestorName']", "[class*='investor-name']",
+            "[class*='PersonName']", "[class*='person-name']",
+            # Generic semantic fallbacks
+            "h3", "h2", "[class*='name']", "[class*='Name']",
         )
         if not name or name == "N/A":
             return None
 
         role = _first_text(
             card,
-            ".investor-title", ".title", ".role",
-            "[class*='title']", "[class*='Title']", "[class*='role']",
+            "[data-testid='investor-title']",
+            "[class*='InvestorTitle']", "[class*='investor-title']",
+            "[class*='Title']", "[class*='title']",
+            "[class*='role']", "[class*='Role']",
         )
         fund = _first_text(
             card,
-            ".fund-name", ".firm-name", ".organization",
-            "[class*='firm']", "[class*='Firm']", "[class*='fund']",
+            "[data-testid='fund-name']",
+            "[class*='FundName']", "[class*='fund-name']",
+            "[class*='FirmName']", "[class*='firm-name']",
+            "[class*='OrgName']", "[class*='org-name']",
+            "[class*='organization']",
         )
         focus_areas = _first_list(
             card,
-            ".tags .tag", ".sectors .sector", ".focus-areas span",
-            "[class*='tag']", "[class*='sector']",
+            "[data-testid='focus-area']",
+            "[class*='FocusTag']", "[class*='focus-tag']",
+            "[class*='SectorTag']", "[class*='sector-tag']",
+            "[class*='tag']", "[class*='Tag']",
         )
         stage = _first_text(
             card,
-            ".stage", ".investment-stage", "[class*='stage']",
+            "[data-testid='stage']",
+            "[class*='Stage']", "[class*='stage']",
+            "[class*='InvestmentStage']",
         )
         check_size = _first_text(
             card,
-            ".check-size", ".ticket-size", "[class*='check']", "[class*='ticket']",
+            "[data-testid='check-size']",
+            "[class*='CheckSize']", "[class*='check-size']",
+            "[class*='TicketSize']", "[class*='ticket-size']",
         )
         location = _first_text(
             card,
-            ".location", ".city", "[class*='location']", "[class*='city']",
+            "[data-testid='location']",
+            "[class*='Location']", "[class*='location']",
+            "[class*='City']", "[class*='city']",
         )
         linkedin = _first_attr(
             card, "href",

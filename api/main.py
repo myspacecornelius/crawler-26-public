@@ -13,7 +13,8 @@ from fastapi.responses import JSONResponse
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from .database import init_db
+from sqlalchemy import text
+from .database import init_db, async_session
 from .settings import settings
 from .routers import users, campaigns, leads, verticals, outreach, billing, crm, portfolio
 from .routers import metrics, notifications, analytics, config
@@ -73,4 +74,11 @@ app.include_router(analytics.router, prefix="/api")
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "service": "leadfactory"}
+    try:
+        async with async_session() as session:
+            await session.execute(text("SELECT 1"))
+        db_status = "ok"
+    except Exception as exc:
+        logger.warning("Health check DB probe failed: %s", exc)
+        db_status = "unreachable"
+    return {"status": "ok" if db_status == "ok" else "degraded", "db": db_status, "service": "leadfactory"}

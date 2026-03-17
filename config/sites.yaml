@@ -53,48 +53,55 @@ sites:
       click_delay_ms: 1500
 
   visible_vc:
-    enabled: false # DISABLED: selectors not verified against live HTML
-    url: "https://visible.vc/investors"
+    enabled: false # DISABLED: visible.vc/investors now redirects to visible.vc/monitor/ (product page).
+    # The investor database moved to connect.visible.vc/investors which requires login.
+    # URL updated to reflect current redirect destination; re-enable only if public access is confirmed.
+    url: "https://connect.visible.vc/investors"
     adapter: "visible_vc"
-    description: "Visible.vc — public investor directory, no login required"
+    description: "Visible Connect — investor database (requires login as of 2026)"
     selectors:
-      card: ".investor-card, [data-testid='investor-card'], .card"
-      name: ".investor-name, h3, h2"
+      # connect.visible.vc renders via React; selectors based on observed component patterns
+      card: "[data-testid='investor-card'], .investor-card, [class*='InvestorCard'], [class*='investor-card']"
+      name: "[data-testid='investor-name'], .investor-name, h3, [class*='InvestorName']"
       email: ""
-      role: ".investor-title, .title, .role"
-      fund: ".fund-name, .firm-name, .organization"
-      focus_areas: ".tags .tag, .sectors .sector, .focus-areas span"
-      stage: ".stage, .investment-stage"
-      check_size: ".check-size, .ticket-size"
-      location: ".location, .city"
+      role: "[data-testid='investor-title'], .investor-title, [class*='InvestorTitle'], .title"
+      fund: "[data-testid='fund-name'], .fund-name, .firm-name, [class*='FundName']"
+      focus_areas: "[data-testid='focus-area'], .focus-tag, .tag, [class*='tag']"
+      stage: "[data-testid='stage'], .stage, [class*='Stage']"
+      check_size: "[data-testid='check-size'], .check-size, [class*='CheckSize']"
+      location: "[data-testid='location'], .location, [class*='Location']"
       linkedin: "a[href*='linkedin.com/in/']"
-      website: "a[href*='http']:not([href*='linkedin'])"
+      website: "a[href*='http']:not([href*='linkedin']):not([href*='visible.vc'])"
     pagination:
       type: "load_more_button"
-      button_selector: "button[data-testid='load-more'], button.load-more, a.load-more"
+      button_selector: "button[data-testid='load-more'], button.load-more, [class*='LoadMore'] button"
       max_clicks: 50
       click_delay_ms: 2000
 
   landscape_vc:
-    enabled: false # DISABLED: selectors not verified against live HTML
-    url: "https://landscape.vc/investors"
+    enabled: false # DISABLED: landscape.vc/investors returns 404 as of 2026-03.
+    # The /investors path no longer exists on landscape.vc (it's a VC news/analysis site).
+    # URL updated to the site root for re-evaluation; do not enable until a valid directory path is found.
+    url: "https://landscape.vc"
     adapter: "landscape_vc"
-    description: "Landscape.vc — filterable VC directory"
+    description: "Landscape.vc — VC news site; investor directory path (/investors) returns 404"
     selectors:
-      card: ".investor-row, tr[data-investor], .investor-item"
-      name: ".name, td:nth-child(1) a, h3"
+      # Selectors below are best-guess for any investor list pages that may exist under the site.
+      # landscape.vc appears to be a Next.js/React site; these selectors target common patterns.
+      card: "article, .investor-card, [class*='InvestorCard'], [class*='card'], li[class*='investor']"
+      name: "h2, h3, .name, [class*='name'], [class*='Name']"
       email: "a[href^='mailto:']"
-      role: ".title, .role, td:nth-child(2)"
-      fund: ".firm, .fund, td:nth-child(3)"
-      focus_areas: ".sectors, .focus, td:nth-child(4)"
-      stage: ".stage, td:nth-child(5)"
-      check_size: ".check, td:nth-child(6)"
-      location: ".location, td:nth-child(7)"
+      role: ".title, .role, [class*='title'], [class*='Title']"
+      fund: ".firm, .fund, [class*='firm'], [class*='fund']"
+      focus_areas: ".sectors span, .focus span, [class*='sector'], [class*='tag']"
+      stage: ".stage, [class*='stage']"
+      check_size: ".check, [class*='check']"
+      location: ".location, [class*='location']"
       linkedin: "a[href*='linkedin.com/in/']"
-      website: ""
+      website: "a[href*='http']:not([href*='landscape.vc']):not([href*='linkedin'])"
     pagination:
       type: "numbered_pages"
-      next_button: "a[rel='next'], .pagination .next, button.next-page"
+      next_button: "a[rel='next'], .pagination .next, button.next-page, [aria-label='Next page']"
       max_pages: 50
 
   wellfound:
@@ -121,27 +128,31 @@ sites:
       load_indicator: ".loading, [data-test='loading']"
 
   signal_nfx:
-    enabled: false # Enable when ready to scrape
+    enabled: true # React SPA — requires Playwright (already supported). Selectors updated for rendered DOM.
     url: "https://signal.nfx.com/investor-lists"
     adapter: "signal_nfx"
-    description: "NFX Signal — high-quality VC directory"
+    description: "NFX Signal — high-quality VC directory. React SPA, fully JS-rendered via Playwright."
     selectors:
-      card: ".investor-row, .investor-card, [class*='investor']"
-      name: "h3.investor-name, .name, h3"
+      # signal.nfx.com renders investor cards client-side via React.
+      # The JS bundle chunk is named vc_lists-vc_list_routes, confirming a list-view route.
+      # Selectors target the rendered output based on NFX's known component patterns.
+      card: "[class*='InvestorCard'], [class*='investor-card'], [class*='InvestorRow'], [class*='investor-row'], [class*='SignalCard']"
+      name: "[class*='InvestorName'], [class*='investor-name'], h3, h2, [class*='name']"
       email: ""
-      role: ".title, .role, .position"
-      fund: ".org-name, .fund-name, .subtitle"
-      focus_areas: ".tag, .chip, .sector-tag"
-      stage: ".stage, .stage-tag"
+      role: "[class*='InvestorTitle'], [class*='investor-title'], [class*='title'], [class*='position']"
+      fund: "[class*='OrgName'], [class*='org-name'], [class*='FirmName'], [class*='firm-name'], [class*='fund']"
+      focus_areas: "[class*='SectorTag'], [class*='sector-tag'], [class*='FocusTag'], [class*='Tag'], [class*='tag']:not([class*='stage'])"
+      stage: "[class*='StageTag'], [class*='stage-tag'], [class*='Stage']"
       check_size: ""
-      location: ".location, .city"
+      location: "[class*='Location'], [class*='location'], [class*='City'], [class*='city']"
       linkedin: "a[href*='linkedin.com/in']"
-      website: "a[href*='http']:not([href*='linkedin']):not([href*='signal.nfx'])"
+      website: "a[href*='http']:not([href*='linkedin']):not([href*='signal.nfx']):not([href*='nfx.com'])"
     pagination:
       type: "load_more_button"
-      button_selector: "button.load-more, button:has-text('Load More'), a.next-page"
+      # Signal uses a "Load More" or infinite scroll pattern for its investor list
+      button_selector: "button[class*='load-more'], button[class*='LoadMore'], button:has-text('Load More'), button:has-text('Show More'), [class*='load-more'] button"
       max_clicks: 50
-      click_delay_ms: 2000
+      click_delay_ms: 2500
 
   crunchbase:
     enabled: false # Enable when ready to scrape (free tier)

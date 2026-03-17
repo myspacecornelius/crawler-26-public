@@ -21,6 +21,7 @@ SEED_FILES = [
     {"file": "vc_firms.csv",             "focus_col": "focus_areas", "location_col": "location"},
     {"file": "vc_firms_supplemental.csv", "focus_col": "focus_areas", "location_col": "location"},
     {"file": "vc_firms_expanded.csv",    "focus_col": "focus_areas", "location_col": "location"},
+    {"file": "vc_firms_tier2.csv",       "focus_col": "focus_areas", "location_col": "location"},
     {"file": "pe_firms.csv",             "focus_col": "sectors",     "location_col": "hq"},
     {"file": "family_offices.csv",       "focus_col": "sectors",     "location_col": "hq"},
     {"file": "corp_dev.csv",             "focus_col": "sectors",     "location_col": "hq"},

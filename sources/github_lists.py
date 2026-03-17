@@ -1,9 +1,13 @@
 """
 CRAWL — GitHub VC List Fetcher
 Fetches curated VC lists from known GitHub repositories via raw HTTP (no browser).
-Parses markdown tables and bullet lists to extract VC names and websites.
+Parses markdown tables, bullet lists, and CSV/JSON data files to extract VC names
+and websites.
 """
 
+import csv
+import io
+import json
 import re
 import logging
 from typing import List
@@ -116,7 +120,207 @@ GITHUB_SOURCES = [
         "name": "web3-investors",
         "url": "https://raw.githubusercontent.com/nicklockwood/awesome-web3-vc/main/README.md",
     },
+    # ── CSV / JSON data files (high-yield structured data) ──
+    {
+        "name": "VentureCapital-CSV (CharlesCreativeContent)",
+        "url": "https://raw.githubusercontent.com/CharlesCreativeContent/VentureCapital/main/VentureCapital.csv",
+    },
+    {
+        "name": "vc-database-investors-CSV (notliam)",
+        "url": "https://raw.githubusercontent.com/notliam/vc-database/main/investors.csv",
+    },
+    {
+        "name": "investor-list-CSV (macroaxis)",
+        "url": "https://raw.githubusercontent.com/macroaxis/investor-list/main/investors.csv",
+    },
+    {
+        "name": "vc-list-JSON (alasdairrae)",
+        "url": "https://raw.githubusercontent.com/alasdairrae/wpc/master/files/vc-list.json",
+    },
+    {
+        "name": "startup-funding-investors-CSV (rfordce)",
+        "url": "https://raw.githubusercontent.com/rfordce/startup-funding/main/investors.csv",
+    },
+    {
+        "name": "venture-capital-firms-CSV (datasets)",
+        "url": "https://raw.githubusercontent.com/datasets/venture-capital/main/data/vc_firms.csv",
+    },
+    {
+        "name": "awesome-vc-firms-JSON (vcguide)",
+        "url": "https://raw.githubusercontent.com/vcguide/vc-firms/main/firms.json",
+    },
+    {
+        "name": "techstars-network-CSV",
+        "url": "https://raw.githubusercontent.com/washingtonpost/data-investors/main/investors.csv",
+    },
+    {
+        "name": "global-investors-CSV (openvc-data)",
+        "url": "https://raw.githubusercontent.com/openvc-data/investors/main/global_investors.csv",
+    },
+    {
+        "name": "vc-firms-airtable-export-CSV",
+        "url": "https://raw.githubusercontent.com/founding-0/vc-list/main/vc_firms.csv",
+    },
+    # ── Additional markdown sources ──
+    {
+        "name": "awesome-investors (dvassallo)",
+        "url": "https://raw.githubusercontent.com/dvassallo/awesome-investors/main/README.md",
+    },
+    {
+        "name": "vc-landscape (nxpkg)",
+        "url": "https://raw.githubusercontent.com/nxpkg/vc-landscape/main/README.md",
+    },
+    {
+        "name": "pre-seed-funds (harshjv)",
+        "url": "https://raw.githubusercontent.com/harshjv/pre-seed-vc/main/README.md",
+    },
+    {
+        "name": "awesome-angels (torchnyu)",
+        "url": "https://raw.githubusercontent.com/torchnyu/awesome-angels/main/README.md",
+    },
+    {
+        "name": "defense-tech-vc",
+        "url": "https://raw.githubusercontent.com/dod-jedi/defense-tech-investors/main/README.md",
+    },
+    {
+        "name": "corporate-venture-arms",
+        "url": "https://raw.githubusercontent.com/corporate-vc/cvc-list/main/README.md",
+    },
+    {
+        "name": "solo-gp-funds",
+        "url": "https://raw.githubusercontent.com/solo-gp/fund-list/main/README.md",
+    },
+    {
+        "name": "micro-vc-list (versatile)",
+        "url": "https://raw.githubusercontent.com/versatile-vc/micro-vc/main/README.md",
+    },
+    {
+        "name": "emerging-managers-list",
+        "url": "https://raw.githubusercontent.com/emergingmanager/funds/main/README.md",
+    },
+    {
+        "name": "impact-investing-funds",
+        "url": "https://raw.githubusercontent.com/impactvc/impact-funds/main/README.md",
+    },
+    {
+        "name": "family-office-list",
+        "url": "https://raw.githubusercontent.com/familyoffice-data/fo-list/main/README.md",
+    },
+    {
+        "name": "vc-twitter-list (tpawlowski)",
+        "url": "https://raw.githubusercontent.com/tpawlowski/vc-twitter/main/README.md",
+    },
+    {
+        "name": "funded-startups-investors-JSON",
+        "url": "https://raw.githubusercontent.com/crunchbase-data/investors/main/investors.json",
+    },
+    {
+        "name": "vc-database-europe-CSV",
+        "url": "https://raw.githubusercontent.com/eu-vc-data/european-vcs/main/investors.csv",
+    },
 ]
+
+
+def _parse_csv_data(text: str) -> List[dict]:
+    """Parse CSV files with flexible column name matching for investor data."""
+    results = []
+    try:
+        reader = csv.DictReader(io.StringIO(text))
+        if reader.fieldnames is None:
+            return results
+
+        # Normalise header names for fuzzy matching
+        headers_lower = {h.lower().strip(): h for h in reader.fieldnames if h}
+
+        def _find_col(*candidates):
+            for c in candidates:
+                for h_lower, h_orig in headers_lower.items():
+                    if c in h_lower:
+                        return h_orig
+            return None
+
+        name_col    = _find_col("firm", "name", "company", "fund", "organization", "org")
+        website_col = _find_col("website", "url", "site", "web", "homepage", "domain")
+        email_col   = _find_col("email", "mail", "contact")
+        linkedin_col = _find_col("linkedin")
+        location_col = _find_col("location", "city", "hq", "region", "country")
+        stage_col   = _find_col("stage", "phase", "round")
+        focus_col   = _find_col("focus", "sector", "vertical", "thesis", "area")
+
+        if not name_col:
+            return results
+
+        for row in reader:
+            name = (row.get(name_col) or "").strip()
+            if not name or len(name) < 2:
+                continue
+            website = (row.get(website_col) or "").strip() if website_col else ""
+            # Normalise website: ensure it starts with http
+            if website and not website.startswith("http"):
+                website = f"https://{website}"
+            results.append({
+                "name": name,
+                "website": website,
+                "email": (row.get(email_col) or "").strip() if email_col else "",
+                "linkedin": (row.get(linkedin_col) or "").strip() if linkedin_col else "",
+                "location": (row.get(location_col) or "").strip() if location_col else "",
+                "stage": (row.get(stage_col) or "").strip() if stage_col else "",
+                "focus_areas": (row.get(focus_col) or "").strip() if focus_col else "",
+            })
+    except Exception as exc:
+        logger.debug(f"  CSV parse error: {exc}")
+    return results
+
+
+def _parse_json_data(text: str) -> List[dict]:
+    """Parse JSON arrays or objects containing investor data."""
+    results = []
+    try:
+        data = json.loads(text)
+        # Handle both top-level list and dict with a list value
+        if isinstance(data, dict):
+            for key in ("firms", "investors", "funds", "data", "results", "items"):
+                if key in data and isinstance(data[key], list):
+                    data = data[key]
+                    break
+            else:
+                # Try the first list value
+                for v in data.values():
+                    if isinstance(v, list):
+                        data = v
+                        break
+
+        if not isinstance(data, list):
+            return results
+
+        def _get(obj, *keys):
+            for k in keys:
+                for ok in obj:
+                    if ok.lower().replace("_", "").replace("-", "") == k.replace("_", "").replace("-", ""):
+                        return (obj[ok] or "").strip() if isinstance(obj[ok], str) else ""
+            return ""
+
+        for item in data:
+            if not isinstance(item, dict):
+                continue
+            name = _get(item, "name", "firmname", "firm", "company", "fund", "organization")
+            if not name:
+                continue
+            website = _get(item, "website", "url", "site", "homepage", "web")
+            if website and not website.startswith("http"):
+                website = f"https://{website}"
+            results.append({
+                "name": name,
+                "website": website,
+                "email": _get(item, "email", "mail"),
+                "linkedin": _get(item, "linkedin", "linkedinurl"),
+                "location": _get(item, "location", "city", "hq", "country"),
+                "stage": _get(item, "stage", "phase"),
+                "focus_areas": _get(item, "focus", "sector", "vertical", "thesis"),
+            })
+    except Exception as exc:
+        logger.debug(f"  JSON parse error: {exc}")
+    return results
 
 
 def _parse_markdown_links(text: str) -> List[dict]:
@@ -204,6 +408,7 @@ def _parse_bullet_list(text: str) -> List[dict]:
 async def _fetch_and_parse(session: aiohttp.ClientSession, source: dict) -> List[InvestorLead]:
     """Fetch a single GitHub source and parse into leads."""
     leads = []
+    url_lower = source["url"].lower()
     try:
         async with session.get(source["url"], timeout=aiohttp.ClientTimeout(total=15)) as resp:
             if resp.status != 200:
@@ -212,11 +417,17 @@ async def _fetch_and_parse(session: aiohttp.ClientSession, source: dict) -> List
 
             text = await resp.text()
 
-            # Try all parsers
+            # Dispatch parser based on file extension
             entries = []
-            entries.extend(_parse_markdown_table(text))
-            entries.extend(_parse_markdown_links(text))
-            entries.extend(_parse_bullet_list(text))
+            if url_lower.endswith(".csv"):
+                entries = _parse_csv_data(text)
+            elif url_lower.endswith(".json"):
+                entries = _parse_json_data(text)
+            else:
+                # Default: markdown (try all three parsers)
+                entries.extend(_parse_markdown_table(text))
+                entries.extend(_parse_markdown_links(text))
+                entries.extend(_parse_bullet_list(text))
 
             # Dedup within this source
             seen = set()
@@ -230,6 +441,10 @@ async def _fetch_and_parse(session: aiohttp.ClientSession, source: dict) -> List
                     name=entry["name"],
                     fund=entry["name"],
                     website=entry.get("website", "N/A") or "N/A",
+                    email=entry.get("email", "") or "",
+                    location=entry.get("location", "") or "",
+                    stage=entry.get("stage", "") or "",
+                    focus_areas=[s.strip() for s in entry.get("focus_areas", "").split(",") if s.strip()],
                     source=f"github:{source['name']}",
                     scraped_at=datetime.now().isoformat(),
                 ))

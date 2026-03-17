@@ -62,7 +62,10 @@ async def _event_generator(user_id: str, request: Request):
                 # Send keepalive ping every 30s
                 yield f": keepalive\n\n"
     finally:
-        _user_queues.get(user_id, []).remove(queue) if queue in _user_queues.get(user_id, []) else None
+        try:
+            _user_queues.get(user_id, []).remove(queue)
+        except ValueError:
+            pass
         if user_id in _user_queues and not _user_queues[user_id]:
             del _user_queues[user_id]
 

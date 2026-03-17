@@ -7,8 +7,10 @@ import io
 from uuid import UUID
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy import select, func, or_, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,6 +18,8 @@ from ..database import get_db
 from ..models import Campaign, Lead
 from ..schemas import LeadResponse, LeadList, OptOutResponse
 from ..auth import get_current_user_id
+
+_limiter = Limiter(key_func=get_remote_address)
 
 router = APIRouter(prefix="/leads", tags=["leads"])
 
@@ -334,8 +338,12 @@ async def optout_lead(
     user_id: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
 ):
-    """Opt a lead out (authenticated, by lead ID)."""
-    result = await db.execute(select(Lead).where(Lead.id == lead_id))
+    """Opt a lead out (authenticated, by lead ID). Requires the lead to belong to the caller's campaign."""
+    result = await db.execute(
+        select(Lead)
+        .join(Campaign, Lead.campaign_id == Campaign.id)
+        .where(Lead.id == lead_id, Campaign.user_id == UUID(user_id))
+    )
     lead = result.scalar_one_or_none()
     if not lead:
         raise HTTPException(status_code=404, detail="Lead not found")
@@ -346,7 +354,9 @@ async def optout_lead(
 
 
 @router.get("/optout", response_model=OptOutResponse)
+@_limiter.limit("10/minute")
 async def optout_by_email(
+    request: Request,
     email: str = Query(..., description="Email address to opt out"),
     db: AsyncSession = Depends(get_db),
 ):

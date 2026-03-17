@@ -75,8 +75,10 @@ async def run_campaign(
     if campaign.status == "running":
         raise HTTPException(status_code=409, detail="Campaign is already running")
 
-    # Check user credits
-    user_result = await db.execute(select(User).where(User.id == UUID(user_id)))
+    # Check user credits — use SELECT FOR UPDATE to prevent double-spend races
+    user_result = await db.execute(
+        select(User).where(User.id == UUID(user_id)).with_for_update()
+    )
     user = user_result.scalar_one_or_none()
     if user.credits_remaining <= 0:
         raise HTTPException(status_code=402, detail="Insufficient credits")

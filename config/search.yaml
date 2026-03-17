@@ -19,8 +19,8 @@ discovery:
       enabled: false                        # SerpAPI: 100 free searches/month
       # api_key: "YOUR_SERPAPI_KEY"          # or set GOOGLE_API_KEY env var
     bing:
-      enabled: false                        # Bing Web Search: 1,000 free/month
-      # api_key: "YOUR_BING_KEY"            # or set BING_API_KEY env var
+      enabled: true                         # HTML scrape mode (no key needed); set BING_API_KEY for API mode
+      # api_key: "YOUR_BING_KEY"            # or set BING_API_KEY env var (optional — enables API mode)
     brave:
       enabled: false                        # Brave Search: 2,000 free/month
       # api_key: "YOUR_BRAVE_KEY"           # or set BRAVE_API_KEY env var
