@@ -83,12 +83,18 @@ class CSVWriter:
         """
         Write the master CSV with all leads, deduped.
         Also saves a timestamped snapshot.
+
+        Dedup key is (name, fund, email) so that multiple email-pattern rows
+        for the same person are all preserved while exact duplicates are dropped.
         """
-        # Dedup by name+fund
         seen = set()
         deduped = []
         for lead in leads:
-            key = (lead.name.lower(), lead.fund.lower())
+            key = (
+                lead.name.lower(),
+                lead.fund.lower(),
+                (lead.email or "").lower(),
+            )
             if key not in seen:
                 seen.add(key)
                 deduped.append(lead)

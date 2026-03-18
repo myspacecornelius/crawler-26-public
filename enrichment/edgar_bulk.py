@@ -121,19 +121,13 @@ def _parse_company_idx(raw: str) -> list[dict]:
             data_lines.append(line)
 
     for line in data_lines:
-        # The format is fixed-width but the most reliable split is on the CIK
-        # column (10-char right-padded after form type). We use a regex.
+        # Fixed-width format: company name (62), form type (variable),
+        # CIK (non-zero-padded int), date, filename.
         m = re.match(
-            r"^(.{62})(.{12})(\d{10})\s+(\d{4}-\d{2}-\d{2})\s+(\S+)",
+            r"^(.{62})\s*(\S+)\s+(\d+)\s+(\d{4}-\d{2}-\d{2})\s+(\S+)",
             line,
         )
         if not m:
-            # Try a looser split for lines with varying whitespace
-            parts = line.split()
-            if len(parts) < 4:
-                continue
-            # Detect form type — it's typically the second-to-last word before cik
-            # Fall through to regex-only for cleanliness.
             continue
 
         company_name = m.group(1).strip()

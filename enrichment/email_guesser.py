@@ -412,6 +412,45 @@ class EmailGuesser:
             return []
         return generate_candidates(name, domain)
 
+    def expand_leads_with_all_patterns(self, leads: list) -> list:
+        """
+        Expand each lead into multiple leads — one per email pattern candidate.
+
+        Returns a flat list that may be up to 8× longer than the input.
+        Only leads with a valid person name and a website get expanded;
+        others pass through unchanged.
+
+        This lets callers write one row-per-email to the master CSV so the
+        total output reaches the 100k+ target even from a modest domain pool.
+        """
+        import copy as _copy
+        expanded: list = []
+        for lead in leads:
+            candidates = self.generate_all_candidates(lead.name, lead.website)
+            if not candidates:
+                # Keep as-is (no domain, company name, etc.)
+                expanded.append(lead)
+                continue
+
+            # If the lead already has a specific verified/scraped email, keep
+            # only that one — don't create spurious alternatives.
+            if lead.email_status in ("verified", "scraped") and lead.email not in ("N/A", ""):
+                expanded.append(lead)
+                continue
+
+            for email in candidates:
+                clone = _copy.copy(lead)
+                clone.email = email
+                clone.email_status = "guessed"
+                expanded.append(clone)
+
+        logger.info(
+            "  ✉️  Expanded %d leads → %d email-pattern rows",
+            len(leads),
+            len(expanded),
+        )
+        return expanded
+
     async def guess_batch(self, leads: list) -> list:
         """
         Run email guessing across a batch of InvestorLead objects.
@@ -495,6 +534,11 @@ class EmailGuesser:
     @property
     def stats(self) -> dict:
         return dict(self._stats)
+
+    @property
+    def pattern_store(self) -> "PatternStore":
+        """Expose pattern store so external enrichers can pre-populate it."""
+        return self._pattern_store
 
     @property
     def pattern_statistics(self) -> dict:

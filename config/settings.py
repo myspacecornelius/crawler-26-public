@@ -95,7 +95,7 @@ class CrawlSettings(BaseSettings):
     )
 
     # ── Pipeline ─────────────────────────────────────────────────
-    target_lead_count: int = Field(30000, description="Target total lead count")
+    target_lead_count: int = Field(150000, description="Target total lead count")
     lead_batch_size: int = Field(100, description="Batch size for DB persistence of leads")
 
     # ── Config file paths ────────────────────────────────────────

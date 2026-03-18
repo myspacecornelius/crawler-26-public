@@ -68,6 +68,7 @@ from enrichment.gravatar_oracle import GravatarOracle
 from enrichment.pgp_keyserver import PGPKeyserverScraper
 from enrichment.dedup import LeadDeduplicator
 from enrichment.email_waterfall import EmailWaterfall
+from enrichment.hunter_domain_finder import HunterDomainFinder
 from enrichment.edgar_bulk import run_edgar_bulk_discovery
 
 logger = get_logger("crawl.engine")
@@ -97,6 +98,9 @@ class CrawlEngine:
         self.proxy_mgr = ProxyManager(str(settings.proxies_config))
         self.email_validator = EmailValidator()
         self.email_guesser = EmailGuesser(concurrency=settings.concurrency)
+        self.hunter_finder = HunterDomainFinder(
+            pattern_store=self.email_guesser.pattern_store,
+        )
         self.scorer = LeadScorer(str(settings.scoring_config))
         self.csv_writer = CSVWriter(str(settings.data_dir))
         self.webhook = WebhookNotifier(
@@ -233,27 +237,55 @@ class CrawlEngine:
             await self.lead_store.add_leads(edgar_leads, source="edgar_bulk")
             print(f"  EDGAR: {new_count} new leads added (total {len(edgar_leads)} extracted)")
 
-            # Derive probable fund domains from extracted fund names and append to
-            # target_funds.txt so the deep crawl can find their team pages.
+            # Derive and DNS-verify fund domains, then add to target_funds.txt
+            # so the deep crawl can find their team pages.
             target_file = Path("data/target_funds.txt")
             existing_domains: set[str] = set()
             if target_file.exists():
                 existing_domains = {l.strip() for l in target_file.read_text().splitlines() if l.strip()}
-            fund_domains: list[str] = []
-            seen: set[str] = set()
+
+            # Collect unique fund names and generate domain candidates
+            from scripts.verify_fund_domains import domain_candidates as _domain_candidates
+            import socket as _socket
+
+            fund_candidates: list[str] = []
+            cand_seen: set[str] = set()
             for lead in edgar_leads:
                 fund = lead.fund or ""
                 if not fund or fund == "N/A":
                     continue
-                d = self._fund_name_to_domain(fund)
-                if d and d not in existing_domains and d not in seen:
-                    seen.add(d)
-                    fund_domains.append(d)
-            if fund_domains:
+                for cand in _domain_candidates(fund):
+                    if cand not in existing_domains and cand not in cand_seen:
+                        cand_seen.add(cand)
+                        fund_candidates.append(cand)
+
+            # DNS-verify candidates asynchronously (batch, 200 concurrent)
+            verified_domains: list[str] = []
+            if fund_candidates:
+                print(f"  EDGAR: DNS-verifying {len(fund_candidates)} fund domain candidates...")
+                sem = asyncio.Semaphore(200)
+                loop = asyncio.get_event_loop()
+
+                async def _check(d: str) -> tuple:
+                    async with sem:
+                        try:
+                            result = await loop.run_in_executor(
+                                None,
+                                lambda: _socket.getaddrinfo(d, None, _socket.AF_INET, _socket.SOCK_STREAM),
+                            )
+                            return d, bool(result)
+                        except Exception:
+                            return d, False
+
+                checks = await asyncio.gather(*[_check(d) for d in fund_candidates])
+                verified_domains = [d for d, ok in checks if ok]
+                print(f"  EDGAR: {len(verified_domains)}/{len(fund_candidates)} fund domains verified via DNS")
+
+            if verified_domains:
                 with open(target_file, "a") as fh:
-                    for d in fund_domains:
+                    for d in sorted(verified_domains):
                         fh.write(d + "\n")
-                print(f"  EDGAR: {len(fund_domains)} probable fund domains added to target_funds.txt")
+                print(f"  EDGAR: {len(verified_domains)} verified fund domains added to target_funds.txt")
 
             self.metrics.stage_end("edgar_bulk", lead_count=new_count)
             self._stages_completed.append("edgar_bulk")
@@ -802,6 +834,21 @@ class CrawlEngine:
             logger.error(f"Email validation failed: {e}", extra={"phase": "validation"}, exc_info=True)
             print(f"  Email validation failed (continuing): {e}")
 
+        # ── Hunter domain search (pattern + known contacts, 1 call/domain) ──
+        if self.hunter_finder.enabled:
+            try:
+                self.all_leads = await self.hunter_finder.enrich_leads(self.all_leads)
+                self._checkpoint("hunter")
+            except Exception as e:
+                self._error_count += 1
+                logger.error(
+                    f"Hunter domain finder failed: {e}",
+                    extra={"phase": "hunter"}, exc_info=True,
+                )
+                print(f"  Hunter domain finder failed (continuing): {e}")
+        else:
+            logger.debug("Hunter domain finder disabled (no HUNTER_API_KEY)")
+
         # ── Email guessing (for leads still missing an email) ──
         try:
             print("  Guessing emails for contacts without one...")
@@ -832,6 +879,14 @@ class CrawlEngine:
             self._error_count += 1
             logger.error(f"Email guessing failed: {e}", extra={"phase": "guesser"}, exc_info=True)
             print(f"  Email guessing failed (continuing): {e}")
+
+        # ── Email pattern expansion (--expand-emails) ──
+        if getattr(self.args, 'expand_emails', False):
+            pre = len(self.all_leads)
+            self.all_leads = self.email_guesser.expand_leads_with_all_patterns(
+                self.all_leads
+            )
+            print(f"  Expanded {pre} contacts → {len(self.all_leads)} email-pattern rows")
 
         # ── Greyhat enrichment ──
         if not getattr(self.args, 'skip_greyhat', False):
@@ -1276,6 +1331,10 @@ def parse_args():
     parser.add_argument(
         "--edgar-max", type=int, default=50000,
         help="Max Form D filings to process per EDGAR run (default: 50000)",
+    )
+    parser.add_argument(
+        "--expand-emails", action="store_true",
+        help="Expand each contact into one row per email pattern (up to 8x volume)",
     )
     parser.add_argument(
         "--log-format", type=str, default=settings.log_format,
