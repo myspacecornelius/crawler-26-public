@@ -112,7 +112,7 @@ class EmailValidator:
                 "valid_format": bool,
                 "is_disposable": bool,
                 "is_role_based": bool,
-                "has_mx": bool | None,
+                "has_mx": Optional[bool],
                 "dns_error": bool,
                 "needs_retry": bool,
                 "quality": "high" | "medium" | "low" | "invalid"

@@ -272,10 +272,11 @@ class TestStep4_NewAdapters:
         assert WellfoundAdapter is not None
 
     def test_new_adapters_registered_in_engine(self):
-        import engine
+        from adapters.registry import get_registry
+        registry = get_registry()
         for key in ("visible_vc", "landscape_vc", "wellfound"):
-            assert key in engine.ADAPTER_MAP, (
-                f"'{key}' not registered in engine.ADAPTER_MAP"
+            assert registry.get(key) is not None, (
+                f"'{key}' not registered in registry"
             )
 
     def test_new_adapters_in_sites_yaml(self):

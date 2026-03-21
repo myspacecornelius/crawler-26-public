@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from adapters.base import InvestorLead
 from enrichment.email_guesser import (
     detect_pattern, generate_candidates, _extract_domain,
-    _PatternCache, EmailGuesser, _normalize,
+    PatternStore, EmailGuesser, _normalize,
 )
 from enrichment.email_validator import EmailValidator
 
@@ -65,53 +65,53 @@ class TestPatternDetection:
         assert pattern == "{first}@{domain}"
 
 
-class TestPatternCache:
+class TestPatternStore:
     def test_learn_and_get(self):
-        cache = _PatternCache()
+        cache = PatternStore()
         cache.learn("accel.com", "john@accel.com", "John Smith")
         assert cache.get("accel.com") == "{first}@{domain}"
 
     def test_apply_known_pattern(self):
-        cache = _PatternCache()
+        cache = PatternStore()
         cache.learn("accel.com", "john@accel.com", "John Smith")
         email = cache.apply("Jane Doe", "accel.com")
         assert email == "jane@accel.com"
 
     def test_apply_unknown_domain_returns_none(self):
-        cache = _PatternCache()
+        cache = PatternStore()
         assert cache.apply("Jane Doe", "unknown.com") is None
 
     def test_learn_does_not_overwrite(self):
-        cache = _PatternCache()
+        cache = PatternStore()
         cache.learn("accel.com", "john@accel.com", "John Smith")
         cache.learn("accel.com", "john.smith@accel.com", "John Smith")
         # First pattern should stick
         assert cache.get("accel.com") == "{first}@{domain}"
 
     def test_domains_known_count(self):
-        cache = _PatternCache()
+        cache = PatternStore()
         assert cache.domains_known == 0
         cache.learn("a.com", "john@a.com", "John Smith")
         cache.learn("b.com", "john.smith@b.com", "John Smith")
         assert cache.domains_known == 2
 
     def test_apply_with_first_dot_last_pattern(self):
-        cache = _PatternCache()
+        cache = PatternStore()
         cache.learn("fund.com", "john.smith@fund.com", "John Smith")
         email = cache.apply("Alice Johnson", "fund.com")
         assert email == "alice.johnson@fund.com"
 
     def test_apply_returns_none_for_single_name(self):
-        cache = _PatternCache()
+        cache = PatternStore()
         cache.learn("fund.com", "john@fund.com", "John Smith")
         assert cache.apply("Madonna", "fund.com") is None
 
 
 class TestGuesserPatternIntegration:
-    def test_guesser_has_pattern_cache(self):
+    def test_guesser_has_pattern_store(self):
         guesser = EmailGuesser()
-        assert hasattr(guesser, '_pattern_cache')
-        assert isinstance(guesser._pattern_cache, _PatternCache)
+        assert hasattr(guesser, '_pattern_store')
+        assert isinstance(guesser._pattern_store, PatternStore)
 
     def test_guesser_stats_has_pattern_hits(self):
         guesser = EmailGuesser()
@@ -128,7 +128,7 @@ class TestGuesserPatternIntegration:
             with patch.object(guesser, 'guess', new=AsyncMock(return_value=None)):
                 await guesser.guess_batch(leads)
             # Pattern should have been learned
-            assert guesser._pattern_cache.get("fund.com") == "{first}@{domain}"
+            assert guesser._pattern_store.get("fund.com") == "{first}@{domain}"
             # Jane should get pattern-based email
             assert leads[1].email == "jane@fund.com"
         asyncio.run(run())

@@ -1,0 +1,13 @@
+{
+  "patterns": {
+    "example.com": {
+      "{first}@{domain}": 1
+    },
+    "fund.com": {
+      "{first}@{domain}": 6
+    },
+    "acme.vc": {
+      "{first}@{domain}": 1
+    }
+  }
+}

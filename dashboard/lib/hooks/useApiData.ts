@@ -79,11 +79,13 @@ export interface Lead {
   fund: string;
   role?: string;
   website?: string;
+  /** Semicolon-separated string from backend. Split on ";" before display. */
   sectors?: string;
   check_size?: string;
   stage?: string;
   hq?: string;
   score: number;
+  /** HOT | WARM | COOL | COLD */
   tier: string;
   source?: string;
   opted_out: boolean;
@@ -126,6 +128,51 @@ export interface Vertical {
   description: string;
   seed_count: number;
   search_queries?: string[];
+}
+
+export interface ScoringWeights {
+  stage_match: number;
+  sector_match: number;
+  check_size_fit: number;
+  portfolio_relevance: number;
+  recency: number;
+}
+
+export interface TierThresholds {
+  hot: number;
+  warm: number;
+  cool: number;
+}
+
+export interface ScoringConfig {
+  weights: ScoringWeights;
+  tiers: TierThresholds;
+}
+
+export interface ScrapingRule {
+  domain: string;
+  team_page_selector: string;
+  name_selector: string;
+  role_selector: string;
+  email_selector: string;
+  pagination_type: string;
+  pagination_selector: string;
+  enabled: boolean;
+}
+
+export interface ApiKeyInfo {
+  id: string;
+  name: string;
+  is_active: boolean;
+  created_at: string;
+  last_used?: string;
+}
+
+export interface ApiKeyCreated {
+  id: string;
+  name: string;
+  key: string;
+  created_at: string;
 }
 
 /* ── Hooks ──────────────────────────────────────────── */

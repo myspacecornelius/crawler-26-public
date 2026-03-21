@@ -5,13 +5,17 @@ Handles common operations: page loading, pagination, data extraction.
 """
 
 import asyncio
+import logging
+import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field, asdict
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
-from playwright.async_api import Page
 from bs4 import BeautifulSoup
+from playwright.async_api import Page
+
+logger = logging.getLogger(__name__)
 
 
 # ──────────────────────────────────────────────────
@@ -61,6 +65,7 @@ class BaseSiteAdapter(ABC):
         self.pagination = site_config.get("pagination", {})
         self.stealth = stealth_module
         self.leads: list[InvestorLead] = []
+        self._seen_names: set[str] = set()  # O(1) dedup within adapter
 
     @property
     def name(self) -> str:
@@ -176,7 +181,8 @@ class BaseSiteAdapter(ABC):
 
                 await page.wait_for_timeout(click_delay)
 
-            except Exception:
+            except Exception as e:
+                logger.debug("load_more stopped for %s: %s", self.name, e)
                 break
 
         await self._extract_from_page(page)
@@ -208,7 +214,8 @@ class BaseSiteAdapter(ABC):
                 else:
                     await page.wait_for_timeout(1500)
 
-            except Exception:
+            except Exception as e:
+                logger.debug("pagination stopped for %s at page %d: %s", self.name, i + 1, e)
                 break
 
     async def _extract_from_page(self, page: Page, silent: bool = False):
@@ -237,12 +244,12 @@ class BaseSiteAdapter(ABC):
                 if lead and lead.name and lead.name != "N/A":
                     lead.source = self.url
                     lead.scraped_at = datetime.now().isoformat()
-                    # Dedup by name within this adapter
-                    if not any(existing.name == lead.name for existing in self.leads):
+                    if lead.name not in self._seen_names:
+                        self._seen_names.add(lead.name)
                         self.leads.append(lead)
                         new_leads += 1
             except Exception as e:
-                continue
+                logger.debug("parse_card failed for %s: %s", self.name, e)
 
         if not silent:
             print(f"  ➕  {new_leads} new unique leads extracted")
@@ -297,7 +304,6 @@ class BaseSiteAdapter(ABC):
         # Strategy 2: scan for email-like text
         text = card.get_text()
         if "@" in text:
-            import re
             matches = re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', text)
             if matches:
                 return matches[0]

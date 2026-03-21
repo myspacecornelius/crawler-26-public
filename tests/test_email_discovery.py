@@ -101,7 +101,7 @@ async def test_discover_pattern_finds_first_at_domain():
     result = await guesser._discover_domain_pattern("John Smith", "acme.com")
     assert result == "john@acme.com"
     assert guesser._stats["patterns_discovered"] == 1
-    assert guesser._pattern_cache.get("acme.com") == "{first}@{domain}"
+    assert guesser._pattern_store.get("acme.com") == "{first}@{domain}"
 
 
 @pytest.mark.anyio
@@ -116,7 +116,7 @@ async def test_discover_pattern_all_fail_returns_none():
     result = await guesser._discover_domain_pattern("John Smith", "acme.com")
     assert result is None
     assert guesser._stats["patterns_discovered"] == 0
-    assert guesser._pattern_cache.get("acme.com") is None
+    assert guesser._pattern_store.get("acme.com") is None
 
 
 # ── Test 4: Phase 1.5 integration into guess_batch ──
@@ -150,7 +150,7 @@ async def test_guess_batch_phase_1_5_discovers_pattern():
     await guesser.guess_batch(leads)
 
     # Phase 1.5 should have discovered {first}@{domain} via Alice
-    assert guesser._pattern_cache.get("example.com") == "{first}@{domain}"
+    assert guesser._pattern_store.get("example.com") == "{first}@{domain}"
     assert guesser._stats["patterns_discovered"] == 1
 
 

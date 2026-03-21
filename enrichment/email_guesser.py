@@ -41,35 +41,44 @@ _PATTERNS = [
 # Default pattern when no learned pattern exists
 _DEFAULT_PATTERN = "{first}.{last}@{domain}"
 
-# Words that indicate a company/fund name rather than a person name
+# Words that indicate a company/fund name rather than a person name.
+# Deliberately limited to business entity terms and navigation/social noise —
+# NOT generic English stop words ("on", "at", "an") which would false-positive
+# on names like "An Chen" or "Al-Amin".
 _COMPANY_WORDS = {
+    # Business entity types
     "capital", "ventures", "partners", "fund", "group", "holdings",
     "management", "investments", "equity", "advisors", "advisory",
-    "associates", "labs", "studio", "studios", "foundation",
-    "initiative", "institute", "accelerator", "incubator", "llc",
-    "inc", "corp", "ltd", "limited", "gmbh", "sa", "ag",
-    "news", "our", "the", "about", "additional", "strategic",
-    "continuity", "growth", "seed", "series", "demo", "day",
-    "portfolio", "companies", "company", "team", "meet", "join",
-    "alumni", "network", "community", "program", "programs",
-    "scout", "scouts", "bio", "life", "sciences", "games",
-    "start", "path", "next", "catalyst", "innovation",
-    "development", "fundamentals", "research", "digital",
-    "global", "international", "technology", "technologies",
-    "operating", "platform", "select", "emerging",
+    "associates", "foundation", "institute", "accelerator", "incubator",
+    "llc", "inc", "corp", "ltd", "limited", "gmbh", "sa", "ag",
+    # VC/PE stage/product noise
+    "seed", "series", "portfolio", "companies", "company",
+    "growth", "emerging", "strategic", "continuity",
+    # Lab/product entity types
+    "labs", "studio", "studios", "platform",
+    "sciences", "technologies", "technology", "digital", "global", "international",
+    "development", "research", "innovation", "catalyst", "operating",
+    # Navigation / page-section words scraped as names
+    "team", "meet", "about", "join", "alumni", "network", "community",
+    "program", "programs", "scout", "scouts", "leadership", "board",
+    "blog", "press", "media", "news", "contact", "apply",
+    "subscribe", "follow", "visit", "learn", "read", "view", "more",
+    # Social media handles scraped as names
     "twitter", "linkedin", "facebook", "instagram", "youtube",
-    "follow", "contact", "apply", "subscribe", "sign", "read",
-    "learn", "view", "visit", "more", "blog", "press", "media",
-    "on", "in", "at", "for", "to", "of", "an", "by", "from",
+    # Cookie consent banners
     "cookies", "cookie", "functional", "performance", "targeting",
-    "marketing", "privacy", "overview", "principles", "core",
-    "leadership", "history", "availability", "resources",
-    "navigation", "submission", "submissions", "board",
-    "shared", "values", "philosophy", "customers", "colleagues",
-    "communities", "activity", "putting", "challenging",
-    "convention", "smarter", "together", "humbly", "check",
-    "your", "every", "stage", "how", "we", "help",
-    "startups", "links", "additional", "information", "connect",
+    "marketing", "privacy",
+    # Misc page copy fragments
+    "overview", "principles", "core", "history", "resources",
+    "navigation", "submission", "submissions", "shared", "values",
+    "philosophy", "customers", "colleagues", "communities",
+    "startups", "information", "connect", "links", "help",
+    "select", "sign", "check",
+    # Generic filler
+    "bio", "life", "games", "start", "path", "next",
+    "fundamentals", "availability", "activity", "putting", "challenging",
+    "convention", "smarter", "together", "humbly",
+    "day", "demo",
 }
 
 
@@ -319,7 +328,7 @@ class EmailGuesser:
     def __init__(self, concurrency: int = 10):
         self.validator = EmailValidator()
         self.concurrency = concurrency
-        self._sem = asyncio.Semaphore(concurrency)
+        self._sem_instance = None
         self._pattern_store = PatternStore()
         self._mx_cache: dict[str, bool] = {}
         self._stats = {
@@ -327,6 +336,12 @@ class EmailGuesser:
             "pattern_hits": 0, "default_hits": 0, "mx_rejects": 0,
             "company_skipped": 0, "patterns_discovered": 0,
         }
+
+    @property
+    def _sem(self):
+        if self._sem_instance is None:
+            self._sem_instance = asyncio.Semaphore(self.concurrency)
+        return self._sem_instance
 
     async def _discover_domain_pattern(self, name: str, domain: str) -> Optional[str]:
         """SMTP-verify top 3 candidates for one contact to discover domain's email pattern."""

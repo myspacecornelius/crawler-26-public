@@ -46,7 +46,14 @@ class LeadStore:
             self._db_available = True
             logger.info("LeadStore: database connection established")
         except Exception as e:
-            logger.warning(f"LeadStore: DB unavailable, using in-memory fallback: {e}")
+            # In-memory fallback is intentionally NOT silent — callers must
+            # acknowledge data loss risk. Log at ERROR so it surfaces in any log
+            # aggregator, and set a flag so callers can decide whether to abort.
+            logger.error(
+                "LeadStore: DB unavailable — falling back to in-memory store. "
+                "DATA WILL BE LOST if the process exits. Error: %s",
+                e,
+            )
             self._db_available = False
 
     async def add_leads(self, leads: list, source: str = "") -> int:
@@ -141,7 +148,10 @@ class LeadStore:
             return new_count
 
         except Exception as e:
-            logger.error(f"LeadStore: DB write failed, falling back to memory: {e}")
+            logger.error(
+                "LeadStore: DB write failed, falling back to in-memory store. "
+                "DATA WILL BE LOST if the process exits. Error: %s", e
+            )
             self._db_available = False
             return self._add_in_memory(leads)
 
@@ -252,7 +262,10 @@ class LeadStore:
             logger.info(f"LeadStore: saved {len(leads)} enriched leads to DB")
 
         except Exception as e:
-            logger.error(f"LeadStore: save_all failed: {e}")
+            logger.error(
+                "LeadStore: save_all failed — enriched data stored in memory only. "
+                "DATA WILL BE LOST if the process exits. Error: %s", e
+            )
             self._in_memory_fallback = list(leads)
 
     @property

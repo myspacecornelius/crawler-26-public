@@ -21,7 +21,7 @@ import asyncio
 import functools
 import logging
 import random
-from typing import Callable, Sequence, Type
+from typing import Callable, Sequence, Type, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +58,7 @@ def retry_async(
     base_delay: float = 1.0,
     max_delay: float = 30.0,
     retryable: Sequence[Type[Exception]] = TRANSIENT_EXCEPTIONS,
-    on_retry: Callable | None = None,
+    on_retry: Optional[Callable] = None,
 ):
     """
     Decorator for async functions that retries on transient errors.
@@ -75,20 +75,21 @@ def retry_async(
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
             last_error = None
-            for attempt in range(1, max_retries + 2):  # +1 for initial + retries
+            # attempt 0 = initial try; attempts 1..max_retries = retries
+            for attempt in range(max_retries + 1):
                 try:
                     return await func(*args, **kwargs)
                 except tuple(retryable) as e:
                     last_error = e
-                    if attempt > max_retries:
+                    if attempt >= max_retries:
                         break
                     # Exponential backoff with jitter
                     delay = min(base_delay * (2 ** (attempt - 1)), max_delay)
                     delay *= 0.5 + random.random()  # jitter: 50-150% of delay
 
                     logger.warning(
-                        f"Retry {attempt}/{max_retries} for {func.__name__}: {e}",
-                        extra={"retry_attempt": attempt, "phase": func.__name__},
+                        f"Retry {attempt + 1}/{max_retries} for {func.__name__}: {e}",
+                        extra={"retry_attempt": attempt + 1, "phase": func.__name__},
                     )
                     if on_retry:
                         on_retry(attempt, e, delay)
@@ -115,17 +116,17 @@ def retry_sync(
         def wrapper(*args, **kwargs):
             import time
             last_error = None
-            for attempt in range(1, max_retries + 2):
+            for attempt in range(max_retries + 1):
                 try:
                     return func(*args, **kwargs)
                 except tuple(retryable) as e:
                     last_error = e
-                    if attempt > max_retries:
+                    if attempt >= max_retries:
                         break
-                    delay = min(base_delay * (2 ** (attempt - 1)), max_delay)
+                    delay = min(base_delay * (2 ** attempt), max_delay)
                     delay *= 0.5 + random.random()
                     logger.warning(
-                        f"Retry {attempt}/{max_retries} for {func.__name__}: {e}",
+                        f"Retry {attempt + 1}/{max_retries} for {func.__name__}: {e}",
                     )
                     time.sleep(delay)
             raise RetryExhausted(last_error, max_retries)

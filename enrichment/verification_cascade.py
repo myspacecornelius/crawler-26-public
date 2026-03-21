@@ -109,7 +109,7 @@ class ZeroBounceVerifier(ExternalVerifier):
             return None
 
 
-class MillionVerifierVerifier(ExternalVerifier):
+class MillionVerifierClient(ExternalVerifier):
     """MillionVerifier Email Verifier."""
 
     name = "millionverifier"
@@ -174,7 +174,7 @@ class VerificationCascade:
         providers = [
             (HunterVerifier, "HUNTER_API_KEY"),
             (ZeroBounceVerifier, "ZEROBOUNCE_API_KEY"),
-            (MillionVerifierVerifier, "MILLIONVERIFIER_API_KEY"),
+            (MillionVerifierClient, "MILLIONVERIFIER_API_KEY"),
         ]
         for cls, env_key in providers:
             key = os.environ.get(env_key)
@@ -192,10 +192,10 @@ class VerificationCascade:
                 "valid_format": bool,
                 "is_disposable": bool,
                 "is_role_based": bool,
-                "has_mx": bool | None,
+                "has_mx": Optional[bool],
                 "quality": str,
-                "smtp_deliverable": bool | None,
-                "external_result": dict | None,
+                "smtp_deliverable": Optional[bool],
+                "external_result": Optional[dict],
                 "final_verdict": "valid" | "invalid" | "risky" | "unknown",
                 "confidence": float,
             }

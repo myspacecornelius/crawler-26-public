@@ -63,10 +63,11 @@ class TestEnginePipelineWiring:
 
     def test_engine_imports_all_adapters(self):
         """Engine should import and register all adapters."""
-        from engine import ADAPTER_MAP
+        from adapters.registry import get_registry
+        registry = get_registry()
         expected = {"openvc", "angelmatch", "visible_vc", "landscape_vc",
                     "wellfound", "signal_nfx", "crunchbase"}
-        assert set(ADAPTER_MAP.keys()) == expected
+        assert expected.issubset(set(registry.list_adapters()))
 
     def test_parse_args_defaults(self):
         """CLI defaults should be safe (no crawl, no write)."""

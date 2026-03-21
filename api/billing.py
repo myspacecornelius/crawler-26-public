@@ -7,6 +7,7 @@ Requires STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET environment variables.
 
 import logging
 from datetime import datetime, timezone
+from typing import Optional
 
 import stripe
 from sqlalchemy import select
@@ -90,8 +91,8 @@ async def get_or_create_stripe_customer(user: User, db: AsyncSession) -> str:
 async def create_checkout_session(
     user: User,
     db: AsyncSession,
-    plan: str | None = None,
-    credit_pack: str | None = None,
+    plan: Optional[str] = None,
+    credit_pack: Optional[str] = None,
 ) -> str:
     """Create a Stripe Checkout Session and return the URL."""
     customer_id = await get_or_create_stripe_customer(user, db)
@@ -107,6 +108,7 @@ async def create_checkout_session(
             success_url=f"{FRONTEND_URL}/dashboard/settings?checkout=success",
             cancel_url=f"{FRONTEND_URL}/dashboard/settings?checkout=cancelled",
             metadata={"user_id": str(user.id), "plan": plan},
+            idempotency_key=f"checkout-plan-{user.id}-{plan}",
         )
     elif credit_pack and credit_pack in CREDIT_PACKS:
         pack_info = CREDIT_PACKS[credit_pack]
@@ -119,6 +121,7 @@ async def create_checkout_session(
             success_url=f"{FRONTEND_URL}/dashboard/settings?checkout=success",
             cancel_url=f"{FRONTEND_URL}/dashboard/settings?checkout=cancelled",
             metadata={"user_id": str(user.id), "credit_pack": credit_pack},
+            idempotency_key=f"checkout-credits-{user.id}-{credit_pack}",
         )
     else:
         raise ValueError("Must specify a valid plan or credit_pack")
@@ -166,14 +169,14 @@ async def handle_webhook(payload: bytes, sig_header: str, db: AsyncSession) -> d
     return {"status": "ok", "event_type": event_type}
 
 
-async def _find_user_by_customer_id(customer_id: str, db: AsyncSession) -> User | None:
+async def _find_user_by_customer_id(customer_id: str, db: AsyncSession) -> Optional[User]:
     result = await db.execute(
         select(User).where(User.stripe_customer_id == customer_id)
     )
     return result.scalar_one_or_none()
 
 
-async def _find_user_by_metadata(metadata: dict, db: AsyncSession) -> User | None:
+async def _find_user_by_metadata(metadata: dict, db: AsyncSession) -> Optional[User]:
     user_id = metadata.get("user_id")
     if not user_id:
         return None

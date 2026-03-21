@@ -8,8 +8,9 @@ beautifulsoup4>=4.12.0
 pyyaml>=6.0
 pandas>=2.1.0
 
-# Async HTTP (for webhooks)
+# Async HTTP and SMTP
 aiohttp>=3.9.0
+aiosmtplib>=3.0.0
 
 # Email validation (optional, for MX lookups)
 dnspython>=2.4.0

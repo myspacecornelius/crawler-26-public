@@ -242,7 +242,7 @@ class TestPatternStore:
         store._best_pattern.clear()
 
         assert store.domains_known == 0
-        store.learn("a.com", "j.s@a.com", "John Smith")
+        store.learn("a.com", "john.smith@a.com", "John Smith")
         assert store.domains_known == 1
 
 

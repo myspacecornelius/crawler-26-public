@@ -94,3 +94,9 @@ def email_validator():
     """A fresh EmailValidator instance for testing."""
     from enrichment.email_validator import EmailValidator
     return EmailValidator()
+
+@pytest.fixture(autouse=True)
+def isolated_pattern_store(tmp_path, monkeypatch):
+    """Ensure PatternStore uses a fresh, temporary file for each test."""
+    from enrichment import email_guesser
+    monkeypatch.setattr(email_guesser, "_PATTERN_STORE_PATH", tmp_path / "test_patterns.json")

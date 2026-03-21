@@ -70,11 +70,10 @@ def _normalize_fund(fund: str) -> str:
 
 
 def _dedup_key(name: str, fund: str) -> str:
-    """Generate a stable dedup key from name + fund."""
+    """Generate a stable merge key from name + fund."""
     norm_name = _normalize_name(name)
     norm_fund = _normalize_fund(fund)
-    raw_key = f"{norm_name}|{norm_fund}"
-    return hashlib.md5(raw_key.encode()).hexdigest()
+    return hashlib.md5(f"{norm_name}|{norm_fund}".encode()).hexdigest()
 
 
 class LeadDeduplicator:
@@ -190,6 +189,7 @@ class LeadDeduplicator:
 
         # Now deduplicate within the current batch too
         seen_keys: Set[str] = set()
+        seen_emails: Set[str] = set()
         deduped_leads = []
         for lead in leads:
             key = _dedup_key(lead.name, lead.fund)
@@ -205,6 +205,17 @@ class LeadDeduplicator:
                     lead.linkedin = idx["linkedin"]
                 if idx.get("role") and idx["role"] not in ("N/A", ""):
                     lead.role = idx["role"]
+
+                # Secondary dedup: if two name+fund-distinct leads share an email
+                # (e.g. same person listed at two funds, or name variation), keep
+                # only the first. This prevents duplicate outreach to the same address.
+                clean_email = (lead.email or "").strip().lower()
+                if clean_email and clean_email not in ("n/a", "unknown", ""):
+                    if clean_email in seen_emails:
+                        duplicate_count += 1
+                        continue
+                    seen_emails.add(clean_email)
+
                 deduped_leads.append(lead)
             else:
                 duplicate_count += 1
@@ -212,8 +223,10 @@ class LeadDeduplicator:
         # Persist updated index
         self._save_index()
 
-        print(f"  🔄  Dedup: {new_count} new, {merged_count} merged, {duplicate_count} duplicates removed")
-        print(f"  📊  Index total: {len(self.index)} unique leads across all runs")
+        logger.info(
+            "Dedup: %d new, %d merged, %d duplicates removed. Index total: %d unique leads",
+            new_count, merged_count, duplicate_count, len(self.index),
+        )
 
         return deduped_leads
 
