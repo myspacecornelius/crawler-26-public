@@ -45,6 +45,13 @@ TEAM_PAGE_KEYWORDS = [
     "contact", "connect", "reach-out", "get-in-touch",
     # Management/exec pages
     "management", "executives", "board-of-directors", "advisory-board",
+    # Additional patterns found on VC sites
+    "principals", "firm", "our-firm", "who-we-are", "the-team",
+    "investment-team", "investment-professionals", "senior-team",
+    "managing-directors", "general-partners", "venture-partners",
+    "operating-partners", "advisors", "advisory", "board",
+    "founders", "bio", "profiles", "directory", "roster",
+    "about-us", "meet-us", "meet-our-team", "our-partners",
 ]
 
 # Words that indicate a person's role
@@ -554,6 +561,48 @@ def extract_name_role_pairs(soup: BeautifulSoup) -> List[Dict[str, str]]:
                 role_text = _find_role_nearby(heading, require_keyword=False)
                 pairs.append({"name": name_text, "role": role_text})
 
+    # ── Strategy 3: Image alt-text and aria-label mining ──
+    # Many VC team pages use headshot images with alt text containing person names
+    if not pairs:
+        for img in soup.find_all("img"):
+            alt = (img.get("alt") or "").strip()
+            if alt and looks_like_name(alt):
+                # Look for a role in the parent container
+                parent = img.parent
+                role = ""
+                if parent:
+                    for child in parent.children:
+                        if child is not img and hasattr(child, "get_text"):
+                            text = child.get_text(strip=True)
+                            if text and any(kw in text.lower() for kw in ROLE_KEYWORDS):
+                                role = _clean_role_text(text)
+                                break
+                pairs.append({"name": alt, "role": role})
+
+        # aria-label attributes on links/buttons
+        for el in soup.find_all(True, attrs={"aria-label": True}):
+            label = (el.get("aria-label") or "").strip()
+            if label and looks_like_name(label):
+                pairs.append({"name": label, "role": ""})
+
+        # title attributes on links wrapping headshots
+        for a in soup.find_all("a", attrs={"title": True}):
+            title = (a.get("title") or "").strip()
+            if title and looks_like_name(title):
+                pairs.append({"name": title, "role": ""})
+
+    # ── Strategy 4: figure/figcaption pattern ──
+    # <figure><img .../><figcaption>Name<br>Role</figcaption></figure>
+    if not pairs:
+        for fig in soup.find_all("figure"):
+            caption = fig.find("figcaption")
+            if not caption:
+                continue
+            lines = [l.strip() for l in caption.get_text(separator="\n").split("\n") if l.strip()]
+            if lines and looks_like_name(lines[0]):
+                role = lines[1] if len(lines) > 1 else ""
+                pairs.append({"name": lines[0], "role": role})
+
     # Deduplicate by name
     seen_names = set()
     unique_pairs = []
@@ -1041,7 +1090,6 @@ class DeepCrawler:
         for bio in bio_links[:MAX_BIO_PAGES]:
             try:
                 await page.goto(bio["url"], wait_until="networkidle", timeout=12000)
-                await asyncio.sleep(0.8)
 
                 title = await page.title()
                 if "404" in title.lower() or "not found" in title.lower():
@@ -1131,12 +1179,37 @@ class DeepCrawler:
 
         return new_contacts
 
+    async def _http_precheck(self, fund_url: str) -> bool:
+        """Fast HTTP HEAD check to skip dead/blocked domains before launching browser."""
+        try:
+            import aiohttp
+            async with aiohttp.ClientSession() as session:
+                async with session.head(
+                    fund_url,
+                    timeout=aiohttp.ClientTimeout(total=4),
+                    allow_redirects=True,
+                    headers={"User-Agent": "Mozilla/5.0 (compatible)"},
+                ) as resp:
+                    if resp.status in (403, 451, 410, 502, 503, 504):
+                        logger.info(f"  HTTP precheck {fund_url} → {resp.status}, skipping")
+                        return False
+                    return True
+        except Exception:
+            # Timeout or connection error — domain likely dead
+            logger.info(f"  HTTP precheck {fund_url} → unreachable, skipping")
+            return False
+
     async def _crawl_fund_with_retry(self, browser: Browser, fund_url: str) -> List[InvestorLead]:
         """Crawl a fund with exponential backoff retry and circuit breaker protection."""
         # Circuit breaker check
         if not self.circuit_breakers.allow_request(fund_url):
             logger.info(f"  Circuit open for {fund_url}, skipping")
             self.metrics.record_circuit_trip(fund_url)
+            return []
+
+        # Fast HTTP pre-filter: skip dead/blocked domains before expensive browser work
+        if not await self._http_precheck(fund_url):
+            self.circuit_breakers.record_failure(fund_url)
             return []
 
         self.metrics.record_request(fund_url)
@@ -1189,13 +1262,53 @@ class DeepCrawler:
 
             logger.info(f"  Visiting {fund_url}")
             try:
-                await page.goto(fund_url, wait_until="domcontentloaded", timeout=15000)
+                await page.goto(fund_url, wait_until="domcontentloaded", timeout=20000)
+                # Wait for network to settle (critical for SPAs)
+                try:
+                    await page.wait_for_load_state("networkidle", timeout=8000)
+                except Exception:
+                    pass  # networkidle timeout is non-fatal
             except Exception:
                 logger.warning(f"  Timeout on {fund_url}, continuing...")
                 await ctx.close()
                 return []
 
-            await asyncio.sleep(random.uniform(1.0, 2.5))
+            # Wait for meaningful content instead of fixed sleep
+            try:
+                await page.wait_for_selector("a, p, h1, h2", timeout=3000)
+            except Exception:
+                pass  # If no content found quickly, continue anyway
+
+            # Scroll page to trigger lazy-loaded content (React/Angular SPAs)
+            try:
+                for _ in range(3):
+                    await page.mouse.wheel(0, 800)
+                    await asyncio.sleep(0.15)
+                await page.mouse.wheel(0, -2400)  # scroll back to top
+                await asyncio.sleep(0.2)
+            except Exception:
+                pass
+
+            # ── Homepage email harvest (capture fund-level emails before navigating away) ──
+            try:
+                hp_html = await page.content()
+                hp_soup = BeautifulSoup(hp_html, "html.parser")
+                hp_text = hp_soup.get_text(separator=" ")
+                hp_emails = extract_emails_from_html(hp_soup, hp_text)
+                if hp_emails:
+                    logger.info(f"  📧 Homepage emails on {fund_url}: {len(hp_emails)} found")
+                    for email in hp_emails:
+                        contacts.append(InvestorLead(
+                            name="Unknown",
+                            email=email,
+                            email_status="scraped",
+                            fund=fund_name,
+                            website=fund_url,
+                            source=fund_url,
+                            scraped_at=datetime.now().isoformat(),
+                        ))
+            except Exception:
+                pass
 
             # ── Sitemap-first discovery (fast, no browser) ──
             sitemap_team_urls = await self._check_sitemap(fund_url)
@@ -1216,15 +1329,52 @@ class DeepCrawler:
                              # Contact pages
                              "/contact", "/connect", "/get-in-touch",
                              # Management pages
-                             "/management", "/executives"]:
+                             "/management", "/executives",
+                             # Additional common VC site paths
+                             "/team/", "/about/", "/people/", "/firm",
+                             "/investment-team", "/the-team", "/our-firm",
+                             "/professionals", "/bios", "/principals",
+                             "/senior-team", "/managing-directors",
+                             "/general-partners", "/advisors", "/board",
+                             "/about/people", "/about/leadership",
+                             "/about/our-team", "/team/investment-team",
+                             "/who-we-are/team", "/meet-the-team",
+                             "/bio", "/profiles", "/directory"]:
                     team_urls.append(urljoin(fund_url, path))
 
             logger.info(f"  📄 Found {len(team_urls)} potential team pages")
 
-            for team_url in team_urls[:5]:  # Cap at 5 pages to stay within timeout
+            for team_url_idx, team_url in enumerate(team_urls[:8]):  # Cap at 8 pages per fund
+                # Early exit: if we already have 5+ contacts from earlier pages,
+                # skip remaining fallback URLs (guessed paths are low-yield)
+                if len(contacts) >= 5 and team_url_idx >= 2:
+                    logger.info(f"  ✅ Early exit: {len(contacts)} contacts already found, skipping remaining team pages")
+                    break
                 try:
-                    await page.goto(team_url, wait_until="networkidle", timeout=15000)
-                    await asyncio.sleep(1.0)  # Post-load delay for JS rendering
+                    await page.goto(team_url, wait_until="domcontentloaded", timeout=20000)
+                    # Wait for network to settle (SPA content loading)
+                    try:
+                        await page.wait_for_load_state("networkidle", timeout=10000)
+                    except Exception:
+                        pass
+                    # Wait for team content to render instead of fixed sleep
+                    try:
+                        await page.wait_for_selector(
+                            "img, .team, .people, [class*=team], [class*=person], [class*=member], a[href*=linkedin]",
+                            timeout=3000,
+                        )
+                    except Exception:
+                        pass  # timeout is non-fatal — content may use different selectors
+
+                    # Scroll to trigger lazy-loaded team cards
+                    try:
+                        for _ in range(4):
+                            await page.mouse.wheel(0, 600)
+                            await asyncio.sleep(0.15)
+                        await page.mouse.wheel(0, -2400)
+                        await asyncio.sleep(0.2)
+                    except Exception:
+                        pass
 
                     title = await page.title()
                     if "404" in title.lower() or "not found" in title.lower():
@@ -1243,7 +1393,10 @@ class DeepCrawler:
                                 if await btn.count() > 0 and await btn.first.is_visible():
                                     await btn.first.click()
                                     clicked = True
-                                    await asyncio.sleep(2.0)
+                                    try:
+                                        await page.wait_for_load_state("networkidle", timeout=3000)
+                                    except Exception:
+                                        pass
                                     extra = await self._extract_from_page(
                                         page, team_url, fund_name, fund_url
                                     )
@@ -1259,7 +1412,10 @@ class DeepCrawler:
                                     if await link.count() > 0 and await link.first.is_visible():
                                         await link.first.click()
                                         clicked = True
-                                        await asyncio.sleep(2.0)
+                                        try:
+                                            await page.wait_for_load_state("networkidle", timeout=3000)
+                                        except Exception:
+                                            pass
                                         extra = await self._extract_from_page(
                                             page, team_url, fund_name, fund_url
                                         )
@@ -1281,7 +1437,6 @@ class DeepCrawler:
                                 if re.search(r'[?&]page=\d+', full):
                                     try:
                                         await page.goto(full, wait_until="networkidle", timeout=10000)
-                                        await asyncio.sleep(1.0)
                                         extra = await self._extract_from_page(
                                             page, full, fund_name, fund_url
                                         )
@@ -1330,10 +1485,10 @@ class DeepCrawler:
             return
 
         try:
-            await asyncio.wait_for(_do_crawl(), timeout=120.0)
+            await asyncio.wait_for(_do_crawl(), timeout=180.0)
         except asyncio.TimeoutError:
             logger.warning(
-                f"  ⏱️ Hard timeout (120s) reached for {fund_url}, "
+                f"  ⏱️ Hard timeout (180s) reached for {fund_url}, "
                 f"keeping {len(contacts)} partial contacts"
             )
         except Exception as e:
@@ -1365,7 +1520,30 @@ class DeepCrawler:
 
     async def run(self):
         """Execute the deep crawl across all target funds."""
+        # Load any existing checkpoint before starting
+        self._load_checkpoint()
+        
         targets = self._load_targets()
+        
+        # Filter targets that were already crawled in this session (crash recovery)
+        if self.all_contacts:
+            crawled_domains = set()
+            for c in self.all_contacts:
+                if c.website and c.website not in ("N/A", ""):
+                    try:
+                        crawled_domains.add(urlparse(c.website).netloc.lower().replace("www.", ""))
+                    except Exception:
+                        pass
+            
+            original_len = len(targets)
+            targets = [
+                t for t in targets 
+                if urlparse(t).netloc.lower().replace("www.", "") not in crawled_domains
+            ]
+            skipped = original_len - len(targets)
+            if skipped > 0:
+                logger.info(f"  ⏭️  Resuming: skipped {skipped} targets already in checkpoint")
+
         logger.info(f"""
 ╔══════════════════════════════════════════╗
 ║   🕷️  DEEP CRAWLER v1                    ║
@@ -1497,7 +1675,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CRAWL Deep Crawler — Extract contacts from VC websites")
     parser.add_argument("--targets", default="data/target_funds.txt", help="Path to target URLs file")
     parser.add_argument("--output", default="data/vc_contacts.csv", help="Output CSV path")
-    parser.add_argument("--concurrent", type=int, default=3, help="Max concurrent crawls")
+    parser.add_argument("--concurrent", type=int, default=5, help="Max concurrent crawls")
     parser.add_argument("--headless", action="store_true", default=True, help="Run in headless mode")
     parser.add_argument("--headed", action="store_true", help="Run with browser visible")
     parser.add_argument("--limit", type=int, default=0, help="Limit number of funds to crawl (0 = all)")

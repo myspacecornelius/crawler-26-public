@@ -11,7 +11,7 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..database import get_db
-from ..models import Campaign, Lead, User, CreditTransaction
+from ..models import Campaign, Lead, User, CreditTransaction, PipelineLead
 from ..schemas import CampaignCreate, CampaignResponse, CampaignList
 from ..auth import get_current_user_id
 from verticals import load_vertical, list_verticals
@@ -179,3 +179,97 @@ async def delete_campaign(
 
     await db.delete(campaign)
     await db.commit()
+
+
+@router.post("/{campaign_id}/import-pipeline")
+async def import_pipeline_leads(
+    campaign_id: UUID,
+    run_id: Optional[str] = Query(None, description="Filter by pipeline run_id (imports all if omitted)"),
+    min_score: Optional[int] = Query(None, ge=0, description="Only import leads with score >= this value"),
+    user_id: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    """Import leads from the pipeline's PipelineLead table into a campaign.
+
+    This bridges the gap between the pipeline (which writes to pipeline_leads)
+    and the dashboard (which reads from campaign-scoped leads).
+    """
+    # Verify ownership
+    result = await db.execute(
+        select(Campaign).where(Campaign.id == campaign_id, Campaign.user_id == UUID(user_id))
+    )
+    campaign = result.scalar_one_or_none()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    # Build query for pipeline leads
+    query = select(PipelineLead)
+    if run_id:
+        query = query.where(PipelineLead.run_id == run_id)
+    if min_score is not None:
+        query = query.where(PipelineLead.lead_score >= min_score)
+
+    result = await db.execute(query)
+    pipeline_leads = result.scalars().all()
+
+    if not pipeline_leads:
+        return {"imported": 0, "skipped": 0, "message": "No pipeline leads found matching criteria"}
+
+    imported = 0
+    skipped = 0
+
+    for pl in pipeline_leads:
+        # Skip if this lead already exists in the campaign (by email+fund)
+        exists = await db.execute(
+            select(Lead.id).where(
+                Lead.campaign_id == campaign_id,
+                Lead.email == (pl.email or "N/A"),
+                Lead.fund == (pl.fund or "N/A"),
+            )
+        )
+        if exists.scalar_one_or_none() is not None:
+            skipped += 1
+            continue
+
+        lead = Lead(
+            campaign_id=campaign_id,
+            name=pl.name,
+            email=pl.email or "N/A",
+            email_verified=pl.email_status in ("verified", "scraped"),
+            email_source="scraped" if pl.email_status == "scraped" else (
+                "verified" if pl.email_status == "verified" else "guessed"
+            ),
+            email_status=pl.email_status or "unknown",
+            linkedin=pl.linkedin or "N/A",
+            phone="N/A",
+            fund=pl.fund or "N/A",
+            role=pl.role or "N/A",
+            website=pl.website or "N/A",
+            sectors=pl.focus_areas or "N/A",
+            check_size=pl.check_size or "N/A",
+            stage=pl.stage or "N/A",
+            hq=pl.location or "N/A",
+            score=float(pl.lead_score or 0),
+            tier=pl.tier or "COOL",
+            source=pl.source or "N/A",
+        )
+        db.add(lead)
+        imported += 1
+
+    # Update campaign totals
+    campaign.total_leads = (campaign.total_leads or 0) + imported
+    email_count = sum(
+        1 for pl in pipeline_leads
+        if pl.email and pl.email not in ("N/A", "")
+    )
+    campaign.total_emails = (campaign.total_emails or 0) + email_count
+
+    await db.commit()
+
+    return {
+        "imported": imported,
+        "skipped": skipped,
+        "total_pipeline_leads": len(pipeline_leads),
+        "message": f"Imported {imported} leads into campaign '{campaign.name}'",
+    }
+

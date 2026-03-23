@@ -62,6 +62,32 @@ DISPOSABLE_DOMAINS = _load_set_from_config("disposable_domains", _DEFAULT_DISPOS
 ROLE_PREFIXES = _load_set_from_config("role_prefixes", _DEFAULT_ROLE_PREFIXES)
 
 
+_MX_CACHE_PATH = Path(__file__).resolve().parent.parent / "data" / "mx_cache.json"
+
+
+def _load_mx_cache() -> dict[str, bool]:
+    """Load persistent MX cache from disk."""
+    try:
+        if _MX_CACHE_PATH.exists():
+            import json
+            with open(_MX_CACHE_PATH) as f:
+                return json.load(f)
+    except Exception:
+        pass
+    return {}
+
+
+def _save_mx_cache(cache: dict[str, bool]):
+    """Persist MX cache to disk for reuse across runs."""
+    try:
+        import json
+        _MX_CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with open(_MX_CACHE_PATH, "w") as f:
+            json.dump(cache, f)
+    except Exception as e:
+        logger.debug("Failed to save MX cache: %s", e)
+
+
 class EmailValidator:
     """
     Multi-layer email validation with cascading strategy:
@@ -77,7 +103,7 @@ class EmailValidator:
     """
 
     def __init__(self):
-        self._mx_cache: dict[str, bool] = {}  # domain → has_mx
+        self._mx_cache: dict[str, bool] = _load_mx_cache()  # domain → has_mx (persistent)
         self._mx_host_cache: dict[str, str] = {}  # domain → best MX host
         self._smtp_cache: dict[str, dict] = {}  # email → smtp result
         self._catch_all_cache: dict[str, bool] = {}  # domain → is_catch_all
@@ -555,15 +581,23 @@ class EmailValidator:
         return results
 
     async def validate_batch(self, emails: list[str]) -> list[dict]:
-        """Validate a batch of emails concurrently."""
-        results = []
-        for email in emails:
-            result = self.validate(email)
+        """Validate a batch of emails with concurrent MX lookups."""
+        # Phase 1: synchronous format/disposable validation (instant)
+        results = [self.validate(email) for email in emails]
+
+        # Phase 2: concurrent MX checks for valid-format emails
+        sem = asyncio.Semaphore(100)  # DNS lookups are fast and cached by domain
+
+        async def _mx_check(result):
             if result["valid_format"]:
-                result["has_mx"] = await self.verify_mx(email)
+                async with sem:
+                    result["has_mx"] = await self.verify_mx(result["email"])
             else:
                 result["has_mx"] = False
-            results.append(result)
+
+        await asyncio.gather(*[_mx_check(r) for r in results])
+        # Persist MX cache for future runs
+        _save_mx_cache(self._mx_cache)
         return results
 
     async def validate_batch_deep(self, emails: list[str], smtp_check: bool = False) -> list[dict]:

@@ -325,7 +325,7 @@ class EmailGuesser:
     - Exposes statistics for pattern analysis
     """
 
-    def __init__(self, concurrency: int = 10):
+    def __init__(self, concurrency: int = 30):
         self.validator = EmailValidator()
         self.concurrency = concurrency
         self._sem_instance = None

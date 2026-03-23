@@ -3,17 +3,26 @@ LeadFactory API — Analytics & Metrics Router
 Exposes pipeline analytics, email pattern statistics, and ML scoring metrics.
 """
 
+from functools import lru_cache
+
 from fastapi import APIRouter, Query
 
 from enrichment.analytics import pipeline_analytics
-from enrichment.email_guesser import EmailGuesser
-from enrichment.ml_scorer import MLLeadScorer
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
-# Shared instances (can be replaced with dependency injection)
-_guesser = EmailGuesser()
-_ml_scorer = MLLeadScorer()
+
+# Lazy singletons — instantiated on first request, not at import time
+@lru_cache(maxsize=1)
+def _get_guesser():
+    from enrichment.email_guesser import EmailGuesser
+    return EmailGuesser()
+
+
+@lru_cache(maxsize=1)
+def _get_ml_scorer():
+    from enrichment.ml_scorer import MLLeadScorer
+    return MLLeadScorer()
 
 
 @router.get("/pipeline")
@@ -43,13 +52,13 @@ async def get_email_pattern_stats():
     Get email pattern learning statistics.
     Shows pattern distribution, per-domain confidence, and global rankings.
     """
-    return _guesser.pattern_statistics
+    return _get_guesser().pattern_statistics
 
 
 @router.get("/ml-scorer")
 async def get_ml_scorer_stats():
     """Get ML lead scorer statistics and model status."""
-    return _ml_scorer.stats
+    return _get_ml_scorer().stats
 
 
 @router.get("/email-validation")
@@ -61,3 +70,4 @@ async def get_email_validation_stats():
         "cache_stats": validator.cache_stats,
         "dns_error_domains": list(validator.dns_error_domains),
     }
+

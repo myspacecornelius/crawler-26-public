@@ -35,7 +35,7 @@ class JSONFormatter(logging.Formatter):
         for key in ("phase", "domain", "adapter", "stage", "duration_s",
                      "lead_count", "error_count", "domain_count", "run_id",
                      "retry_attempt", "email_count"):
-            val = getattr(record, key, None)
+            val = getattr(record, key, getattr(record, f"_ctx_{key}", None))
             if val is not None:
                 log_entry[key] = val
 
@@ -59,7 +59,7 @@ class HumanFormatter(logging.Formatter):
         extras = []
         for key in ("phase", "domain", "adapter", "stage", "duration_s",
                      "lead_count", "error_count", "run_id"):
-            val = getattr(record, key, None)
+            val = getattr(record, key, getattr(record, f"_ctx_{key}", None))
             if val is not None:
                 extras.append(f"{key}={val}")
         if extras:
@@ -130,8 +130,9 @@ class PipelineContext:
         def record_factory(*args, **kwargs):
             record = old_factory(*args, **kwargs)
             for k, v in fields.items():
-                if not hasattr(record, k):
-                    setattr(record, k, v)
+                ctx_k = f"_ctx_{k}"
+                if not hasattr(record, ctx_k):
+                    setattr(record, ctx_k, v)
             return record
 
         logging.setLogRecordFactory(record_factory)

@@ -206,11 +206,38 @@ class CrawlEngine:
             return ''
         return slug + '.com'
 
+    @staticmethod
+    def _fund_name_to_domains(fund_name: str) -> list:
+        """
+        Generate multiple candidate domains from a fund name.
+        Tries .com, .vc, .co, and hyphenated variants.
+        """
+        import re as _re
+        name = _re.sub(
+            r'\b(llc|lp|l\.p\.|ltd|limited|inc|corp|fund\s+[ixv]+|fund\s+\d+|gp|llp|plc|co\.?)\b',
+            '', fund_name, flags=_re.IGNORECASE
+        ).strip()
+        name = _re.sub(r'[,.\'"!?()&@]', '', name).strip()
+
+        # Two slug variants: concatenated and hyphenated
+        words = name.lower().split()
+        slug_concat = ''.join(words).strip('-')
+        slug_hyphen = '-'.join(words).strip('-')
+
+        if len(slug_concat) < 4:
+            return []
+
+        candidates = []
+        for slug in [slug_concat, slug_hyphen]:
+            for tld in ['.com', '.vc', '.co', '.capital', '.ventures', '.fund', '.io']:
+                candidates.append(slug + tld)
+        return list(dict.fromkeys(candidates))  # dedup preserving order
+
     async def _run_edgar_bulk(self):
         """Pull Form D fund officers from SEC EDGAR at bulk scale."""
         self.metrics.stage_start("edgar_bulk")
-        edgar_years = getattr(self.args, "edgar_years", None) or [2022, 2023, 2024]
-        max_filings = getattr(self.args, "edgar_max", 50000)
+        edgar_years = getattr(self.args, "edgar_years", None) or [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+        max_filings = getattr(self.args, "edgar_max", 200000)
         print(f"\n  EDGAR BULK — pulling Form D officers (years={edgar_years}, max={max_filings})...")
         try:
             edgar_leads = await run_edgar_bulk_discovery(
@@ -220,11 +247,12 @@ class CrawlEngine:
             )
             # Assign probable fund domains to leads so email_guesser can run.
             # Form D XML has no website field, so we derive it from the fund name.
+            # Try multiple TLD variants (.com, .vc, .co, etc.)
             for lead in edgar_leads:
                 if not lead.website or lead.website in ("N/A", ""):
-                    guessed = self._fund_name_to_domain(lead.fund or "")
-                    if guessed:
-                        lead.website = guessed
+                    candidates = self._fund_name_to_domains(lead.fund or "")
+                    if candidates:
+                        lead.website = candidates[0]  # Best guess (.com first)
 
             existing_emails = {lead.email for lead in self.all_leads if lead.email and lead.email != "N/A"}
             new_count = 0
@@ -578,17 +606,16 @@ class CrawlEngine:
         self._print_banner()
 
         with PipelineContext(run_id=self.run_id):
-            # ── Stage 1: Source Aggregation ──
+            # ── Stages 1-2.5: Run independent data sourcing concurrently ──
+            init_tasks = []
             if not self.args.site:
-                await self._run_aggregator()
-
-            # ── Stage 2: Discovery ──
+                init_tasks.append(self._run_aggregator())
             if self.args.discover:
-                await self._run_discovery()
-
-            # ── Stage 2.5: SEC EDGAR Form D bulk extraction ──
+                init_tasks.append(self._run_discovery())
             if getattr(self.args, 'edgar', False):
-                await self._run_edgar_bulk()
+                init_tasks.append(self._run_edgar_bulk())
+            if init_tasks:
+                await asyncio.gather(*init_tasks)
 
             # ── Stage 3: Adapter-based site crawling ──
             sites = self.config.get("sites", {})
@@ -1018,103 +1045,85 @@ class CrawlEngine:
 
         greyhat_errors = 0
 
-        # ── 0. DNS Harvester ──
-        try:
-            print("  Phase 0: DNS Record Harvesting...")
-            dns_harvester = DNSHarvester()
-            self.all_leads = await dns_harvester.enrich_batch(self.all_leads)
-            dns_stats = dns_harvester.stats
-            print(f"  DNS: {dns_stats['leads_enriched']} enriched, "
-                  f"{dns_stats['emails_found']} emails found, "
-                  f"{dns_stats['domains_queried']} domains queried")
-        except Exception as e:
-            greyhat_errors += 1
-            logger.error(f"DNS harvesting failed: {e}", extra={"phase": "greyhat", "stage": "dns"})
-            print(f"  DNS harvesting failed (continuing): {e}")
+        # ── Phases 0-6: Run independent enrichers concurrently ──
+        # Each enricher has its own rate limiting and targets different
+        # external APIs, so running them in parallel is safe and ~5-7x faster.
+        import copy
 
-        # ── 1. Google Dorking ──
-        try:
-            print("  Phase 1: Google Dorking...")
-            dorker = GoogleDorker(concurrency=settings.dorker_concurrency)
-            self.all_leads = await dorker.enrich_batch(self.all_leads)
-            gs = dorker.stats
-            print(f"  Dorker: {gs['leads_enriched']} enriched, "
-                  f"{gs['emails_found']} emails, {gs['queries_made']} queries")
-        except Exception as e:
-            greyhat_errors += 1
-            logger.error(f"Google dorking failed: {e}", extra={"phase": "greyhat", "stage": "dorker"})
-            print(f"  Google dorking failed (continuing): {e}")
+        async def _run_enricher(name, make_enricher, leads_snapshot, log_fn):
+            """Run a single enricher on a snapshot; return enriched leads."""
+            try:
+                enricher = make_enricher()
+                enriched = await enricher.enrich_batch(leads_snapshot)
+                log_fn(enricher)
+                return name, enriched, None
+            except Exception as e:
+                logger.error(f"{name} failed: {e}", extra={"phase": "greyhat", "stage": name})
+                print(f"  {name} failed (continuing): {e}")
+                return name, leads_snapshot, e
 
-        # ── 2. Gravatar Oracle ──
-        try:
-            print("  Phase 2: Gravatar Email Confirmation...")
-            gravatar = GravatarOracle(concurrency=settings.gravatar_concurrency)
-            self.all_leads = await gravatar.enrich_batch(self.all_leads)
-            grav_s = gravatar.stats
-            print(f"  Gravatar: {grav_s['emails_confirmed']} confirmed "
-                  f"out of {grav_s['candidates_probed']} probes")
-        except Exception as e:
-            greyhat_errors += 1
-            logger.error(f"Gravatar oracle failed: {e}", extra={"phase": "greyhat", "stage": "gravatar"})
-            print(f"  Gravatar oracle failed (continuing): {e}")
+        # Snapshot leads so each enricher works independently
+        leads_snapshot = copy.deepcopy(self.all_leads)
 
-        # ── 3. PGP Keyserver Scraping ──
-        try:
-            print("  Phase 3: PGP Keyserver Search...")
-            pgp = PGPKeyserverScraper(concurrency=settings.greyhat_concurrency)
-            self.all_leads = await pgp.enrich_batch(self.all_leads)
-            pgp_s = pgp.stats
-            print(f"  PGP: {pgp_s['leads_enriched']} enriched, "
-                  f"{pgp_s['emails_extracted']} emails extracted "
-                  f"({pgp_s['keyservers_queried']} queries)")
-        except Exception as e:
-            greyhat_errors += 1
-            logger.error(f"PGP keyserver failed: {e}", extra={"phase": "greyhat", "stage": "pgp"})
-            print(f"  PGP keyserver failed (continuing): {e}")
+        def _log_dns(e):
+            s = e.stats
+            print(f"  DNS: {s['leads_enriched']} enriched, {s['emails_found']} emails found, {s['domains_queried']} domains queried")
 
-        # ── 4. GitHub Commit Mining ──
-        try:
-            print("  Phase 4: GitHub Commit Mining...")
-            miner = GitHubMiner(concurrency=settings.greyhat_concurrency)
-            self.all_leads = await miner.enrich_batch(self.all_leads)
-            ghs = miner.stats
-            print(f"  GitHub: {ghs['leads_enriched']} enriched, "
-                  f"{ghs['emails_found']} emails, "
-                  f"{ghs['commits_inspected']} commits scanned")
-        except Exception as e:
-            greyhat_errors += 1
-            logger.error(f"GitHub mining failed: {e}", extra={"phase": "greyhat", "stage": "github"})
-            print(f"  GitHub mining failed (continuing): {e}")
+        def _log_dorker(e):
+            s = e.stats
+            print(f"  Dorker: {s['leads_enriched']} enriched, {s['emails_found']} emails, {s['queries_made']} queries")
 
-        # ── 5. SEC EDGAR ──
-        try:
-            print("  Phase 5: SEC EDGAR Filings...")
-            edgar = SECEdgarScraper()
-            self.all_leads = await edgar.enrich_batch(self.all_leads)
-            es = edgar.stats
-            print(f"  EDGAR: {es['leads_enriched']} enriched, "
-                  f"{es['emails_found']} emails, "
-                  f"{es['domains_searched']} domains searched")
-        except Exception as e:
-            greyhat_errors += 1
-            logger.error(f"SEC EDGAR failed: {e}", extra={"phase": "greyhat", "stage": "edgar"})
-            print(f"  SEC EDGAR failed (continuing): {e}")
+        def _log_gravatar(e):
+            s = e.stats
+            print(f"  Gravatar: {s['emails_confirmed']} confirmed out of {s['candidates_probed']} probes")
 
-        # ── 6. Wayback Machine ──
-        try:
-            print("  Phase 6: Wayback Machine Snapshots...")
-            wayback = WaybackEnricher()
-            self.all_leads = await wayback.enrich_batch(self.all_leads)
-            ws = wayback.stats
-            print(f"  Wayback: {ws['leads_enriched']} enriched, "
-                  f"{ws['emails_found']} emails, "
-                  f"{ws['snapshots_fetched']} snapshots fetched")
-        except Exception as e:
-            greyhat_errors += 1
-            logger.error(f"Wayback Machine failed: {e}", extra={"phase": "greyhat", "stage": "wayback"})
-            print(f"  Wayback Machine failed (continuing): {e}")
+        def _log_pgp(e):
+            s = e.stats
+            print(f"  PGP: {s['leads_enriched']} enriched, {s['emails_extracted']} emails extracted ({s['keyservers_queried']} queries)")
 
-        # ── 7. Catch-All & JS Scraper ──
+        def _log_github(e):
+            s = e.stats
+            print(f"  GitHub: {s['leads_enriched']} enriched, {s['emails_found']} emails, {s['commits_inspected']} commits scanned")
+
+        def _log_edgar(e):
+            s = e.stats
+            print(f"  EDGAR: {s['leads_enriched']} enriched, {s['emails_found']} emails, {s['domains_searched']} domains searched")
+
+        def _log_wayback(e):
+            s = e.stats
+            print(f"  Wayback: {s['leads_enriched']} enriched, {s['emails_found']} emails, {s['snapshots_fetched']} snapshots fetched")
+
+        print("  Running phases 0-6 concurrently...")
+        enricher_tasks = [
+            _run_enricher("dns", DNSHarvester, copy.deepcopy(leads_snapshot), _log_dns),
+            _run_enricher("dorker", lambda: GoogleDorker(concurrency=settings.dorker_concurrency), copy.deepcopy(leads_snapshot), _log_dorker),
+            _run_enricher("gravatar", lambda: GravatarOracle(concurrency=settings.gravatar_concurrency), copy.deepcopy(leads_snapshot), _log_gravatar),
+            _run_enricher("pgp", lambda: PGPKeyserverScraper(concurrency=settings.greyhat_concurrency), copy.deepcopy(leads_snapshot), _log_pgp),
+            _run_enricher("github", lambda: GitHubMiner(concurrency=settings.greyhat_concurrency), copy.deepcopy(leads_snapshot), _log_github),
+            _run_enricher("edgar", SECEdgarScraper, copy.deepcopy(leads_snapshot), _log_edgar),
+            _run_enricher("wayback", WaybackEnricher, copy.deepcopy(leads_snapshot), _log_wayback),
+        ]
+
+        enricher_results = await asyncio.gather(*enricher_tasks)
+
+        # Merge results: for each lead, take the best email found across enrichers
+        # Priority: any enricher that found an email for a lead that didn't have one
+        for name, enriched_leads, err in enricher_results:
+            if err:
+                greyhat_errors += 1
+                continue
+            for i, lead in enumerate(enriched_leads):
+                orig = self.all_leads[i]
+                if (not orig.email or orig.email in ("N/A", "N/A (invalid)")) and \
+                   lead.email and lead.email not in ("N/A", "N/A (invalid)"):
+                    orig.email = lead.email
+                    orig.email_status = lead.email_status
+                # Also merge non-email enrichments (linkedin, role, etc.)
+                if (not orig.linkedin or orig.linkedin in ("N/A", "")) and \
+                   lead.linkedin and lead.linkedin not in ("N/A", ""):
+                    orig.linkedin = lead.linkedin
+
+        # ── Phase 7: Catch-All & JS Scraper (runs after others to skip already-found) ──
         try:
             print("  Phase 7: Catch-All Detection & JS Scraping...")
             catchall = CatchAllDetector(browser_timeout=settings.browser_timeout_ms)
@@ -1326,11 +1335,11 @@ def parse_args():
     parser.add_argument(
         "--edgar-years", nargs="+", type=int, default=None,
         metavar="YEAR",
-        help="Calendar years to pull EDGAR Form D filings (default: 2022 2023 2024)",
+        help="Calendar years to pull EDGAR Form D filings (default: 2016–2025)",
     )
     parser.add_argument(
-        "--edgar-max", type=int, default=50000,
-        help="Max Form D filings to process per EDGAR run (default: 50000)",
+        "--edgar-max", type=int, default=200000,
+        help="Max Form D filings to process per EDGAR run (default: 200000)",
     )
     parser.add_argument(
         "--expand-emails", action="store_true",

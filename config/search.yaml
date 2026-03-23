@@ -5,7 +5,7 @@
 # ──────────────────────────────────────────────────
 
 discovery:
-  target_domains_count: 5000
+  target_domains_count: 15000
   search_engine: "duckduckgo"   # legacy field, kept for compatibility
 
   # ── Multi-engine config ──────────────────────────────
@@ -24,6 +24,10 @@ discovery:
     brave:
       enabled: false                        # Brave Search: 2,000 free/month
       # api_key: "YOUR_BRAVE_KEY"           # or set BRAVE_API_KEY env var
+    startpage:
+      enabled: true                         # Google proxy, no API key needed
+    mojeek:
+      enabled: true                         # Independent search engine, no API key needed
 
   queries:
     # ── Seed / Pre-seed ──────────────────────────────────────
@@ -459,6 +463,144 @@ discovery:
     - '"assets under management" "venture" "team" "portfolio"'
     - '"venture firm" "managing partner" "portfolio" "contact"'
     - '"venture firm" "investment team" "portfolio" "thesis"'
+
+    # ── Private Equity Firms ──────────────────────────
+    - '"private equity" "team" "portfolio" "contact" site:.com'
+    - '"private equity firm" "managing director" "portfolio" "contact"'
+    - '"buyout fund" "team" "portfolio" "investment focus"'
+    - '"middle market" "private equity" "team" "portfolio"'
+    - '"lower middle market" "private equity" "team" "portfolio" "contact"'
+    - '"growth equity" "team" "portfolio" "investment thesis"'
+    - '"growth equity firm" "managing partner" "portfolio" "contact"'
+    - '"private equity" "operating partner" "portfolio" "team"'
+    - '"private equity" "principal" "portfolio" "deal team"'
+    - '"leveraged buyout" "team" "portfolio" "contact" site:.com'
+    - '"pe fund" "investment team" "portfolio" "contact"'
+    - '"private capital" "team" "portfolio" "investment focus"'
+    - '"sponsor-backed" "private equity" "team" "portfolio"'
+    - '"industrials" "private equity" "team" "portfolio"'
+    - '"healthcare" "private equity" "team" "portfolio"'
+    - '"technology" "private equity" "team" "portfolio"'
+    - '"consumer" "private equity" "team" "portfolio"'
+    - '"financial services" "private equity" "team" "portfolio"'
+    - '"infrastructure" "private equity" "team" "portfolio"'
+    - '"real estate" "private equity" "team" "portfolio"'
+    - '"energy" "private equity" "team" "portfolio"'
+
+    # ── Angel Groups / Networks ────────────────────────
+    - '"angel group" "members" "portfolio" "contact"'
+    - '"angel network" "team" "investments" "contact"'
+    - '"angel investor group" "members" "investments"'
+    - '"angel investing network" "portfolio" "members"'
+    - '"angel capital association" "member" "portfolio"'
+    - '"tech coast angels" OR "golden seeds" OR "new york angels"'
+    - '"keiretsu forum" OR "band of angels" OR "pipeline angels"'
+    - '"angel fund" "managing director" "portfolio" "contact"'
+    - '"super angel" "portfolio" "investments" "team"'
+    - '"angel syndicate" "lead" "portfolio" "contact"'
+    - '"accredited investor" "angel" "group" "portfolio" "members"'
+    - '"angel investor" "portfolio" "team" "check size"'
+
+    # ── Venture Debt / Revenue-Based ───────────────────
+    - '"venture debt" "team" "portfolio" "contact" site:.com'
+    - '"venture lending" "team" "portfolio" "investment"'
+    - '"revenue-based financing" "team" "portfolio" "contact"'
+    - '"venture credit" "team" "portfolio" "contact"'
+    - '"growth lending" "team" "portfolio" "contact"'
+
+    # ── Secondary / Continuation Funds ─────────────────
+    - '"secondary fund" "team" "portfolio" "private equity"'
+    - '"secondaries" "private equity" "team" "portfolio"'
+    - '"continuation fund" "team" "portfolio" "gp-led"'
+    - '"direct secondaries" "team" "portfolio" "contact"'
+
+    # ── Real Assets / Infrastructure ───────────────────
+    - '"infrastructure fund" "team" "portfolio" "contact"'
+    - '"real assets" "investment team" "portfolio" "contact"'
+    - '"infrastructure private equity" "team" "portfolio"'
+    - '"renewable energy fund" "team" "portfolio" "contact"'
+
+    # ── Hedge Fund / Crossover / Multi-Strategy ────────
+    - '"crossover investor" "team" "portfolio" "public private"'
+    - '"hedge fund" "venture" "team" "portfolio" site:.com'
+    - '"multi-strategy" "venture" "team" "portfolio"'
+    - '"public equity" "private investments" "team" "portfolio"'
+    - '"long short" "venture" "portfolio" "team" "contact"'
+    - '"tiger global" OR "coatue" OR "d1 capital" OR "altimeter" "team" "portfolio"'
+
+    # ── Family Office Investment Arms ──────────────────
+    - '"family office" "direct investments" "team" "portfolio"'
+    - '"single family office" "venture" "team" "portfolio"'
+    - '"multi family office" "venture" "team" "portfolio"'
+    - '"family office" "co-invest" "team" "portfolio" "contact"'
+    - '"family office" "principal investments" "team" "portfolio"'
+    - '"family investment office" "team" "portfolio" "contact"'
+    - '"family holding" "venture" "team" "portfolio" "contact"'
+    - '"generational wealth" "family office" "team" "portfolio"'
+
+    # ── Accelerators & Studios (with investment) ───────
+    - '"startup accelerator" "investment" "team" "portfolio" "contact"'
+    - '"venture studio" "fund" "team" "portfolio" "contact"'
+    - '"company builder" "venture" "team" "portfolio"'
+    - '"startup studio" "investment" "team" "portfolio"'
+    - '"techstars" OR "500 startups" OR "plug and play" "team" "portfolio"'
+    - '"accelerator program" "investment" "team" "portfolio" "fund"'
+
+    # ── Government / Sovereign Venture ─────────────────
+    - '"government venture" "fund" "team" "portfolio" "contact"'
+    - '"state venture fund" "team" "portfolio" "contact"'
+    - '"sovereign venture" "team" "portfolio" "innovation"'
+    - '"development bank" "venture" "team" "portfolio"'
+    - '"innovation fund" "government" "team" "portfolio"'
+
+    # ── University / Endowment / Alumni ────────────────
+    - '"university venture fund" "team" "portfolio" "contact"'
+    - '"endowment" "venture" "team" "portfolio" "startup"'
+    - '"alumni venture" "fund" "team" "portfolio"'
+    - '"university innovation" "venture" "team" "portfolio"'
+    - '"student-run venture fund" "team" "portfolio"'
+    - '"dorm room fund" OR "rough draft ventures" OR "contrary capital" "team" "portfolio"'
+
+    # ── Emerging Market Specific ───────────────────────
+    - '"venture capital" "team" "portfolio" "east africa"'
+    - '"venture capital" "team" "portfolio" "west africa"'
+    - '"venture capital" "team" "portfolio" "southeast asia" "contact"'
+    - '"venture capital" "team" "portfolio" "central asia"'
+    - '"venture capital" "team" "portfolio" "central europe"'
+    - '"venture capital" "team" "portfolio" "caribbean"'
+    - '"venture capital" "team" "portfolio" "pacific islands"'
+    - '"venture capital" "team" "portfolio" "balkans"'
+    - '"venture capital" "team" "portfolio" "scandinavia"'
+    - '"venture capital" "team" "portfolio" "benelux"'
+
+    # ── PE / VC Geography: Tier 2/3 US Cities ──────────
+    - '"venture capital" "team" "portfolio" "reno"'
+    - '"venture capital" "team" "portfolio" "boise"'
+    - '"venture capital" "team" "portfolio" "providence"'
+    - '"venture capital" "team" "portfolio" "birmingham" "alabama"'
+    - '"venture capital" "team" "portfolio" "tulsa"'
+    - '"venture capital" "team" "portfolio" "lexington"'
+    - '"venture capital" "team" "portfolio" "omaha"'
+    - '"venture capital" "team" "portfolio" "des moines"'
+    - '"venture capital" "team" "portfolio" "chattanooga"'
+    - '"venture capital" "team" "portfolio" "greenville"'
+    - '"venture capital" "team" "portfolio" "little rock"'
+    - '"venture capital" "team" "portfolio" "albuquerque"'
+    - '"venture capital" "team" "portfolio" "sacramento"'
+    - '"venture capital" "team" "portfolio" "jacksonville"'
+    - '"venture capital" "team" "portfolio" "memphis"'
+
+    # ── Industry-Specific PE/Growth ────────────────────
+    - '"saas" "growth equity" "team" "portfolio" "contact"'
+    - '"healthcare services" "private equity" "team" "portfolio"'
+    - '"software" "growth equity" "team" "portfolio" site:.com'
+    - '"tech-enabled services" "private equity" "team" "portfolio"'
+    - '"business services" "private equity" "team" "portfolio"'
+    - '"e-commerce" "growth equity" "team" "portfolio"'
+    - '"marketplace" "growth equity" "team" "portfolio"'
+    - '"payments" "fintech" "growth" "team" "portfolio"'
+    - '"insurance" "private equity" "team" "portfolio"'
+    - '"education" "private equity" "team" "portfolio"'
 
   # Domains to explicitly discard (aggregators, directories, social networks)
   ignore_domains:

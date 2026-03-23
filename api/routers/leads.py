@@ -67,17 +67,7 @@ async def list_leads(
     if email_verified is not None:
         query = query.where(Lead.email_verified == email_verified)
     if email_status:
-        status = email_status.lower()
-        if status == "verified":
-            query = query.where(Lead.email_verified == True, Lead.email_source != "scraped")
-        elif status == "scraped":
-            query = query.where(Lead.email_source == "scraped")
-        elif status == "guessed":
-            query = query.where(Lead.email_verified == False, Lead.email_source.in_(["guessed", "pattern"]))
-        elif status == "undeliverable":
-            query = query.where(Lead.email_verified == False, Lead.email_source == "undeliverable")
-        elif status == "catch_all":
-            query = query.where(Lead.email_source == "catch_all")
+        query = query.where(Lead.email_status == email_status.lower())
     if fund:
         query = query.where(Lead.fund.ilike(f"%{fund}%"))
     if sector:

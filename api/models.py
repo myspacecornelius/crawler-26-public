@@ -121,6 +121,7 @@ class Lead(Base):
     email = Column(String(255), default="N/A")
     email_verified = Column(Boolean, default=False)
     email_source = Column(String(50), default="guessed")  # scraped, pattern, guessed, verified
+    email_status = Column(String(50), default="unknown")  # unknown, guessed, scraped, verified, undeliverable, catch_all
     linkedin = Column(String(500), default="N/A")
     phone = Column(String(50), default="N/A")
 

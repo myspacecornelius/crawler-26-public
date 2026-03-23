@@ -610,6 +610,359 @@ async def _fetch_ivca(session: aiohttp.ClientSession) -> List[InvestorLead]:
 
 
 # ──────────────────────────────────────────────────
+#  Source 13: LAVCA (Latin America VC Association)
+# ──────────────────────────────────────────────────
+
+async def _fetch_lavca(session: aiohttp.ClientSession) -> List[InvestorLead]:
+    """Fetch Latin American VC data from LAVCA member directory."""
+    leads = []
+    source = "directory:lavca"
+
+    try:
+        url = "https://lavca.org/members/"
+        async with session.get(url, timeout=DEFAULT_TIMEOUT) as resp:
+            if resp.status != 200:
+                return leads
+            html = await resp.text()
+            soup = BeautifulSoup(html, "html.parser")
+
+            for el in soup.select(".member-item, .member-card, .directory-item, article, .listing-item"):
+                name_el = el.select_one("h2, h3, h4, .name, .title, a")
+                name = name_el.get_text(strip=True) if name_el else el.get_text(strip=True)
+                href = ""
+                link_el = el.select_one("a[href]")
+                if link_el:
+                    href = link_el.get("href", "")
+
+                if name and 2 < len(name) < 120:
+                    leads.append(_make_lead(
+                        name=name, source=source,
+                        location="Latin America",
+                        website=href if href.startswith("http") else "",
+                    ))
+    except Exception as e:
+        logger.debug(f"  LAVCA: {e}")
+
+    logger.debug(f"  LAVCA: {len(leads)} leads")
+    return leads
+
+
+# ──────────────────────────────────────────────────
+#  Source 14: SVCA (Singapore Venture Capital Assoc.)
+# ──────────────────────────────────────────────────
+
+async def _fetch_svca(session: aiohttp.ClientSession) -> List[InvestorLead]:
+    """Fetch Singapore VC data from SVCA member directory."""
+    leads = []
+    source = "directory:svca"
+
+    try:
+        url = "https://www.svca.org.sg/members/"
+        async with session.get(url, timeout=DEFAULT_TIMEOUT) as resp:
+            if resp.status != 200:
+                return leads
+            html = await resp.text()
+            soup = BeautifulSoup(html, "html.parser")
+
+            for el in soup.select(".member-item, .member-card, .directory-item, li.member, article"):
+                name_el = el.select_one("h2, h3, h4, .name, a")
+                name = name_el.get_text(strip=True) if name_el else el.get_text(strip=True)
+                href = ""
+                link_el = el.select_one("a[href]")
+                if link_el:
+                    href = link_el.get("href", "")
+
+                if name and 2 < len(name) < 120:
+                    leads.append(_make_lead(
+                        name=name, source=source,
+                        location="Singapore",
+                        website=href if href.startswith("http") else "",
+                    ))
+    except Exception as e:
+        logger.debug(f"  SVCA: {e}")
+
+    logger.debug(f"  SVCA: {len(leads)} leads")
+    return leads
+
+
+# ──────────────────────────────────────────────────
+#  Source 15: HKVCA (Hong Kong VC Association)
+# ──────────────────────────────────────────────────
+
+async def _fetch_hkvca(session: aiohttp.ClientSession) -> List[InvestorLead]:
+    """Fetch Hong Kong VC data from HKVCA member directory."""
+    leads = []
+    source = "directory:hkvca"
+
+    try:
+        url = "https://www.hkvca.com.hk/en/members.html"
+        async with session.get(url, timeout=DEFAULT_TIMEOUT) as resp:
+            if resp.status != 200:
+                return leads
+            html = await resp.text()
+            soup = BeautifulSoup(html, "html.parser")
+
+            for el in soup.select(".member-item, .member-card, .directory-item, li, article, tr"):
+                name_el = el.select_one("h2, h3, h4, .name, a, td:first-child")
+                name = name_el.get_text(strip=True) if name_el else ""
+                href = ""
+                link_el = el.select_one("a[href]")
+                if link_el:
+                    href = link_el.get("href", "")
+
+                if name and 2 < len(name) < 120:
+                    leads.append(_make_lead(
+                        name=name, source=source,
+                        location="Hong Kong",
+                        website=href if href.startswith("http") else "",
+                    ))
+    except Exception as e:
+        logger.debug(f"  HKVCA: {e}")
+
+    logger.debug(f"  HKVCA: {len(leads)} leads")
+    return leads
+
+
+# ──────────────────────────────────────────────────
+#  Source 16: AVCAL (Australia Private Equity & VC)
+# ──────────────────────────────────────────────────
+
+async def _fetch_avcal(session: aiohttp.ClientSession) -> List[InvestorLead]:
+    """Fetch Australian PE/VC data from AVCAL member directory."""
+    leads = []
+    source = "directory:avcal"
+
+    try:
+        url = "https://www.avcal.com.au/member-directory"
+        async with session.get(url, timeout=DEFAULT_TIMEOUT) as resp:
+            if resp.status != 200:
+                return leads
+            html = await resp.text()
+            soup = BeautifulSoup(html, "html.parser")
+
+            for el in soup.select(".member-item, .member-card, .directory-item, li.member, article"):
+                name_el = el.select_one("h2, h3, h4, .name, a")
+                name = name_el.get_text(strip=True) if name_el else el.get_text(strip=True)
+                href = ""
+                link_el = el.select_one("a[href]")
+                if link_el:
+                    href = link_el.get("href", "")
+
+                if name and 2 < len(name) < 120:
+                    leads.append(_make_lead(
+                        name=name, source=source,
+                        location="Australia",
+                        website=href if href.startswith("http") else "",
+                    ))
+    except Exception as e:
+        logger.debug(f"  AVCAL: {e}")
+
+    logger.debug(f"  AVCAL: {len(leads)} leads")
+    return leads
+
+
+# ──────────────────────────────────────────────────
+#  Source 17: KVCA (Korea Venture Capital Association)
+# ──────────────────────────────────────────────────
+
+async def _fetch_kvca(session: aiohttp.ClientSession) -> List[InvestorLead]:
+    """Fetch Korean VC data from KVCA."""
+    leads = []
+    source = "directory:kvca"
+
+    try:
+        url = "https://www.kvca.or.kr/en/member/member.html"
+        async with session.get(url, timeout=DEFAULT_TIMEOUT) as resp:
+            if resp.status != 200:
+                return leads
+            html = await resp.text()
+            soup = BeautifulSoup(html, "html.parser")
+
+            for el in soup.select(".member-item, .member-card, li, tr, article"):
+                name_el = el.select_one("h2, h3, h4, .name, a, td:first-child")
+                name = name_el.get_text(strip=True) if name_el else ""
+                href = ""
+                link_el = el.select_one("a[href]")
+                if link_el:
+                    href = link_el.get("href", "")
+
+                if name and 2 < len(name) < 120:
+                    leads.append(_make_lead(
+                        name=name, source=source,
+                        location="South Korea",
+                        website=href if href.startswith("http") else "",
+                    ))
+    except Exception as e:
+        logger.debug(f"  KVCA: {e}")
+
+    logger.debug(f"  KVCA: {len(leads)} leads")
+    return leads
+
+
+# ──────────────────────────────────────────────────
+#  Source 18: ILPA (Institutional LP Association)
+# ──────────────────────────────────────────────────
+
+async def _fetch_ilpa(session: aiohttp.ClientSession) -> List[InvestorLead]:
+    """Fetch LP/GP data from ILPA member directory."""
+    leads = []
+    source = "directory:ilpa"
+
+    try:
+        url = "https://ilpa.org/membership/member-directory/"
+        async with session.get(url, timeout=DEFAULT_TIMEOUT) as resp:
+            if resp.status != 200:
+                return leads
+            html = await resp.text()
+            soup = BeautifulSoup(html, "html.parser")
+
+            for el in soup.select(".member-item, .member-card, .directory-item, li, article"):
+                name_el = el.select_one("h2, h3, h4, .name, a")
+                name = name_el.get_text(strip=True) if name_el else el.get_text(strip=True)
+                href = ""
+                link_el = el.select_one("a[href]")
+                if link_el:
+                    href = link_el.get("href", "")
+
+                if name and 2 < len(name) < 120:
+                    leads.append(_make_lead(
+                        name=name, source=source,
+                        website=href if href.startswith("http") else "",
+                    ))
+    except Exception as e:
+        logger.debug(f"  ILPA: {e}")
+
+    logger.debug(f"  ILPA: {len(leads)} leads")
+    return leads
+
+
+# ──────────────────────────────────────────────────
+#  Source 19: JVCA (Japan Venture Capital Association)
+# ──────────────────────────────────────────────────
+
+async def _fetch_jvca(session: aiohttp.ClientSession) -> List[InvestorLead]:
+    """Fetch Japanese VC data from JVCA member list."""
+    leads = []
+    source = "directory:jvca"
+
+    try:
+        url = "https://www.jvca.jp/en/members"
+        async with session.get(url, timeout=DEFAULT_TIMEOUT) as resp:
+            if resp.status != 200:
+                return leads
+            html = await resp.text()
+            soup = BeautifulSoup(html, "html.parser")
+
+            for el in soup.select(".member-item, .member-card, li, tr, article, .company"):
+                name_el = el.select_one("h2, h3, h4, .name, a, td:first-child")
+                name = name_el.get_text(strip=True) if name_el else ""
+                href = ""
+                link_el = el.select_one("a[href]")
+                if link_el:
+                    href = link_el.get("href", "")
+
+                if name and 2 < len(name) < 120:
+                    leads.append(_make_lead(
+                        name=name, source=source,
+                        location="Japan",
+                        website=href if href.startswith("http") else "",
+                    ))
+    except Exception as e:
+        logger.debug(f"  JVCA: {e}")
+
+    logger.debug(f"  JVCA: {len(leads)} leads")
+    return leads
+
+
+# ──────────────────────────────────────────────────
+#  Source 20: Dealroom public data
+# ──────────────────────────────────────────────────
+
+async def _fetch_dealroom_public(session: aiohttp.ClientSession) -> List[InvestorLead]:
+    """Fetch publicly available investor data from Dealroom API."""
+    leads = []
+    source = "directory:dealroom"
+
+    # Dealroom's public API may expose some investor data
+    urls = [
+        "https://api.dealroom.co/api/v1/investors?limit=100&offset=0",
+        "https://api.dealroom.co/api/v1/investors?limit=100&offset=100",
+        "https://api.dealroom.co/api/v1/investors?limit=100&offset=200",
+    ]
+
+    for url in urls:
+        try:
+            async with session.get(url, timeout=DEFAULT_TIMEOUT) as resp:
+                if resp.status != 200:
+                    continue
+                data = await resp.json(content_type=None)
+                items = data if isinstance(data, list) else data.get("items", data.get("investors", data.get("data", [])))
+                for item in items:
+                    if not isinstance(item, dict):
+                        continue
+                    name = item.get("name", item.get("entity_name", ""))
+                    if not name:
+                        continue
+                    leads.append(_make_lead(
+                        name=name,
+                        source=source,
+                        fund=item.get("name", name),
+                        website=item.get("url", item.get("website", "")),
+                        location=item.get("hq_city", item.get("location", "")),
+                        focus_areas=item.get("tags", []),
+                        stage=item.get("investor_type", ""),
+                    ))
+        except Exception as e:
+            logger.debug(f"  Dealroom {url}: {e}")
+
+    logger.debug(f"  Dealroom Public: {len(leads)} leads")
+    return leads
+
+
+# ──────────────────────────────────────────────────
+#  Source 21: AngelList / Wellfound Public API
+# ──────────────────────────────────────────────────
+
+async def _fetch_angellist_investors(session: aiohttp.ClientSession) -> List[InvestorLead]:
+    """Fetch publicly listed investors from AngelList/Wellfound."""
+    leads = []
+    source = "directory:angellist"
+
+    urls = [
+        "https://api.wellfound.com/graphql",
+    ]
+
+    # Try the public startup listings which include investor data
+    pages = [
+        "https://wellfound.com/investors",
+        "https://angel.co/investors",
+    ]
+
+    for url in pages:
+        try:
+            async with session.get(url, timeout=DEFAULT_TIMEOUT) as resp:
+                if resp.status != 200:
+                    continue
+                html = await resp.text()
+                soup = BeautifulSoup(html, "html.parser")
+
+                for el in soup.select("a[href*='/v/'], a[href*='/i/'], .investor-card, .styles_name"):
+                    name = el.get_text(strip=True)
+                    href = el.get("href", "")
+                    if name and 2 < len(name) < 100:
+                        leads.append(_make_lead(
+                            name=name,
+                            source=source,
+                            website=href if href.startswith("http") else "",
+                        ))
+        except Exception as e:
+            logger.debug(f"  AngelList {url}: {e}")
+
+    logger.debug(f"  AngelList/Wellfound: {len(leads)} leads")
+    return leads
+
+
+# ──────────────────────────────────────────────────
 #  Main aggregation function
 # ──────────────────────────────────────────────────
 
@@ -627,6 +980,15 @@ _FETCHERS = [
     ("GitHub JSON", _fetch_github_json_datasets),
     ("AVCA", _fetch_avca),
     ("IVCA", _fetch_ivca),
+    ("LAVCA", _fetch_lavca),
+    ("SVCA", _fetch_svca),
+    ("HKVCA", _fetch_hkvca),
+    ("AVCAL", _fetch_avcal),
+    ("KVCA", _fetch_kvca),
+    ("ILPA", _fetch_ilpa),
+    ("JVCA", _fetch_jvca),
+    ("Dealroom", _fetch_dealroom_public),
+    ("AngelList", _fetch_angellist_investors),
 ]
 
 

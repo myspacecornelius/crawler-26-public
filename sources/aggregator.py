@@ -55,14 +55,14 @@ class SourceAggregator:
         # ── Source 1: Curated seed database ──
         seed_leads = load_seed_leads()
         seed_count = self._dedup_add(seed_leads, "seed_db")
-        print(f"  📂  Seed database: {seed_count} leads")
+        print(f"  📂  Seed database: {seed_count} firms")
 
         # ── Source 2: GitHub VC lists (HTTP-based, no browser) ──
         try:
             from sources.github_lists import fetch_github_vc_lists
             github_leads = await fetch_github_vc_lists()
             gh_count = self._dedup_add(github_leads, "github_lists")
-            print(f"  🐙  GitHub lists: {gh_count} new leads")
+            print(f"  🐙  GitHub lists: {gh_count} new firms")
         except Exception as e:
             logger.warning(f"  ⚠️  GitHub lists failed: {e}")
 
@@ -71,13 +71,13 @@ class SourceAggregator:
             from sources.directory_fetchers import fetch_all_directories
             dir_leads = await fetch_all_directories()
             dir_count = self._dedup_add(dir_leads, "http_directories")
-            print(f"  🌐  HTTP directories: {dir_count} new leads")
+            print(f"  🌐  HTTP directories: {dir_count} new firms")
         except Exception as e:
             logger.warning(f"  ⚠️  HTTP directories failed: {e}")
 
         self._stats["total_deduped"] = len(self.all_leads)
 
-        print(f"\n  ✅  Aggregator complete: {len(self.all_leads)} unique leads")
+        print(f"\n  ✅  Aggregator complete: {len(self.all_leads)} unique target firms")
         print(f"      Seed: {self._stats['seed_db']} | GitHub: {self._stats['github_lists']} | Directories: {self._stats['http_directories']}")
 
         return self.all_leads

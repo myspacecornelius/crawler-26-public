@@ -7,14 +7,19 @@ A full-stack system that discovers investor contacts across VC/PE fund websites,
 ## Project Tree
 
 ```
-crawl/
+.
 ├── engine.py                          # Main pipeline orchestrator
 ├── deep_crawl.py                      # Playwright-based fund website crawler
 ├── enrich_checkpoint.py               # Checkpoint-based enrichment runner
 ├── requirements.txt                   # Python dependencies
+├── requirements-dev.txt               # Dev dependencies
+├── pyproject.toml                     # Build & tool config
+├── .env.example                       # Environment secrets template
+├── alembic.ini                        # Database migration config
 ├── gameplan.md                        # Strategic planning notes
 │
 ├── adapters/                          # VC directory adapters
+├── alembic/                           # Database migration scripts
 │   ├── base.py                        #   InvestorLead data model
 │   ├── angelmatch.py                  #   AngelMatch scraper
 │   ├── crunchbase.py                  #   Crunchbase adapter
@@ -154,6 +159,8 @@ crawl/
 │   ├── searcher.py                    #   Single-engine search wrapper
 │   └── aggregator.py                  #   Discovery result aggregation
 │
+├── docs/                              # Project documentation
+│
 ├── enrichment/                        # Email discovery & validation
 │   ├── email_guesser.py               #   Pattern-based email generation (8 patterns)
 │   ├── email_validator.py             #   Format + MX + SMTP verification
@@ -200,6 +207,16 @@ crawl/
 ├── output/                            # Data export
 │   ├── csv_writer.py                  #   Master CSV writer + checkpoints
 │   └── webhook.py                     #   Discord/Slack notifications
+│
+├── pipeline/                          # Pipeline task logic and execution
+│   ├── tasks.py                       #   Celery/Redis asynchronous workers
+│   ├── retry.py                       #   Retry handlers and backoff algorithms
+│   ├── metrics.py                     #   Prometheus/StatsD pipeline metrics
+│   └── logging.py                     #   Structured JSON log formatters
+│
+├── scraping/                          # Scraper safety modules
+│   ├── circuit_breaker.py             #   Protective fallback state machine
+│   └── domain_limiter.py              #   Concurrency limiters by domain
 │
 ├── scripts/
 │   └── expand_seed.py                 #   Seed database expansion utility
@@ -291,7 +308,15 @@ crawl/
 # Python setup
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
+pip install -r requirements-dev.txt
 playwright install chromium
+
+# Environment setup
+cp .env.example .env
+# Edit .env and supply keys as needed
+
+# Database migrations
+alembic upgrade head
 
 # Run the crawl pipeline
 python engine.py --deep --headless --force-recrawl
@@ -343,6 +368,10 @@ cd landing && npx tsx scripts/export-pdf.ts
 | `/billing` | Stripe checkout, portal, plans |
 | `/users` | Register, login, profile |
 | `/verticals` | List, detail |
+| `/config` | Application configuration |
+| `/metrics` | System metrics and health |
+| `/notifications` | Activity notifications |
+| `/analytics` | System analytics |
 
 ---
 

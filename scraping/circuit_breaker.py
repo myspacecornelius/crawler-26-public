@@ -35,15 +35,23 @@ class CircuitBreaker:
     def __init__(
         self,
         failure_threshold: int = 3,
-        cooldown_seconds: float = 300.0,
+        cooldown_seconds: float = 90.0,
+        max_cooldown_seconds: float = 600.0,
     ):
         self.failure_threshold = failure_threshold
-        self.cooldown_seconds = cooldown_seconds
+        self.base_cooldown = cooldown_seconds
+        self.max_cooldown = max_cooldown_seconds
         self.state = CircuitState.CLOSED
         self.consecutive_failures = 0
         self.last_failure_time: float = 0.0
         self.total_failures = 0
         self.total_successes = 0
+        self._trip_count = 0  # number of times circuit has opened
+
+    @property
+    def cooldown_seconds(self) -> float:
+        """Exponential backoff: 90s → 180s → 360s → 600s (cap)."""
+        return min(self.base_cooldown * (2 ** self._trip_count), self.max_cooldown)
 
     def allow_request(self) -> bool:
         """Check if a request should be allowed through."""
@@ -64,6 +72,7 @@ class CircuitBreaker:
         self.consecutive_failures = 0
         if self.state == CircuitState.HALF_OPEN:
             self.state = CircuitState.CLOSED
+            self._trip_count = 0  # reset backoff on recovery
             logger.info("  Circuit breaker: HALF_OPEN -> CLOSED (recovered)")
 
     def record_failure(self):
@@ -74,15 +83,21 @@ class CircuitBreaker:
 
         if self.state == CircuitState.HALF_OPEN:
             self.state = CircuitState.OPEN
-            logger.warning("  Circuit breaker: HALF_OPEN -> OPEN (probe failed)")
+            self._trip_count += 1
+            logger.warning(
+                f"  Circuit breaker: HALF_OPEN -> OPEN "
+                f"(probe failed, next cooldown {self.cooldown_seconds:.0f}s)"
+            )
         elif (
             self.state == CircuitState.CLOSED
             and self.consecutive_failures >= self.failure_threshold
         ):
             self.state = CircuitState.OPEN
+            self._trip_count += 1
             logger.warning(
                 f"  Circuit breaker: CLOSED -> OPEN "
-                f"(after {self.consecutive_failures} consecutive failures)"
+                f"(after {self.consecutive_failures} consecutive failures, "
+                f"cooldown {self.cooldown_seconds:.0f}s)"
             )
 
     @property
@@ -114,10 +129,12 @@ class DomainCircuitBreakerManager:
     def __init__(
         self,
         failure_threshold: int = 3,
-        cooldown_seconds: float = 300.0,
+        cooldown_seconds: float = 90.0,
+        max_cooldown_seconds: float = 600.0,
     ):
         self.failure_threshold = failure_threshold
         self.cooldown_seconds = cooldown_seconds
+        self.max_cooldown_seconds = max_cooldown_seconds
         self._breakers: Dict[str, CircuitBreaker] = {}
 
     def _domain_key(self, url: str) -> str:
@@ -133,6 +150,7 @@ class DomainCircuitBreakerManager:
             self._breakers[domain] = CircuitBreaker(
                 failure_threshold=self.failure_threshold,
                 cooldown_seconds=self.cooldown_seconds,
+                max_cooldown_seconds=self.max_cooldown_seconds,
             )
         return self._breakers[domain]
 

@@ -323,6 +323,109 @@ class BraveSearchEngine(SearchEngine):
             return []
 
 
+# ── Startpage Engine ────────────────────────────
+
+class StartpageEngine(SearchEngine):
+    """Startpage search — Google results via privacy proxy, no API key needed."""
+
+    name = "startpage"
+    requires_key = False
+
+    _USER_AGENTS = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_3) AppleWebKit/605.1.15 "
+        "(KHTML, like Gecko) Version/17.2 Safari/605.1.15",
+        "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0",
+    ]
+
+    async def search(self, session: aiohttp.ClientSession, query: str) -> List[str]:
+        await asyncio.sleep(random.uniform(2.5, 4.5))  # Be polite
+        data = {"query": query, "cat": "web", "language": "english"}
+        headers = {
+            "User-Agent": random.choice(self._USER_AGENTS),
+            "Accept": "text/html,application/xhtml+xml",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://www.startpage.com/",
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
+        try:
+            async with session.post(
+                "https://www.startpage.com/sp/search",
+                data=data,
+                headers=headers,
+                timeout=aiohttp.ClientTimeout(total=20),
+            ) as resp:
+                if resp.status != 200:
+                    return []
+                html = await resp.text()
+                if "captcha" in html.lower() or "blocked" in html.lower():
+                    logger.warning(f"  [{self.name}] Possible block, backing off 90s")
+                    await asyncio.sleep(90)
+                    return []
+                return self._extract_urls(html)
+        except Exception as e:
+            logger.debug(f"  [{self.name}] Query failed: {e}")
+            return []
+
+    @staticmethod
+    def _extract_urls(html: str) -> List[str]:
+        urls = []
+        for match in re.finditer(r'href="(https?://[^"]+)"', html):
+            u = match.group(1)
+            if "startpage.com" not in u and "ixquick" not in u:
+                urls.append(u)
+        return urls
+
+
+# ── Mojeek Engine ───────────────────────────────
+
+class MojeekEngine(SearchEngine):
+    """Mojeek — independent search engine with its own index. No API key for HTML scrape."""
+
+    name = "mojeek"
+    requires_key = False
+
+    _USER_AGENTS = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0",
+    ]
+
+    async def search(self, session: aiohttp.ClientSession, query: str) -> List[str]:
+        await asyncio.sleep(random.uniform(2.0, 4.0))
+        encoded = urllib.parse.quote_plus(query)
+        url = f"https://www.mojeek.com/search?q={encoded}"
+        headers = {
+            "User-Agent": random.choice(self._USER_AGENTS),
+            "Accept": "text/html,application/xhtml+xml",
+            "Accept-Language": "en-US,en;q=0.9",
+        }
+        try:
+            async with session.get(url, headers=headers, timeout=aiohttp.ClientTimeout(total=20)) as resp:
+                if resp.status != 200:
+                    return []
+                html = await resp.text()
+                return self._extract_urls(html)
+        except Exception as e:
+            logger.debug(f"  [{self.name}] Query failed: {e}")
+            return []
+
+    @staticmethod
+    def _extract_urls(html: str) -> List[str]:
+        urls = []
+        # Mojeek results have <a class="ob" href="...">
+        for match in re.finditer(r'<a[^>]+class="ob"[^>]+href="(https?://[^"]+)"', html):
+            urls.append(match.group(1))
+        # Fallback: generic href extraction
+        if not urls:
+            for match in re.finditer(r'href="(https?://(?!www\.mojeek\.com)[^"]+)"', html):
+                u = match.group(1)
+                if "mojeek.com" not in u:
+                    urls.append(u)
+        return urls
+
+
 # ── Engine Registry ──────────────────────────────
 
 ENGINE_CLASSES: Dict[str, type] = {
@@ -330,6 +433,8 @@ ENGINE_CLASSES: Dict[str, type] = {
     "google": GoogleSerpAPIEngine,
     "bing": BingSearchEngine,
     "brave": BraveSearchEngine,
+    "startpage": StartpageEngine,
+    "mojeek": MojeekEngine,
 }
 
 
@@ -338,7 +443,9 @@ def _build_engines(engine_config: dict) -> List[SearchEngine]:
     engines = []
     for name, cls in ENGINE_CLASSES.items():
         cfg = engine_config.get(name, {})
-        enabled = cfg.get("enabled", name == "duckduckgo")  # DDG on by default
+        # Enable no-key engines by default
+        no_key_default = name in ("duckduckgo", "bing", "startpage", "mojeek")
+        enabled = cfg.get("enabled", no_key_default)
         if not enabled:
             continue
 

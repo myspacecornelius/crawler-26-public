@@ -1,5 +1,5 @@
 # Email Ranking Report
-Generated: 2026-03-17 23:02
+Generated: 2026-03-22 00:09
 
 ## Methodology
 
@@ -15,7 +15,7 @@ Email candidates are ranked using deterministic evidence only — no SMTP, no pa
 | `base_rate` | Global VC corpus statistics (n=361 scraped emails) | 0.02–0.41 |
 
 ### Global VC email pattern base rates
-Derived from 12510 real scraped emails in this corpus:
+Derived from 15276 real scraped emails in this corpus:
 
 | Pattern | Rate |
 |---------|------|
@@ -43,38 +43,38 @@ and top-2 in `investor_leads_top_candidates.csv`.
 
 | Metric | Count |
 |--------|-------|
-| Total people | 12523 |
-| Domains with observed pattern | 58 |
-| Domains with MX record | 531 / 546 |
-| Domains without MX (penalised) | 15 |
+| Total people | 15511 |
+| Domains with observed pattern | 49 |
+| Domains with MX record | 823 / 887 |
+| Domains without MX (penalised) | 64 |
 
 ### Confidence tiers (top-1 per person)
 
 | Tier | Count | Criteria |
 |------|-------|---------|
-| HIGH | 1183 | Score ≥ 0.75 — domain pattern confirmed |
-| MEDIUM | 11214 | Score 0.40–0.74 — single observation or strong base rate |
-| LOW | 113 | Score < 0.40 — base rate only, no domain signal |
+| HIGH | 646 | Score ≥ 0.75 — domain pattern confirmed |
+| MEDIUM | 14464 | Score 0.40–0.74 — single observation or strong base rate |
+| LOW | 166 | Score < 0.40 — base rate only, no domain signal |
 
 ### Pattern source breakdown
 
 | Source | Count |
 |--------|-------|
-| Scraped ground truth | 367 |
-| Domain lock (2+ obs.) | 882 |
-| Domain hint (1 obs.) | 763 |
-| Base rate only | 10498 |
+| Scraped ground truth | 348 |
+| Domain lock (2+ obs.) | 403 |
+| Domain hint (1 obs.) | 688 |
+| Base rate only | 13837 |
 
 ### Pattern distribution in output
 
 | Pattern | Assigned |
 |---------|---------|
-| `{first}@{domain}` | 11066 |
-| `{f}{last}@{domain}` | 1035 |
-| `{first}.{last}@{domain}` | 136 |
-| `{last}@{domain}` | 121 |
-| `{first}{last}@{domain}` | 83 |
-| `other` | 69 |
+| `{first}@{domain}` | 14315 |
+| `{f}{last}@{domain}` | 448 |
+| `{first}.{last}@{domain}` | 191 |
+| `{last}@{domain}` | 130 |
+| `other` | 102 |
+| `{first}{last}@{domain}` | 90 |
 
 
 ---

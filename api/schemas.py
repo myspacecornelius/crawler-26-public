@@ -105,22 +105,27 @@ class LeadResponse(BaseModel):
 
     @classmethod
     def model_validate(cls, obj, **kwargs):
-        """Override to compute email_status from email_verified + email_source."""
+        """Override to compute email_status when the column value is 'unknown'.
+
+        If email_status is already set to a meaningful value on the ORM object,
+        use it directly. Otherwise, derive from email_verified + email_source
+        for backward compatibility with pre-migration data.
+        """
         instance = super().model_validate(obj, **kwargs)
-        if instance.email in ("N/A", "", None):
-            instance.email_status = "unknown"
-        elif instance.email_verified and instance.email_source == "scraped":
-            instance.email_status = "scraped"
-        elif instance.email_verified:
-            instance.email_status = "verified"
-        elif instance.email_source == "scraped":
-            instance.email_status = "scraped"
-        elif instance.email_source == "guessed":
-            instance.email_status = "guessed"
-        elif instance.email_source == "pattern":
-            instance.email_status = "guessed"
-        else:
-            instance.email_status = "unknown"
+        # Only compute if the column has the default 'unknown' value
+        if instance.email_status == "unknown":
+            if instance.email in ("N/A", "", None):
+                instance.email_status = "unknown"
+            elif instance.email_verified and instance.email_source == "scraped":
+                instance.email_status = "scraped"
+            elif instance.email_verified:
+                instance.email_status = "verified"
+            elif instance.email_source == "scraped":
+                instance.email_status = "scraped"
+            elif instance.email_source == "guessed":
+                instance.email_status = "guessed"
+            elif instance.email_source == "pattern":
+                instance.email_status = "guessed"
         return instance
 
 

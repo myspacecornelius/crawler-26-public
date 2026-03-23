@@ -29,9 +29,13 @@ async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit
 
 
 async def init_db():
-    """Create all tables (for development — use Alembic migrations in production)."""
+    """Create all tables (for development — use Alembic migrations in production).
+
+    Uses checkfirst=True so this is safe to call even when
+    Alembic migrations have already created the schema.
+    """
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(Base.metadata.create_all, checkfirst=True)
 
 
 async def get_db() -> AsyncSession:

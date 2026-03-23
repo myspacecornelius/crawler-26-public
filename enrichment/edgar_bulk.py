@@ -54,8 +54,10 @@ _INDEX_URL = _EDGAR_BASE + "/Archives/edgar/full-index/{year}/QTR{qtr}/company.i
 _INDEX_GZ_URL = _EDGAR_BASE + "/Archives/edgar/full-index/{year}/QTR{qtr}/company.gz"
 _FILING_BASE = _EDGAR_BASE + "/Archives/edgar/data"
 
-# Form D types we care about (D and D/A = amendment)
-_FORM_D_TYPES = {"D", "D/A"}
+# Form types we care about:
+#   D, D/A  = Regulation D offerings (fund officers)
+#   ADV, ADV/A, ADV-W = Registered investment advisers (principals, CCOs)
+_FORM_D_TYPES = {"D", "D/A", "ADV", "ADV/A", "ADV-W"}
 
 # CSV header matching the master investor_leads format
 _CSV_FIELDNAMES = [
@@ -311,6 +313,108 @@ def parse_form_d_xml(xml_text: str, record: dict) -> list[dict]:
     return results
 
 
+def parse_form_adv_text(text: str, record: dict) -> list[dict]:
+    """
+    Parse a Form ADV filing (XML or plain text) and extract principals.
+    Form ADV has a different structure — it lists control persons, officers,
+    and directors of registered investment advisers.
+    """
+    results: list[dict] = []
+    company = record.get("company", "N/A")
+    state = record.get("state", "N/A")
+    date_filed = record.get("date_filed", datetime.utcnow().strftime("%Y-%m-%d"))
+
+    # Try XML parse first (some ADV filings are XML)
+    try:
+        root = ET.fromstring(text.encode("utf-8", errors="replace"))
+        # ADV XML: look for <Info> blocks with name fields
+        for tag in ("controlPerson", "officer", "director", "signatory",
+                     "ScheduleA", "ScheduleB"):
+            for person in _find_all_ns(root, tag):
+                first = _text_of(_find_ns(person, "FirstName")) or _text_of(_find_ns(person, "firstName"))
+                last = _text_of(_find_ns(person, "LastName")) or _text_of(_find_ns(person, "lastName"))
+                if not first and not last:
+                    name = _text_of(_find_ns(person, "Name")) or _text_of(_find_ns(person, "name"))
+                    if name:
+                        parts = name.strip().split(None, 1)
+                        first = parts[0] if parts else ""
+                        last = parts[1] if len(parts) > 1 else ""
+                if not first and not last:
+                    continue
+                full_name = f"{first} {last}".strip()
+                title = (_text_of(_find_ns(person, "Title")) or
+                         _text_of(_find_ns(person, "title")) or
+                         _text_of(_find_ns(person, "Position")) or
+                         "Principal")
+                results.append({
+                    "name": full_name,
+                    "email": "N/A",
+                    "email_status": "unknown",
+                    "role": title,
+                    "fund": company,
+                    "focus_areas": [],
+                    "stage": "N/A",
+                    "check_size": "N/A",
+                    "location": state,
+                    "linkedin": "N/A",
+                    "website": "",
+                    "source": "SEC EDGAR Form ADV",
+                    "scraped_at": datetime.utcnow().isoformat(),
+                    "lead_score": 0,
+                    "tier": "",
+                    "_date_filed": date_filed,
+                    "_cik": record.get("cik", ""),
+                })
+        if results:
+            return results
+    except ET.ParseError:
+        pass
+
+    # Fallback: regex extraction from plain text / HTML ADV filings
+    # Pattern: lines like "JOHN A. SMITH" followed by "Chief Compliance Officer"
+    name_pattern = re.compile(
+        r'^([A-Z][a-z]+(?:\s+[A-Z]\.?)?\s+[A-Z][a-z]{2,})\s*$', re.MULTILINE
+    )
+    role_keywords = {"partner", "principal", "director", "officer", "president",
+                     "ceo", "cfo", "coo", "cco", "managing", "chief", "head",
+                     "founder", "chairman", "compliance", "adviser", "advisor"}
+    lines = text.split("\n")
+    for i, line in enumerate(lines):
+        line_s = line.strip()
+        m = name_pattern.match(line_s)
+        if m:
+            full_name = m.group(1).strip()
+            # Look at the next 3 lines for a role
+            role = "Principal"
+            for j in range(1, 4):
+                if i + j < len(lines):
+                    candidate = lines[i + j].strip()
+                    if candidate and any(kw in candidate.lower() for kw in role_keywords):
+                        role = candidate
+                        break
+            results.append({
+                "name": full_name,
+                "email": "N/A",
+                "email_status": "unknown",
+                "role": role,
+                "fund": company,
+                "focus_areas": [],
+                "stage": "N/A",
+                "check_size": "N/A",
+                "location": state,
+                "linkedin": "N/A",
+                "website": "",
+                "source": "SEC EDGAR Form ADV",
+                "scraped_at": datetime.utcnow().isoformat(),
+                "lead_score": 0,
+                "tier": "",
+                "_date_filed": date_filed,
+                "_cik": record.get("cik", ""),
+            })
+
+    return results
+
+
 # ── Network fetching ──────────────────────────────────────────────────────────
 
 def _headers() -> dict:
@@ -438,18 +542,22 @@ async def _process_filing(
     limiter: _RateLimiter,
 ) -> list[dict]:
     """
-    Fetch one Form D XML filing and extract officer records.
+    Fetch one filing and extract officer records.
+    Dispatches to the correct parser based on form type.
     Returns a (possibly empty) list of officer dicts.
     """
     xml_url = _xml_url_from_record(record)
     if not xml_url:
         return []
 
-    xml_text = await _fetch_text(xml_url, session, limiter)
-    if not xml_text:
+    text = await _fetch_text(xml_url, session, limiter)
+    if not text:
         return []
 
-    return parse_form_d_xml(xml_text, record)
+    form_type = record.get("form_type", "D")
+    if form_type.startswith("ADV"):
+        return parse_form_adv_text(text, record)
+    return parse_form_d_xml(text, record)
 
 
 # ── CSV output ────────────────────────────────────────────────────────────────
@@ -505,7 +613,7 @@ async def bulk_extract_form_d_officers(
 
     Args:
         output_file:  Path to write the output CSV.
-        years:        List of years to pull (default: [2022, 2023, 2024]).
+        years:        List of years to pull (default: [2016–2025]).
         max_filings:  Maximum number of filings to process (across all quarters).
         concurrency:  Number of concurrent HTTP workers (max 10 recommended).
         quarters:     Quarters to pull per year (default: [1, 2, 3, 4]).
@@ -514,7 +622,7 @@ async def bulk_extract_form_d_officers(
         List of officer dicts (also written to output_file as CSV).
     """
     if years is None:
-        years = [2022, 2023, 2024]
+        years = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
     if quarters is None:
         quarters = [1, 2, 3, 4]
 

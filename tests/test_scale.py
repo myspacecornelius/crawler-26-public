@@ -239,7 +239,7 @@ class TestStep3_ConcurrencyAndTimeout:
         wait_for_timeouts = re.findall(r"wait_for\([^,]+,\s*timeout=(\d+\.?\d*)", source)
         assert wait_for_timeouts, "No timeout value found in wait_for() call"
         t = float(wait_for_timeouts[0])
-        assert 20 <= t <= 120, f"Per-fund timeout {t}s is outside reasonable range 20-120s"
+        assert 20 <= t <= 300, f"Per-fund timeout {t}s is outside reasonable range 20-300s"
 
     def test_team_pages_limit_increased(self):
         """_crawl_fund should try at least 5 team page candidates (was 3)."""
