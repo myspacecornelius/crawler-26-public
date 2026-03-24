@@ -201,6 +201,7 @@ class TestEmailValidatorDNSErrors:
         assert "flaky.com" in email_validator.dns_error_domains
 
     def test_cache_stats(self, email_validator):
+        email_validator._mx_cache.clear()
         email_validator._mx_cache["a.com"] = True
         email_validator._mx_cache["b.com"] = False
         stats = email_validator.cache_stats

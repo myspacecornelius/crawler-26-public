@@ -251,7 +251,7 @@ class TestEmailGuesserInit:
 
     def test_default_init(self):
         guesser = EmailGuesser()
-        assert guesser.concurrency == 10
+        assert guesser.concurrency == 30
         assert guesser.stats["attempted"] == 0
 
     def test_custom_concurrency(self):

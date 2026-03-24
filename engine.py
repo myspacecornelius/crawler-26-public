@@ -591,6 +591,7 @@ class CrawlEngine:
     async def run(self):
         """Execute the full crawl pipeline."""
         start_time = time.time()
+        self.metrics.stage_start("pipeline_total")
 
         # Initialize lead store for streaming persistence
         await self.lead_store.init()
@@ -1363,6 +1364,10 @@ def parse_args():
     parser.add_argument(
         "--skip-fund-intel", action="store_true",
         help="Skip fund intelligence web enrichment",
+    )
+    parser.add_argument(
+        "--skip-smtp", action="store_true",
+        help="Skip SMTP verification step",
     )
     parser.add_argument(
         "--log-format", type=str, default=settings.log_format,

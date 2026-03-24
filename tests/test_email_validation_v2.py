@@ -204,11 +204,13 @@ class TestValidatorCacheStats:
 
     def test_cache_stats_empty(self):
         validator = EmailValidator()
+        validator._mx_cache.clear()
         stats = validator.cache_stats
         assert stats["domains_cached"] == 0
         assert stats["smtp_checks_cached"] == 0
 
     def test_cache_stats_after_validation(self, email_validator):
+        email_validator._mx_cache.clear()
         email_validator._mx_cache["test.com"] = True
         stats = email_validator.cache_stats
         assert stats["domains_cached"] == 1
