@@ -9,8 +9,8 @@ html {
 }
 
 body {
-  background-color: #f5f1ea;
-  color: #1a1a17;
+  background-color: #F7F3EA;
+  color: #1E1916;
   font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -24,7 +24,7 @@ body::before {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.025;
+  opacity: 0.02;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 256px 256px;
@@ -40,14 +40,14 @@ body > * {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f5f1ea;
+  background: #F7F3EA;
 }
 ::-webkit-scrollbar-thumb {
-  background: #ccc9c0;
+  background: #C5B9A8;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #9a978f;
+  background: #7A7066;
 }
 
 /* Print styles */

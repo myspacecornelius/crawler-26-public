@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Search, RefreshCw } from "lucide-react";
+import { ArrowRight, Search, RefreshCw, Check } from "lucide-react";
 import { HoneycombPattern } from "./icons";
-import { ButtonPrimary, ButtonSecondary, Container, UnderlineAccent, scrollToForm } from "./primitives";
+import { ButtonPrimary, ButtonSecondary, Container, scrollToForm } from "./primitives";
 
 /* ═══════════════════════════════════════════════════
    DATA PREVIEW (interactive mock table)
@@ -29,50 +29,194 @@ const MOCK_DATA = {
 } as const;
 type MockTab = keyof typeof MOCK_DATA;
 
+const FIT_SIGNALS = [
+  "Recent deal overlap",
+  "Partner thesis match",
+  "Check-size alignment",
+];
+
 function DataPreview() {
   const [activeTab, setActiveTab] = useState<MockTab>("Series A");
+  const [selectedRow, setSelectedRow] = useState<number>(1);
   const tabs: MockTab[] = ["Seed", "Series A", "Series B"];
   const rows = MOCK_DATA[activeTab];
+
   return (
-    <div className="bg-petrol-700 rounded-[22px] p-[2px] shadow-xl shadow-petrol-glow ring-1 ring-petrol-600/30">
-      <div className="bg-petrol-800/80 backdrop-blur-xl rounded-[20px] border border-white/10 overflow-hidden">
-        <div className="px-4 pt-4 pb-3 border-b border-white/10">
-          <div className="flex items-center gap-2 bg-white/10 rounded-button px-3 py-2">
-            <Search size={14} strokeWidth={1.75} className="text-white/50" />
-            <span className="text-white/40 text-sm">Search funds, partners, sectors...</span>
-          </div>
-        </div>
-        <div className="flex gap-1 px-4 pt-3 pb-2">
-          {tabs.map((tab) => (
-            <button key={tab} onClick={() => setActiveTab(tab)} className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-150 ${activeTab === tab ? "bg-honey-500/30 text-white" : "text-white/50 hover:text-white/70 hover:bg-white/5"}`}>{tab}</button>
-          ))}
-        </div>
-        {/* Scrollable grid wrapper for mobile */}
-        <div className="overflow-x-auto">
-          <div className="min-w-[480px]">
-            <div className="px-4 py-2 grid grid-cols-[1fr_0.8fr_0.6fr_0.5fr_0.4fr] gap-2 text-[10px] font-semibold text-white/40 uppercase tracking-wider border-b border-white/5">
-              <span>Fund / Partner</span><span>Sector</span><span>Check</span><span>Location</span><span>Score</span>
+    <div className="flex gap-3 items-start">
+      {/* Main table card */}
+      <div className="flex-1 min-w-0 rounded-[22px] p-[2px] shadow-xl"
+        style={{
+          backgroundColor: "#3D6A67",
+          boxShadow: "0 20px 50px -12px rgba(46,90,88,0.25), 0 0 0 1px rgba(46,90,88,0.3)",
+        }}
+      >
+        <div className="rounded-[20px] border overflow-hidden"
+          style={{
+            backgroundColor: "rgba(30,27,22,0.92)",
+            backdropFilter: "blur(16px)",
+            borderColor: "rgba(255,255,255,0.10)",
+          }}
+        >
+          {/* Search bar */}
+          <div className="px-4 pt-4 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.10)" }}>
+            <div className="flex items-center gap-2 rounded-lg px-3 py-2" style={{ backgroundColor: "rgba(255,255,255,0.10)" }}>
+              <Search size={14} strokeWidth={1.75} style={{ color: "rgba(255,255,255,0.5)" }} />
+              <span className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>Search funds, partners, sectors...</span>
             </div>
-            <AnimatePresence mode="wait">
-              <motion.div key={activeTab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.2 }}>
-                {rows.map((row, i) => (
-                  <div key={i} className="px-4 py-3 grid grid-cols-[1fr_0.8fr_0.6fr_0.5fr_0.4fr] gap-2 border-b border-white/5 last:border-0 hover:bg-white/[0.04] transition-colors">
-                    <div><div className="text-white text-xs font-semibold leading-snug">{row.fund}</div><div className="text-white/50 text-[10px]">{row.partner}</div></div>
-                    <div className="text-white/70 text-xs self-center">{row.sector}</div>
-                    <div className="text-white/70 text-xs self-center">{row.check}</div>
-                    <div className="text-white/70 text-xs self-center">{row.location}</div>
-                    <div className="self-center"><span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${row.score >= 95 ? "bg-honey-500/25 text-honey-400" : row.score >= 90 ? "bg-petrol-600/40 text-petrol-mist" : "bg-white/10 text-white/70"}`}>{row.score}</span></div>
-                  </div>
-                ))}
-              </motion.div>
-            </AnimatePresence>
           </div>
-        </div>
-        <div className="px-4 py-2.5 border-t border-white/5 flex items-center justify-between">
-          <span className="text-white/30 text-[10px]">Showing 3 of 15,548 leads</span>
-          <span className="text-white/40 text-[10px] flex items-center gap-1">Updated daily <RefreshCw size={9} strokeWidth={1.75} /></span>
+
+          {/* Filter chips */}
+          <div className="flex gap-1 px-4 pt-3 pb-2">
+            {tabs.map((tab) => (
+              <motion.button
+                key={tab}
+                onClick={() => { setActiveTab(tab); setSelectedRow(tab === "Series A" ? 1 : -1); }}
+                whileHover={{ y: -1 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+                className="px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-150"
+                style={
+                  activeTab === tab
+                    ? { backgroundColor: "rgba(199,155,44,0.35)", color: "#F8F4EC", boxShadow: "inset 0 0 0 1px rgba(199,155,44,0.4)" }
+                    : { color: "rgba(255,255,255,0.5)" }
+                }
+                onMouseEnter={(e) => {
+                  if (activeTab !== tab) {
+                    e.currentTarget.style.color = "rgba(255,255,255,0.7)";
+                    e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.05)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (activeTab !== tab) {
+                    e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+                    e.currentTarget.style.backgroundColor = "transparent";
+                  }
+                }}
+              >
+                {tab}
+              </motion.button>
+            ))}
+          </div>
+
+          {/* Table header */}
+          <div className="overflow-x-auto">
+            <div className="min-w-[480px]">
+              <div
+                className="px-4 py-2 grid grid-cols-[1fr_0.8fr_0.6fr_0.5fr_0.4fr] gap-2 text-[10px] font-semibold uppercase tracking-wider"
+                style={{ color: "rgba(255,255,255,0.4)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+              >
+                <span>Fund / Partner</span><span>Sector</span><span>Check</span><span>Location</span><span>Score</span>
+              </div>
+
+              {/* Table rows */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {rows.map((row, i) => {
+                    const isSelected = selectedRow === i;
+                    return (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.25, delay: i * 0.04, ease: "easeOut" }}
+                        onClick={() => setSelectedRow(isSelected ? -1 : i)}
+                        className="px-4 py-3 grid grid-cols-[1fr_0.8fr_0.6fr_0.5fr_0.4fr] gap-2 cursor-pointer transition-colors duration-150"
+                        style={{
+                          borderBottom: i < rows.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none",
+                          borderLeft: isSelected ? "2px solid #C79B2C" : "2px solid transparent",
+                          backgroundColor: isSelected ? "rgba(199,155,44,0.08)" : undefined,
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isSelected) e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.04)";
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isSelected) e.currentTarget.style.backgroundColor = "transparent";
+                        }}
+                      >
+                        <div>
+                          <div className="text-xs font-semibold leading-snug" style={{ color: isSelected ? "#F8F4EC" : "rgba(255,255,255,0.95)" }}>{row.fund}</div>
+                          <div className="text-[10px]" style={{ color: "rgba(255,255,255,0.5)" }}>{row.partner}</div>
+                        </div>
+                        <div className="text-xs self-center" style={{ color: "rgba(255,255,255,0.7)" }}>{row.sector}</div>
+                        <div className="text-xs self-center" style={{ color: "rgba(255,255,255,0.7)" }}>{row.check}</div>
+                        <div className="text-xs self-center" style={{ color: "rgba(255,255,255,0.7)" }}>{row.location}</div>
+                        <div className="self-center">
+                          <span
+                            className="text-[11px] font-bold px-2 py-0.5 rounded-full"
+                            style={
+                              row.score >= 95
+                                ? { backgroundColor: "rgba(199,155,44,0.25)", color: "#E3C56A" }
+                                : row.score >= 90
+                                  ? { backgroundColor: "rgba(46,90,88,0.40)", color: "rgba(255,255,255,0.75)" }
+                                  : { backgroundColor: "rgba(255,255,255,0.10)", color: "rgba(255,255,255,0.7)" }
+                            }
+                          >
+                            {row.score}
+                          </span>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="px-4 py-2.5 flex items-center justify-between" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+            <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>Showing 3 of 15,548 leads</span>
+            <span className="text-[10px] flex items-center gap-1" style={{ color: "rgba(255,255,255,0.4)" }}>Updated daily <RefreshCw size={9} strokeWidth={1.75} /></span>
+          </div>
         </div>
       </div>
+
+      {/* Side drilldown card */}
+      <AnimatePresence>
+        {selectedRow >= 0 && (
+          <motion.div
+            initial={{ opacity: 0, x: 8, scale: 0.97 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 8, scale: 0.97 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="hidden lg:block w-[172px] flex-shrink-0 rounded-xl p-4"
+            style={{
+              backgroundColor: "#FFFDF8",
+              border: "1px solid #DDD1BE",
+              boxShadow: "0 4px 16px -4px rgba(21,17,14,0.08)",
+            }}
+          >
+            <div className="text-[11px] font-semibold mb-3" style={{ color: "#1E1916" }}>
+              Fit signals
+            </div>
+            <div className="flex flex-col gap-2.5">
+              {FIT_SIGNALS.map((signal, i) => (
+                <motion.div
+                  key={signal}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: 0.08 + i * 0.06 }}
+                  className="flex items-start gap-2"
+                >
+                  <div
+                    className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-px"
+                    style={{ backgroundColor: "rgba(199,155,44,0.15)" }}
+                  >
+                    <Check size={9} strokeWidth={3} style={{ color: "#C79B2C" }} />
+                  </div>
+                  <span className="text-[11px] leading-snug" style={{ color: "#5E554C" }}>
+                    {signal}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -84,22 +228,49 @@ function DataPreview() {
 export function Hero() {
   return (
     <section className="relative pt-28 pb-16 md:pt-36 md:pb-20 overflow-hidden">
-      <HoneycombPattern opacity={0.06} className="text-text-primary" />
+      {/* Honeycomb pattern -- top-right corner only */}
+      <div className="absolute top-0 right-0 w-[480px] h-[420px] pointer-events-none">
+        <HoneycombPattern opacity={0.03} className="text-text-primary" />
+      </div>
+
       <Container className="relative">
         <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
-          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <h1 className="text-[40px] md:text-[48px] leading-[1.10] font-[650] text-text-primary">
-              Stop guessing which VCs{" "}<UnderlineAccent><span className="text-petrol-600">fit your raise.</span></UnderlineAccent>
+          {/* Left column: headline + CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
+          >
+            <h1
+              className="text-[40px] md:text-[48px] leading-[1.10] font-[650]"
+              style={{ color: "#1E1916" }}
+            >
+              Stop guessing which VCs{" "}
+              <span style={{ color: "#2E5A58" }}>fit your raise.</span>
             </h1>
-            <p className="mt-5 text-base md:text-[17px] leading-relaxed text-text-secondary max-w-lg">Enriched, partner-level VC leads matched to your stage, sector, and geography -- with outreach copy, sequencing, and advisory support built in.</p>
+            <p
+              className="mt-5 text-base md:text-[17px] leading-relaxed max-w-lg"
+              style={{ color: "#5E554C" }}
+            >
+              Enriched, partner-level VC leads matched to your stage, sector, and geography -- with outreach copy, sequencing, and advisory support built in.
+            </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <ButtonPrimary onClick={scrollToForm}>Request access <ArrowRight size={16} strokeWidth={1.75} className="inline ml-1.5 -mt-0.5" /></ButtonPrimary>
+              <ButtonPrimary onClick={scrollToForm}>
+                Request access <ArrowRight size={16} strokeWidth={1.75} className="inline ml-1.5 -mt-0.5" />
+              </ButtonPrimary>
               <ButtonSecondary href="#what-you-get">See what&apos;s included</ButtonSecondary>
             </div>
-            <p className="mt-4 text-xs text-text-muted">No spam. 1--2 emails/week. Unsubscribe anytime.</p>
+            <p className="mt-4 text-xs" style={{ color: "#7A7066" }}>
+              No spam. 1--2 emails/week. Unsubscribe anytime.
+            </p>
           </motion.div>
-          {/* Show DataPreview on all viewports (horizontal scroll on mobile) */}
-          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15 }}>
+
+          {/* Right column: interactive product panel */}
+          <motion.div
+            initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 0.55, ease: "easeOut" }}
+          >
             <DataPreview />
           </motion.div>
         </div>

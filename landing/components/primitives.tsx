@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, Info, User } from "lucide-react";
 
 // ═══════════════════════════════════════════════════
-//  PRIMITIVES
+//  PRIMITIVES — updated design system
 // ═══════════════════════════════════════════════════
 
 export function Container({ children, className = "" }: { children: ReactNode; className?: string }) {
@@ -14,7 +14,14 @@ export function Container({ children, className = "" }: { children: ReactNode; c
 
 export function Section({ children, id, className = "" }: { children: ReactNode; id?: string; className?: string }) {
   return (
-    <motion.section id={id} className={`py-16 md:py-24 ${className}`} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.5, ease: "easeOut" }}>
+    <motion.section
+      id={id}
+      className={`py-24 ${className}`}
+      initial={{ opacity: 0, y: 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+    >
       <Container>{children}</Container>
     </motion.section>
   );
@@ -22,9 +29,9 @@ export function Section({ children, id, className = "" }: { children: ReactNode;
 
 export function SectionTitle({ children, subtitle }: { children: ReactNode; subtitle?: string }) {
   return (
-    <div className="mb-12 md:mb-16">
-      <h2 className="text-[32px] leading-[1.2] font-[650] text-text-primary">{children}</h2>
-      {subtitle && <p className="mt-3 text-base leading-relaxed text-text-secondary max-w-xl">{subtitle}</p>}
+    <div className="mb-12 md:mb-16 max-w-prose">
+      <h2 className="text-[30px] md:text-[36px] leading-[1.15] font-[650] text-text-primary tracking-tight">{children}</h2>
+      {subtitle && <p className="mt-3 text-[16px] leading-relaxed text-text-secondary max-w-xl">{subtitle}</p>}
     </div>
   );
 }
@@ -40,7 +47,7 @@ export function UnderlineAccent({ children }: { children: ReactNode }) {
 
 export function Card({ children, className = "", hover = true }: { children: ReactNode; className?: string; hover?: boolean }) {
   return (
-    <div className={`bg-surface-primary rounded-card border border-border-subtle shadow-card p-7 ${hover ? "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover" : ""} ${className}`}>
+    <div className={`bg-surface-card rounded-card border border-border-subtle shadow-card p-7 ${hover ? "transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-card-hover hover:border-border-strong" : ""} ${className}`}>
       {children}
     </div>
   );
@@ -82,14 +89,14 @@ export function TooltipInline({ text }: { text: string }) {
 
 export function ButtonPrimary({ children, onClick, type = "button", disabled = false, className = "" }: { children: ReactNode; onClick?: () => void; type?: "button" | "submit"; disabled?: boolean; className?: string }) {
   return (
-    <motion.button type={type} onClick={onClick} disabled={disabled} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className={`bg-honey-500 text-charcoal-900 font-semibold rounded-button px-5 py-3 text-[15px] hover:bg-honey-400 focus:outline-none focus:shadow-honey-ring disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 ${className}`}>
+    <motion.button type={type} onClick={onClick} disabled={disabled} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className={`bg-honey-500 text-charcoal-900 font-semibold rounded-button px-5 py-3 text-[15px] hover:bg-honey-400 focus:outline-none focus:shadow-honey-ring disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-fast ${className}`}>
       {children}
     </motion.button>
   );
 }
 
 export function ButtonSecondary({ children, onClick, href, className = "" }: { children: ReactNode; onClick?: () => void; href?: string; className?: string }) {
-  const cls = `inline-flex items-center justify-center border border-text-primary/20 text-text-primary font-semibold rounded-button px-5 py-3 text-[15px] hover:bg-honey-tint transition-colors duration-150 ${className}`;
+  const cls = `inline-flex items-center justify-center border border-border-strong text-text-primary font-semibold rounded-button px-5 py-3 text-[15px] hover:bg-honey-tint hover:border-honey-500/30 transition-all duration-fast ${className}`;
   if (href) return <a href={href} className={cls}>{children}</a>;
   return <button onClick={onClick} className={cls}>{children}</button>;
 }
@@ -98,7 +105,7 @@ export function Input({ label, id, type = "text", required = false, value, onCha
   return (
     <div>
       <label htmlFor={id} className="block text-sm font-medium text-text-primary mb-1.5">{label}{required && <span className="text-danger ml-0.5">*</span>}</label>
-      <input id={id} name={id} type={type} required={required} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="w-full bg-white border border-border-strong rounded-button px-3 py-3 text-[15px] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-honey-500 focus:ring-2 focus:ring-honey-glow transition-colors duration-150" aria-label={label} />
+      <input id={id} name={id} type={type} required={required} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="w-full bg-white border border-border-strong rounded-button px-3 py-3 text-[15px] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-honey-500 focus:ring-2 focus:ring-honey-glow transition-colors duration-fast" aria-label={label} />
     </div>
   );
 }
@@ -107,7 +114,7 @@ export function Select({ label, id, value, onChange, options, placeholder = "Sel
   return (
     <div>
       <label htmlFor={id} className="block text-sm font-medium text-text-primary mb-1.5">{label}</label>
-      <select id={id} name={id} value={value} onChange={(e) => onChange(e.target.value)} className="w-full bg-white border border-border-strong rounded-button px-3 py-3 text-[15px] text-text-primary focus:outline-none focus:border-honey-500 focus:ring-2 focus:ring-honey-glow transition-colors duration-150 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%239A978F%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_12px_center] bg-no-repeat" aria-label={label}>
+      <select id={id} name={id} value={value} onChange={(e) => onChange(e.target.value)} className="w-full bg-white border border-border-strong rounded-button px-3 py-3 text-[15px] text-text-primary focus:outline-none focus:border-honey-500 focus:ring-2 focus:ring-honey-glow transition-colors duration-fast appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%237A7066%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_12px_center] bg-no-repeat" aria-label={label}>
         <option value="">{placeholder}</option>
         {options.map((o) => <option key={o} value={o}>{o}</option>)}
       </select>

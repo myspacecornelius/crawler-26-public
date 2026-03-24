@@ -1365,10 +1365,7 @@ def parse_args():
         "--skip-fund-intel", action="store_true",
         help="Skip fund intelligence web enrichment",
     )
-    parser.add_argument(
-        "--skip-smtp", action="store_true",
-        help="Skip SMTP verification step",
-    )
+
     parser.add_argument(
         "--log-format", type=str, default=settings.log_format,
         choices=["json", "text"],
