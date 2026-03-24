@@ -23,11 +23,12 @@ async function fetchAPI(path: string, options: RequestInit = {}) {
   }
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
   if (res.status === 401) {
-    if (typeof window !== 'undefined') {
+    const body = await res.json().catch(() => ({}));
+    if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
       localStorage.removeItem('token');
       window.location.href = '/login';
     }
-    throw new Error('Unauthorized');
+    throw new Error(body.detail || 'Unauthorized');
   }
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
@@ -152,7 +153,7 @@ export async function importCSV(campaignId: string, file: File) {
     body: formData,
   });
   if (res.status === 401) {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
       localStorage.removeItem('token');
       window.location.href = '/login';
     }
