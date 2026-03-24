@@ -1,0 +1,157 @@
+# ── Fund Intelligence Configuration ──────────────────────
+# Controls the web-based fund intelligence enrichment module.
+
+# Crawl behavior
+crawl:
+  max_internal_pages: 30       # Max pages to crawl per fund site
+  max_depth: 2                 # Link crawl depth from homepage
+  request_timeout: 12          # HTTP timeout per request (seconds)
+  crawl_delay: 0.5             # Polite delay between requests (seconds)
+  playwright_fallback: true    # Use Playwright for JS-rendered pages
+  user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  concurrency: 5               # Max concurrent fund enrichments
+
+# Recency windows (months)
+recency:
+  recent: 12
+  active: 24
+  stale: 36
+
+# Page discovery keywords (URL path matching)
+page_keywords:
+  team:
+    - team
+    - people
+    - partners
+    - our-team
+    - who-we-are
+    - leadership
+    - investment-team
+    - professionals
+    - bios
+    - our-people
+  portfolio:
+    - portfolio
+    - companies
+    - investments
+    - portfolio-companies
+    - our-portfolio
+    - startups
+    - founders
+  thesis:
+    - thesis
+    - insights
+    - blog
+    - what-we-do
+    - approach
+    - strategy
+    - philosophy
+    - focus
+    - about
+  news:
+    - news
+    - press
+    - media
+    - announcements
+    - in-the-news
+  about:
+    - about
+    - about-us
+    - who-we-are
+    - our-story
+    - firm
+    - overview
+  contact:
+    - contact
+    - connect
+    - get-in-touch
+    - reach-out
+
+# Decision maker title scoring (higher = more senior / relevant)
+title_scores:
+  founding partner: 100
+  founder & partner: 100
+  co-founder: 95
+  general partner: 95
+  managing partner: 90
+  senior partner: 85
+  managing director: 80
+  partner: 75
+  venture partner: 70
+  operating partner: 65
+  director: 60
+  principal: 55
+  vice president: 50
+  vp: 50
+  senior associate: 40
+  associate: 30
+  analyst: 20
+  platform: 15
+  operations: 15
+  talent: 10
+  marketing: 10
+
+# Sector keyword buckets
+sector_keywords:
+  fintech: [fintech, financial technology, payments, banking, neobank, lending, insurance, insurtech, defi, "financial services"]
+  healthtech: [healthtech, health tech, healthcare, digital health, biotech, medtech, life sciences, pharma, therapeutics]
+  enterprise: [enterprise, saas, b2b, "enterprise software", cloud, productivity, workflow, collaboration]
+  consumer: [consumer, d2c, dtc, e-commerce, ecommerce, retail, "consumer internet", marketplace, social]
+  devtools: [devtools, developer tools, infrastructure, open source, api, platform, developer experience]
+  ai_ml: [ai, "artificial intelligence", "machine learning", ml, data, "data infrastructure", nlp, computer vision, "deep learning", llm, "generative ai"]
+  climate: [climate, cleantech, "clean energy", sustainability, "climate tech", carbon, renewable, energy transition]
+  crypto_web3: [crypto, web3, blockchain, defi, nft, decentralized, dao, "digital assets"]
+  cybersecurity: [cybersecurity, security, infosec, "information security", "cyber security", identity, privacy, compliance]
+  edtech: [edtech, education, learning, "ed tech", "education technology"]
+  proptech: [proptech, "real estate", "property technology", "real estate tech"]
+  mobility: [mobility, transportation, logistics, "supply chain", autonomous, ev, "electric vehicle"]
+  gaming: [gaming, games, esports, metaverse, virtual reality, vr, ar, "augmented reality"]
+  foodtech: [foodtech, "food tech", agtech, "ag tech", agriculture, food, "food & beverage"]
+  creator_economy: [creator, "creator economy", media, content, entertainment, streaming, social media]
+
+# Business model keyword buckets
+business_model_keywords:
+  marketplace: [marketplace, platform, two-sided, network effects, matching]
+  saas: [saas, "software as a service", subscription, recurring revenue, arr, mrr]
+  hardware: [hardware, devices, chips, semiconductors, robotics, iot]
+  biotech: [biotech, drug discovery, clinical trials, therapeutics, molecules]
+  infrastructure: [infrastructure, picks and shovels, tooling, platform, api-first]
+  consumer_app: [app, mobile, consumer app, social, community]
+
+# Geography keyword mapping
+geography_keywords:
+  us_broad: [united states, us, usa, america, "north america", nationwide, domestic]
+  us_sf: [san francisco, sf, "bay area", silicon valley, "south bay", palo alto]
+  us_nyc: [new york, nyc, manhattan, brooklyn, "new york city"]
+  us_boston: [boston, cambridge, "new england"]
+  us_la: [los angeles, la, "southern california", socal]
+  us_other: [seattle, austin, miami, chicago, denver, atlanta, dc, "washington dc"]
+  europe: [europe, european, uk, london, berlin, paris, amsterdam, "eu"]
+  latam: [latam, "latin america", brazil, mexico, colombia, "south america"]
+  apac: [asia, apac, "asia pacific", india, southeast asia, singapore, japan, korea, china]
+  global: [global, worldwide, international, "cross-border"]
+  israel: [israel, tel aviv, "israeli"]
+
+# Investment verb patterns for news/blog extraction
+investment_verbs:
+  - invested
+  - led
+  - co-led
+  - participated
+  - backed
+  - announced
+  - closed
+  - raised
+  - funded
+  - seed round
+  - series
+  - joined
+  - "led the"
+  - "co-invested"
+  - "invested in"
+  - "portfolio company"
+
+# Lead/follow evidence phrases
+lead_evidence:
+  lead: ["we lead", "lead investor", "led seed", "led the round", "lead rounds", "we typically lead", "led series", "lead or co-lead", "board seat", "we take board"]
+  follow: ["we participate", "participated in", "co-invested", "follow-on", "syndicate", "we join", "alongside"]

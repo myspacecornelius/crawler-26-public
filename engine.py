@@ -927,6 +927,21 @@ class CrawlEngine:
         else:
             print("  Greyhat enrichment skipped (--skip-greyhat)")
 
+        # ── Fund Intelligence (web-based enrichment) ──
+        if not getattr(self.args, 'skip_fund_intel', False):
+            try:
+                print("  Running fund intelligence enrichment...")
+                from enrichment.fund_intel_engine import FundIntelEngine
+                fund_intel = FundIntelEngine()
+                self.all_leads = await fund_intel.enrich_batch(self.all_leads)
+                self._checkpoint("fund_intel")
+            except Exception as e:
+                self._error_count += 1
+                logger.error(f"Fund intelligence failed: {e}", extra={"phase": "fund_intel"}, exc_info=True)
+                print(f"  Fund intelligence failed (continuing): {e}")
+        else:
+            print("  Fund intelligence skipped (--skip-fund-intel)")
+
         # ── SMTP batch verification ──
         if not getattr(self.args, 'skip_smtp', False):
             try:
@@ -1344,6 +1359,10 @@ def parse_args():
     parser.add_argument(
         "--expand-emails", action="store_true",
         help="Expand each contact into one row per email pattern (up to 8x volume)",
+    )
+    parser.add_argument(
+        "--skip-fund-intel", action="store_true",
+        help="Skip fund intelligence web enrichment",
     )
     parser.add_argument(
         "--log-format", type=str, default=settings.log_format,

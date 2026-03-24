@@ -40,10 +40,18 @@ class InvestorLead:
     lead_score: int = 0
     tier: str = ""
     email_status: str = "unknown"
+    # ── Fund intelligence fields (populated by FundIntelEngine) ──
+    fund_intel: dict = field(default_factory=dict)
 
     def to_dict(self) -> dict:
         d = asdict(self)
         d["focus_areas"] = "; ".join(self.focus_areas) if self.focus_areas else "N/A"
+        # Flatten fund_intel into top-level keys for CSV export
+        intel = d.pop("fund_intel", {})
+        for k, v in intel.items():
+            if k.startswith("_"):
+                continue
+            d[k] = v
         return d
 
 
