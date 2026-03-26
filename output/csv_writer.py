@@ -5,6 +5,7 @@ Handles CSV export with deduplication, delta detection, and formatted output.
 
 import csv
 import os
+import shutil
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -122,8 +123,15 @@ class CSVWriter:
         seen = set()
         deduped = []
 
-        # ── Load existing master CSV first ──
+        # ── Backup existing master before touching it ──
         master_file = self.enriched_dir / "investor_leads_master.csv"
+        if master_file.exists():
+            backup_name = f"investor_leads_master_BACKUP_{len(leads)}.csv"
+            backup_path = self.enriched_dir / backup_name
+            shutil.copy2(master_file, backup_path)
+            print(f"  🛡️  Backed up master CSV → {backup_name}")
+
+        # ── Load existing master CSV first ──
         if master_file.exists():
             try:
                 with open(master_file, "r", encoding="utf-8") as f:
