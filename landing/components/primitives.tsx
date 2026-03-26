@@ -53,9 +53,9 @@ export function Card({ children, className = "", hover = true }: { children: Rea
   );
 }
 
-export function BrandIconBadge({ children, variant = "honey" }: { children: ReactNode; variant?: "honey" | "petrol" | "danger" }) {
-  const bg = variant === "danger" ? "bg-danger/10" : variant === "petrol" ? "bg-petrol-mist" : "bg-honey-tint";
-  const color = variant === "danger" ? "text-danger" : variant === "petrol" ? "text-petrol-600" : "text-honey-500";
+export function BrandIconBadge({ children, variant = "honey" }: { children: ReactNode; variant?: "honey" | "accent" | "danger" }) {
+  const bg = variant === "danger" ? "bg-danger/10" : variant === "accent" ? "bg-accent-mist" : "bg-honey-tint";
+  const color = variant === "danger" ? "text-danger" : variant === "accent" ? "text-accent-600" : "text-honey-500";
   return (
     <div className={`w-9 h-9 rounded-xl ${bg} flex items-center justify-center flex-shrink-0 ${color}`}>
       {children}

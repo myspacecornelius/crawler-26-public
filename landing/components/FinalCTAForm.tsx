@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { TESTIMONIALS, STAGES, SECTORS, type Stage, type Sector, type FormState } from "./constants";
 import { AvatarPlaceholder, ButtonPrimary, Input, Section, Select } from "./primitives";
+import { HoneycombPattern } from "./icons";
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -38,15 +39,18 @@ export function FinalCTAForm() {
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((prev) => ({ ...prev, [key]: value }));
 
   return (
-    <Section id="final-cta" className="bg-charcoal-900 border-t border-charcoal-border">
-      <div className="max-w-xl mx-auto text-center">
+    <Section id="final-cta" className="bg-charcoal-900 border-t border-charcoal-border relative overflow-hidden">
+      {/* Honeycomb background */}
+      <HoneycombPattern opacity={0.03} className="text-honey-500" />
+
+      <div className="max-w-xl mx-auto text-center relative">
         <h2 className="text-[28px] md:text-[32px] leading-[1.2] font-[650] text-charcoal-text mb-3">Get your thesis-fit target list</h2>
-        <p className="text-sm text-charcoal-text/50 mb-10">Tell us about your raise. We&apos;ll build your first target list within 48 hours.</p>
+        <p className="text-[14px] text-charcoal-text/70 mb-10">Tell us about your raise. We&apos;ll build your first target list within 48 hours.</p>
         {submitted ? (
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white/[0.06] backdrop-blur-xl rounded-glass border border-white/10 p-8">
             <div className="w-14 h-14 rounded-full bg-honey-500/20 flex items-center justify-center mx-auto mb-4"><Check size={28} strokeWidth={2} className="text-honey-500" /></div>
             <h3 className="text-xl font-semibold text-charcoal-text mb-2">You&apos;re in.</h3>
-            <p className="text-sm text-charcoal-text/50">We&apos;ll reach out within 48 hours with your first target list and next steps.</p>
+            <p className="text-sm text-charcoal-text/70">We&apos;ll reach out within 48 hours with your first target list and next steps.</p>
           </motion.div>
         ) : (
           <form onSubmit={handleSubmit} className="text-left space-y-4">
@@ -68,12 +72,12 @@ export function FinalCTAForm() {
             <ButtonPrimary type="submit" disabled={!canSubmit} className="w-full py-3.5 text-base">Request access</ButtonPrimary>
             {/* Near-CTA proof */}
             <div className="pt-2">
-              <p className="text-center text-xs text-charcoal-text/30 mb-3">Trusted by founders at every stage</p>
+              <p className="text-center text-[13px] text-charcoal-text/50 mb-3">Trusted by founders at every stage</p>
               <div className="flex items-center justify-center gap-4">
                 {TESTIMONIALS.slice(0, 3).map((t) => (
                   <div key={t.name} className="flex items-center gap-1.5">
                     <AvatarPlaceholder size={20} />
-                    <span className="text-[10px] text-charcoal-text/40">{t.name}</span>
+                    <span className="text-[12px] text-charcoal-text/60">{t.name}</span>
                   </div>
                 ))}
               </div>

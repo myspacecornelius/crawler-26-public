@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Check } from "lucide-react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
-import { Section, UnderlineAccent, CheckBullet } from "./primitives";
+import { UnderlineAccent, CheckBullet } from "./primitives";
+import { HoneycombPattern } from "./icons";
 
 /* ──────────────────────────────────────────────
    Types & mock data
@@ -251,13 +251,17 @@ export function FeatureDeepDive() {
 
   return (
     <motion.section
-      className="py-32"
+      className="py-32 relative overflow-hidden"
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className="max-w-container mx-auto px-6">
+      {/* Subtle honeycomb background */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] pointer-events-none">
+        <HoneycombPattern opacity={0.025} className="text-honey-500" />
+      </div>
+      <div className="max-w-container mx-auto px-6 relative">
         {/* Section heading */}
         <div className="mb-12 md:mb-16 max-w-prose">
           <h2 className="text-[30px] md:text-[36px] leading-[1.15] font-[650] text-text-primary tracking-tight">

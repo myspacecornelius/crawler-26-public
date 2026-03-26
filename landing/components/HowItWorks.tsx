@@ -83,9 +83,10 @@ function DesktopPipeline() {
             y1="2"
             x2="1000"
             y2="2"
-            stroke="#2E5A58"
+            stroke="#C79B2C"
             strokeWidth="2"
             strokeLinecap="round"
+            strokeOpacity="0.4"
             variants={pathVariants}
           />
         </svg>
@@ -100,15 +101,15 @@ function DesktopPipeline() {
             variants={stageVariants(i)}
           >
             {/* Node circle */}
-            <div className="w-14 h-14 rounded-full bg-[#2E5A58] flex items-center justify-center shadow-petrol-glow">
-              <stage.Icon className="text-[#D8E5E4] w-6 h-6" />
+            <div className="w-14 h-14 rounded-full bg-[#8B6914] flex items-center justify-center shadow-accent-glow">
+              <stage.Icon className="text-[#F5ECD4] w-6 h-6" />
             </div>
 
             {/* Label */}
             <h3 className="mt-4 text-[16px] font-semibold text-[#1E1916] tracking-tight">
               {stage.title}
             </h3>
-            <p className="mt-1.5 text-[13px] leading-relaxed text-[#5E554C] max-w-[200px]">
+            <p className="mt-1.5 text-[14px] leading-relaxed text-[#5E554C] max-w-[200px]">
               {stage.description}
             </p>
           </motion.div>
@@ -142,9 +143,10 @@ function MobilePipeline() {
             y1="0"
             x2="2"
             y2="400"
-            stroke="#2E5A58"
+            stroke="#C79B2C"
             strokeWidth="2"
             strokeLinecap="round"
+            strokeOpacity="0.4"
             variants={pathVariants}
           />
         </svg>
@@ -159,8 +161,8 @@ function MobilePipeline() {
             variants={stageVariants(i)}
           >
             {/* Node circle */}
-            <div className="w-14 h-14 rounded-full bg-[#2E5A58] flex items-center justify-center flex-shrink-0 shadow-petrol-glow -ml-7">
-              <stage.Icon className="text-[#D8E5E4] w-6 h-6" />
+            <div className="w-14 h-14 rounded-full bg-[#8B6914] flex items-center justify-center flex-shrink-0 shadow-accent-glow -ml-7">
+              <stage.Icon className="text-[#F5ECD4] w-6 h-6" />
             </div>
 
             {/* Label */}
@@ -168,7 +170,7 @@ function MobilePipeline() {
               <h3 className="text-[16px] font-semibold text-[#1E1916] tracking-tight">
                 {stage.title}
               </h3>
-              <p className="mt-1 text-[13px] leading-relaxed text-[#5E554C] max-w-[260px]">
+              <p className="mt-1 text-[14px] leading-relaxed text-[#5E554C] max-w-[260px]">
                 {stage.description}
               </p>
             </div>

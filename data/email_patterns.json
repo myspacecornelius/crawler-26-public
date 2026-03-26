@@ -10,517 +10,2083 @@
       "{first}@{domain}": 1
     },
     "argandpartners.com": {
-      "{first}.{last}@{domain}": 4
+      "{first}.{last}@{domain}": 21
     },
     "activantcapital.com": {
-      "{first}@{domain}": 2
+      "{first}@{domain}": 23
     },
     "boxgroup.com": {
-      "{first}@{domain}": 26
+      "{first}@{domain}": 109
     },
     "dblpartners.vc": {
-      "{first}@{domain}": 16
+      "{first}@{domain}": 64
     },
     "empireangels.com": {
-      "{last}@{domain}": 1,
-      "{first}@{domain}": 2
+      "{last}@{domain}": 6,
+      "{first}@{domain}": 8
     },
     "vmgpartners.com": {
-      "{last}@{domain}": 68,
-      "{f}{last}@{domain}": 2
+      "{last}@{domain}": 287,
+      "{f}{last}@{domain}": 8
     },
     "grotech.com": {
-      "{f}{last}@{domain}": 2
+      "{f}{last}@{domain}": 23
     },
     "attaincap.com": {
-      "{f}{last}@{domain}": 12
+      "{f}{last}@{domain}": 103
     },
     "copleyequity.com": {
-      "{f}{last}@{domain}": 52
+      "{f}{last}@{domain}": 238
     },
     "advantagecap.com": {
-      "{f}{last}@{domain}": 12
+      "{f}{last}@{domain}": 468
     },
     "ccrenew.com": {
-      "{first}.{last}@{domain}": 2
-    },
-    "endeavor.org": {
-      "{last}@{domain}": 2
-    },
-    "firstanalysis.com": {
-      "{f}{last}@{domain}": 47
-    },
-    "acaciaresearch.com": {
-      "{f}{last}@{domain}": 6
-    },
-    "eniac.vc": {
-      "{first}@{domain}": 1
-    },
-    "xyz.vc": {
-      "{first}.{last}@{domain}": 1
-    },
-    "edovatecapital.com": {
-      "{first}@{domain}": 1
-    },
-    "waitwhat.com": {
-      "{first}@{domain}": 1
-    },
-    "climatecheck.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "gic.com.sg": {
-      "{first}.{last}@{domain}": 1
-    },
-    "electriccapital.com": {
-      "{first}@{domain}": 1
-    },
-    "uncorkcapital.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "becocapital.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "squarepegcap.com": {
-      "{first}@{domain}": 1
-    },
-    "sparkcapital.com": {
-      "{first}@{domain}": 1
-    },
-    "paloaltonetworks.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "mcgovern.org": {
-      "{first}.{last}@{domain}": 1
-    },
-    "forbion.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "thomabravo.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "capitalfactory.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "expeditionsfund.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "usv.com": {
-      "{first}@{domain}": 1
-    },
-    "everywhere.vc": {
-      "{first}@{domain}": 1
-    },
-    "trueventures.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "mdcp.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "capnamic.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "project-a.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "globalbrains.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "bitkraft.vc": {
-      "{first}.{last}@{domain}": 1
-    },
-    "framework.ventures": {
-      "{first}.{last}@{domain}": 1
-    },
-    "adia.ae": {
-      "{first}.{last}@{domain}": 1
-    },
-    "eqtgroup.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "blingcap.com": {
-      "{f}{last}@{domain}": 1
-    },
-    "abstract.vc": {
-      "{first}@{domain}": 1
-    },
-    "kaszek.com": {
-      "{first}@{domain}": 1
-    },
-    "techstars.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "platinumequity.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "2048.vc": {
-      "{first}@{domain}": 1
-    },
-    "gv.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "cultivationcapital.com": {
-      "{f}{last}@{domain}": 1
-    },
-    "cyanventures.com": {
-      "{first}@{domain}": 1
-    },
-    "bluelakecapital.com": {
-      "{first}@{domain}": 1
-    },
-    "apollo.vc": {
-      "{first}.{last}@{domain}": 1
-    },
-    "alleycorp.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "firstminute.capital": {
-      "{first}@{domain}": 1
-    },
-    "deepwatermgmt.com": {
-      "{first}@{domain}": 1
-    },
-    "excedr.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "amblestudio.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "andela.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "brewerlane.com": {
-      "{first}@{domain}": 1
-    },
-    "desjardins.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "broadscale.com": {
-      "{f}{last}@{domain}": 1
-    },
-    "connectivitycap.com": {
-      "{first}@{domain}": 1
-    },
-    "dormroomfund.com": {
-      "{first}@{domain}": 1
-    },
-    "garudaventures.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "impactamericafund.com": {
-      "{first}@{domain}": 1
-    },
-    "civilizationventures.com": {
-      "{first}@{domain}": 1
-    },
-    "dreamit.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "contrary.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "monkshill.com": {
-      "{first}.{last}@{domain}": 31
-    },
-    "revolution.com": {
-      "{first}.{last}@{domain}": 2
-    },
-    "amadeuscapital.com": {
-      "{first}.{last}@{domain}": 62
-    },
-    "producthunt.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "westlygroup.com": {
-      "{first}.{last}@{domain}": 18
-    },
-    "veritascapital.com": {
-      "{first}.{last}@{domain}": 9
-    },
-    "riversidecompany.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "horosproject.org": {
-      "{first}.{last}@{domain}": 3,
-      "{first}@{domain}": 1
-    },
-    "openelis-global.org": {
-      "{first}.{last}@{domain}": 31
-    },
-    "cvc.com": {
       "{first}.{last}@{domain}": 8
     },
-    "lakestar.com": {
-      "{first}.{last}@{domain}": 26
+    "endeavor.org": {
+      "{last}@{domain}": 28
     },
-    "spacecapital.com": {
-      "{first}.{last}@{domain}": 1
+    "firstanalysis.com": {
+      "{f}{last}@{domain}": 185
     },
-    "tauventures.com": {
-      "{first}.{last}@{domain}": 10
+    "acaciaresearch.com": {
+      "{f}{last}@{domain}": 79
     },
-    "prologis.com": {
-      "{first}.{last}@{domain}": 15
+    "eniac.vc": {
+      "{first}@{domain}": 46
     },
-    "alignedclimatecapital.com": {
+    "xyz.vc": {
+      "{first}.{last}@{domain}": 71
+    },
+    "edovatecapital.com": {
+      "{first}@{domain}": 16
+    },
+    "waitwhat.com": {
+      "{first}@{domain}": 111
+    },
+    "climatecheck.com": {
+      "{first}.{last}@{domain}": 66
+    },
+    "gic.com.sg": {
+      "{first}.{last}@{domain}": 71
+    },
+    "electriccapital.com": {
+      "{first}@{domain}": 166
+    },
+    "uncorkcapital.com": {
+      "{first}.{last}@{domain}": 11
+    },
+    "becocapital.com": {
+      "{first}.{last}@{domain}": 111
+    },
+    "squarepegcap.com": {
+      "{first}@{domain}": 81
+    },
+    "sparkcapital.com": {
+      "{first}@{domain}": 116
+    },
+    "paloaltonetworks.com": {
+      "{first}.{last}@{domain}": 46
+    },
+    "mcgovern.org": {
+      "{first}.{last}@{domain}": 126
+    },
+    "forbion.com": {
+      "{first}.{last}@{domain}": 61
+    },
+    "thomabravo.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "capitalfactory.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "expeditionsfund.com": {
+      "{first}.{last}@{domain}": 41
+    },
+    "usv.com": {
+      "{first}@{domain}": 61
+    },
+    "everywhere.vc": {
+      "{first}@{domain}": 6
+    },
+    "trueventures.com": {
+      "{first}.{last}@{domain}": 216
+    },
+    "mdcp.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "capnamic.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "project-a.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "globalbrains.com": {
+      "{first}.{last}@{domain}": 51
+    },
+    "bitkraft.vc": {
+      "{first}.{last}@{domain}": 146
+    },
+    "framework.ventures": {
+      "{first}.{last}@{domain}": 66
+    },
+    "adia.ae": {
+      "{first}.{last}@{domain}": 41
+    },
+    "eqtgroup.com": {
       "{first}.{last}@{domain}": 21
     },
-    "greatnorthventures.com": {
-      "{first}.{last}@{domain}": 4
+    "blingcap.com": {
+      "{f}{last}@{domain}": 26
     },
-    "silversmith.com": {
-      "{first}.{last}@{domain}": 65
+    "abstract.vc": {
+      "{first}@{domain}": 36
     },
-    "orbimed.com": {
-      "{first}.{last}@{domain}": 9
+    "kaszek.com": {
+      "{first}@{domain}": 106
     },
-    "lsvp.com": {
-      "{first}.{last}@{domain}": 3
+    "techstars.com": {
+      "{first}.{last}@{domain}": 11
     },
-    "iriscapital.com": {
-      "{first}.{last}@{domain}": 21
+    "platinumequity.com": {
+      "{first}.{last}@{domain}": 136
     },
-    "oakhcft.com": {
+    "2048.vc": {
+      "{first}@{domain}": 41
+    },
+    "gv.com": {
+      "{first}.{last}@{domain}": 171
+    },
+    "cultivationcapital.com": {
+      "{f}{last}@{domain}": 156
+    },
+    "cyanventures.com": {
+      "{first}@{domain}": 11
+    },
+    "bluelakecapital.com": {
+      "{first}@{domain}": 11
+    },
+    "apollo.vc": {
+      "{first}.{last}@{domain}": 66
+    },
+    "alleycorp.com": {
+      "{first}.{last}@{domain}": 116
+    },
+    "firstminute.capital": {
+      "{first}@{domain}": 71
+    },
+    "deepwatermgmt.com": {
+      "{first}@{domain}": 51
+    },
+    "excedr.com": {
+      "{first}.{last}@{domain}": 51
+    },
+    "amblestudio.com": {
+      "{first}.{last}@{domain}": 11
+    },
+    "andela.com": {
+      "{first}.{last}@{domain}": 36
+    },
+    "brewerlane.com": {
+      "{first}@{domain}": 101
+    },
+    "desjardins.com": {
+      "{first}.{last}@{domain}": 11
+    },
+    "broadscale.com": {
+      "{f}{last}@{domain}": 76
+    },
+    "connectivitycap.com": {
+      "{first}@{domain}": 36
+    },
+    "dormroomfund.com": {
+      "{first}@{domain}": 306
+    },
+    "garudaventures.com": {
+      "{first}.{last}@{domain}": 16
+    },
+    "impactamericafund.com": {
+      "{first}@{domain}": 11
+    },
+    "civilizationventures.com": {
+      "{first}@{domain}": 41
+    },
+    "dreamit.com": {
+      "{first}.{last}@{domain}": 101
+    },
+    "contrary.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "monkshill.com": {
+      "{first}.{last}@{domain}": 186
+    },
+    "revolution.com": {
+      "{first}.{last}@{domain}": 12
+    },
+    "amadeuscapital.com": {
+      "{first}.{last}@{domain}": 127
+    },
+    "producthunt.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "westlygroup.com": {
+      "{first}.{last}@{domain}": 108
+    },
+    "veritascapital.com": {
       "{first}.{last}@{domain}": 54
     },
+    "riversidecompany.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "horosproject.org": {
+      "{first}.{last}@{domain}": 13,
+      "{first}@{domain}": 7
+    },
+    "openelis-global.org": {
+      "{first}.{last}@{domain}": 186
+    },
+    "cvc.com": {
+      "{first}.{last}@{domain}": 43
+    },
+    "lakestar.com": {
+      "{first}.{last}@{domain}": 156
+    },
+    "spacecapital.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "tauventures.com": {
+      "{first}.{last}@{domain}": 60
+    },
+    "prologis.com": {
+      "{first}.{last}@{domain}": 90
+    },
+    "alignedclimatecapital.com": {
+      "{first}.{last}@{domain}": 121
+    },
+    "greatnorthventures.com": {
+      "{first}.{last}@{domain}": 24
+    },
+    "silversmith.com": {
+      "{first}.{last}@{domain}": 390
+    },
+    "orbimed.com": {
+      "{first}.{last}@{domain}": 54
+    },
+    "lsvp.com": {
+      "{first}.{last}@{domain}": 13
+    },
+    "iriscapital.com": {
+      "{first}.{last}@{domain}": 126
+    },
+    "oakhcft.com": {
+      "{first}.{last}@{domain}": 324
+    },
     "goodwatercap.com": {
-      "{first}.{last}@{domain}": 10
+      "{first}.{last}@{domain}": 60
     },
     "dst.com": {
-      "{first}.{last}@{domain}": 3
+      "{first}.{last}@{domain}": 18
     },
     "mercuryfund.com": {
-      "{first}.{last}@{domain}": 28
+      "{first}.{last}@{domain}": 168
     },
     "lewisandclarkventures.com": {
       "{first}.{last}@{domain}": 1
     },
     "magmapartners.com": {
-      "{first}.{last}@{domain}": 22
+      "{first}.{last}@{domain}": 132
     },
     "northzone.com": {
-      "{first}.{last}@{domain}": 37
+      "{first}.{last}@{domain}": 222
     },
     "roarkcapital.com": {
-      "{first}.{last}@{domain}": 66
+      "{first}.{last}@{domain}": 396
     },
     "dncapital.com": {
-      "{first}.{last}@{domain}": 39
+      "{first}.{last}@{domain}": 234
     },
     "shastaventures.com": {
-      "{first}.{last}@{domain}": 4
-    },
-    "moxxie.vc": {
-      "{first}.{last}@{domain}": 7
-    },
-    "alpineinvestors.com": {
-      "{first}.{last}@{domain}": 245
-    },
-    "permira.com": {
-      "{first}.{last}@{domain}": 19
-    },
-    "zato.io": {
-      "{first}.{last}@{domain}": 2
-    },
-    "notion.vc": {
-      "{first}.{last}@{domain}": 38
-    },
-    "sorensoncapital.com": {
-      "{first}.{last}@{domain}": 4
-    },
-    "k9ventures.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "expa.com": {
       "{first}.{last}@{domain}": 24
     },
-    "arrayventures.com": {
-      "{first}.{last}@{domain}": 3
+    "moxxie.vc": {
+      "{first}.{last}@{domain}": 42
     },
-    "appletreepartners.com": {
-      "{first}.{last}@{domain}": 1
+    "alpineinvestors.com": {
+      "{first}.{last}@{domain}": 1470
     },
-    "rtf.vc": {
-      "{first}.{last}@{domain}": 3
+    "permira.com": {
+      "{first}.{last}@{domain}": 114
     },
-    "hl7.org": {
-      "{first}.{last}@{domain}": 7
-    },
-    "nautacapital.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "bluesteinventures.com": {
-      "{first}.{last}@{domain}": 6
-    },
-    "sapphireventures.com": {
-      "{first}.{last}@{domain}": 5
-    },
-    "gate.io": {
-      "{first}.{last}@{domain}": 2
-    },
-    "eclipse.vc": {
-      "{first}.{last}@{domain}": 28
-    },
-    "work-bench.com": {
-      "{first}.{last}@{domain}": 3
-    },
-    "vast.vc": {
-      "{first}.{last}@{domain}": 4
-    },
-    "fasanara.com": {
-      "{first}.{last}@{domain}": 117
-    },
-    "hgcapital.com": {
-      "{first}.{last}@{domain}": 21
-    },
-    "forerunnerventures.com": {
-      "{first}.{last}@{domain}": 16
-    },
-    "americanexpress.com": {
-      "{first}.{last}@{domain}": 17
-    },
-    "broadhaven.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "ecosystemintegrity.com": {
-      "{first}.{last}@{domain}": 11
-    },
-    "acteragroup.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "icumedical.com": {
-      "{first}.{last}@{domain}": 3
-    },
-    "firstcheck.africa": {
-      "{first}.{last}@{domain}": 4
-    },
-    "bamelevate.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "greengenerationfund.com": {
-      "{first}.{last}@{domain}": 3
-    },
-    "generationim.com": {
-      "{first}.{last}@{domain}": 32
-    },
-    "cerealtech.com": {
-      "{first}.{last}@{domain}": 2
-    },
-    "future.africa": {
-      "{first}.{last}@{domain}": 6
-    },
-    "energize.vc": {
-      "{first}.{last}@{domain}": 29
-    },
-    "bairdcapital.com": {
-      "{first}.{last}@{domain}": 50
-    },
-    "circularitycapital.com": {
-      "{first}.{last}@{domain}": 14
-    },
-    "fenwaysummer.com": {
-      "{first}.{last}@{domain}": 2
-    },
-    "counterpart.vc": {
+    "zato.io": {
       "{first}.{last}@{domain}": 12
     },
+    "notion.vc": {
+      "{first}.{last}@{domain}": 88
+    },
+    "sorensoncapital.com": {
+      "{first}.{last}@{domain}": 24
+    },
+    "k9ventures.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "expa.com": {
+      "{first}.{last}@{domain}": 144
+    },
+    "arrayventures.com": {
+      "{first}.{last}@{domain}": 18
+    },
+    "appletreepartners.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "rtf.vc": {
+      "{first}.{last}@{domain}": 18
+    },
+    "hl7.org": {
+      "{first}.{last}@{domain}": 42
+    },
+    "nautacapital.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "bluesteinventures.com": {
+      "{first}.{last}@{domain}": 36
+    },
+    "sapphireventures.com": {
+      "{first}.{last}@{domain}": 30
+    },
+    "gate.io": {
+      "{first}.{last}@{domain}": 12
+    },
+    "eclipse.vc": {
+      "{first}.{last}@{domain}": 168
+    },
+    "work-bench.com": {
+      "{first}.{last}@{domain}": 18
+    },
+    "vast.vc": {
+      "{first}.{last}@{domain}": 24
+    },
+    "fasanara.com": {
+      "{first}.{last}@{domain}": 702
+    },
+    "hgcapital.com": {
+      "{first}.{last}@{domain}": 126
+    },
+    "forerunnerventures.com": {
+      "{first}.{last}@{domain}": 96
+    },
+    "americanexpress.com": {
+      "{first}.{last}@{domain}": 102
+    },
+    "broadhaven.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "ecosystemintegrity.com": {
+      "{first}.{last}@{domain}": 66
+    },
+    "acteragroup.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "icumedical.com": {
+      "{first}.{last}@{domain}": 18
+    },
+    "firstcheck.africa": {
+      "{first}.{last}@{domain}": 24
+    },
+    "bamelevate.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "greengenerationfund.com": {
+      "{first}.{last}@{domain}": 18
+    },
+    "generationim.com": {
+      "{first}.{last}@{domain}": 192
+    },
+    "cerealtech.com": {
+      "{first}.{last}@{domain}": 12
+    },
+    "future.africa": {
+      "{first}.{last}@{domain}": 36
+    },
+    "energize.vc": {
+      "{first}.{last}@{domain}": 174
+    },
+    "bairdcapital.com": {
+      "{first}.{last}@{domain}": 300
+    },
+    "circularitycapital.com": {
+      "{first}.{last}@{domain}": 84
+    },
+    "fenwaysummer.com": {
+      "{first}.{last}@{domain}": 12
+    },
+    "counterpart.vc": {
+      "{first}.{last}@{domain}": 72
+    },
     "beaconcapital.com": {
-      "{first}.{last}@{domain}": 1
+      "{first}.{last}@{domain}": 6
     },
     "dawnbreaker.com": {
-      "{first}.{last}@{domain}": 5
+      "{first}.{last}@{domain}": 30
     },
     "arcternventures.com": {
-      "{first}.{last}@{domain}": 1
+      "{first}.{last}@{domain}": 6
     },
     "greenwich.com": {
-      "{first}.{last}@{domain}": 1
+      "{first}.{last}@{domain}": 6
     },
     "conscience.vc": {
-      "{first}.{last}@{domain}": 1
+      "{first}.{last}@{domain}": 6
     },
     "almanacinsights.com": {
-      "{first}.{last}@{domain}": 1
+      "{first}.{last}@{domain}": 6
     },
     "evokinnovations.com": {
-      "{first}.{last}@{domain}": 1
+      "{first}.{last}@{domain}": 6
     },
     "hikmaventures.com": {
-      "{first}.{last}@{domain}": 11
+      "{first}.{last}@{domain}": 66
     },
     "darwinventures.com": {
-      "{first}.{last}@{domain}": 32
+      "{first}.{last}@{domain}": 192
     },
     "daphni.com": {
-      "{first}.{last}@{domain}": 17
+      "{first}.{last}@{domain}": 102
     },
     "etfpartners.capital": {
-      "{first}.{last}@{domain}": 22
+      "{first}.{last}@{domain}": 132
     },
     "grasshoppercap.com": {
-      "{first}.{last}@{domain}": 1
+      "{first}.{last}@{domain}": 6
     },
     "hc9.vc": {
-      "{first}.{last}@{domain}": 7
+      "{first}.{last}@{domain}": 42
     },
     "backboneangels.com": {
-      "{first}.{last}@{domain}": 1
+      "{first}.{last}@{domain}": 6
     },
     "calvertimpact.org": {
-      "{first}.{last}@{domain}": 65
+      "{first}.{last}@{domain}": 390
     },
     "footprintcoalition.com": {
-      "{first}.{last}@{domain}": 1
+      "{first}.{last}@{domain}": 6
     },
     "chesleybrown.com": {
-      "{first}.{last}@{domain}": 17
+      "{first}.{last}@{domain}": 102
     },
     "b37.vc": {
-      "{first}.{last}@{domain}": 5
+      "{first}.{last}@{domain}": 30
     },
     "startup.google.com": {
       "{first}.{last}@{domain}": 1
     },
     "alevelcapital.com": {
-      "{first}.{last}@{domain}": 39
+      "{first}.{last}@{domain}": 234
     },
     "fledge.co": {
-      "{first}.{last}@{domain}": 1
-    },
-    "aflac.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "aig.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "aegonam.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "apfc.org": {
-      "{first}.{last}@{domain}": 1
-    },
-    "ilpa.org": {
-      "{first}.{last}@{domain}": 38
-    },
-    "alanbiller.com": {
-      "{first}.{last}@{domain}": 1
-    },
-    "atapco.com": {
-      "{first}.{last}@{domain}": 2
-    },
-    "linkedin.com": {
-      "{first}.{last}@{domain}": 2
-    },
-    "aarp.org": {
       "{first}.{last}@{domain}": 6
     },
-    "hkvca.com.hk": {
-      "{first}.{last}@{domain}": 9
+    "aflac.com": {
+      "{first}.{last}@{domain}": 3
     },
-    "acu.edu": {
+    "aig.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "aegonam.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "apfc.org": {
+      "{first}.{last}@{domain}": 3
+    },
+    "ilpa.org": {
+      "{first}.{last}@{domain}": 76
+    },
+    "alanbiller.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "atapco.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "linkedin.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "aarp.org": {
       "{first}.{last}@{domain}": 12
     },
+    "hkvca.com.hk": {
+      "{first}.{last}@{domain}": 19
+    },
+    "acu.edu": {
+      "{first}.{last}@{domain}": 24
+    },
     "alphaleonispartners.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "worldfund.vc": {
+      "{first}@{domain}": 6
+    },
+    "paleblue.vc": {
+      "{first}@{domain}": 21
+    },
+    "omersventures.com": {
+      "{f}{last}@{domain}": 28
+    },
+    "marathon.vc": {
+      "{first}@{domain}": 9
+    },
+    "groundup.vc": {
+      "{first}@{domain}": 18
+    },
+    "fuelcapital.com": {
+      "{first}@{domain}": 6
+    },
+    "groveventures.com": {
+      "{first}@{domain}": 5
+    },
+    "nvp.com": {
+      "{f}{last}@{domain}": 295,
+      "{first}{last}@{domain}": 3
+    },
+    "baincapitalventures.com": {
+      "{f}{last}@{domain}": 10
+    },
+    "marsdd.com": {
+      "{f}{last}@{domain}": 21
+    },
+    "thomvest.com": {
+      "{first}@{domain}": 24
+    },
+    "kearnyjackson.com": {
+      "{first}@{domain}": 4
+    },
+    "courtsidevc.com": {
+      "{first}@{domain}": 25
+    },
+    "eurazeo.com": {
+      "{first}@{domain}": 5
+    },
+    "sixthirty.co": {
+      "{first}@{domain}": 22
+    },
+    "chiratae.com": {
+      "{first}@{domain}": 78,
+      "{first}.{last}@{domain}": 3
+    },
+    "techsquareventures.com": {
+      "{first}@{domain}": 40
+    },
+    "homebrew.co": {
+      "{first}@{domain}": 12
+    },
+    "flourishventures.com": {
+      "{first}@{domain}": 14
+    },
+    "maki.vc": {
+      "{first}@{domain}": 69
+    },
+    "brooklynbridge.vc": {
+      "{first}@{domain}": 3
+    },
+    "tensor.vc": {
+      "{first}@{domain}": 6
+    },
+    "kbpartners.com": {
+      "{first}@{domain}": 27
+    },
+    "stormventures.com": {
+      "{first}@{domain}": 6
+    },
+    "sunstone.eu": {
+      "{last}@{domain}": 23
+    },
+    "kinnevik.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "ylventures.com": {
+      "{first}@{domain}": 49
+    },
+    "triplepointcapital.com": {
+      "{f}{last}@{domain}": 71
+    },
+    "lifelineventures.com": {
+      "{first}@{domain}": 14
+    },
+    "fly.vc": {
+      "{first}@{domain}": 18
+    },
+    "imagej.net": {
+      "{first}.{last}@{domain}": 2
+    },
+    "playground.global": {
+      "{first}@{domain}": 39
+    },
+    "labkey.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "unitedtalent.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "snowflake.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "elevationcapital.com": {
+      "{first}@{domain}": 7
+    },
+    "guardiancapital.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "cowboy.vc": {
+      "{first}@{domain}": 8
+    },
+    "atomic.vc": {
+      "{f}{last}@{domain}": 40
+    },
+    "fpvventures.com": {
+      "{first}@{domain}": 4
+    },
+    "blossomcap.com": {
+      "{first}.{last}@{domain}": 7
+    },
+    "forteventures.com": {
+      "{f}{last}@{domain}": 7
+    },
+    "obvious.com": {
+      "{first}@{domain}": 22
+    },
+    "vistaequitypartners.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "hypothesisvc.com": {
+      "{first}.{last}@{domain}": 33
+    },
+    "clearlake.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "sanabil.com": {
+      "{first}.{last}@{domain}": 29
+    },
+    "bedrockcap.com": {
+      "{first}@{domain}": 9
+    },
+    "javelinvp.com": {
+      "{first}@{domain}": 9
+    },
+    "underscore.vc": {
+      "{first}@{domain}": 23
+    },
+    "socialleverage.com": {
+      "{first}@{domain}": 8
+    },
+    "hustlefund.vc": {
+      "{first}@{domain}": 9
+    },
+    "ocaventures.com": {
+      "{first}@{domain}": 17
+    },
+    "gemini.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "signalfire.com": {
+      "{first}.{last}@{domain}": 41
+    },
+    "meta.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "essencevc.fund": {
+      "{first}.{last}@{domain}": 3
+    },
+    "starburst.aero": {
+      "{first}@{domain}": 12
+    },
+    "felicis.com": {
+      "{first}.{last}@{domain}": 11
+    },
+    "sterlingroad.com": {
+      "{first}@{domain}": 3
+    },
+    "multicoin.capital": {
+      "{first}.{last}@{domain}": 2
+    },
+    "pointnine.com": {
+      "{first}@{domain}": 15
+    },
+    "seedcamp.com": {
+      "{first}@{domain}": 23
+    },
+    "pear.vc": {
+      "{first}.{last}@{domain}": 27
+    },
+    "next47.com": {
+      "{first}.{last}@{domain}": 18
+    },
+    "caffeinatedcapital.com": {
+      "{first}@{domain}": 4
+    },
+    "hack.vc": {
+      "{first}@{domain}": 25
+    },
+    "alphaedison.com": {
+      "{first}@{domain}": 6
+    },
+    "tectonicventures.com": {
+      "{first}@{domain}": 10
+    },
+    "indicocapital.com": {
+      "{first}.{last}@{domain}": 13
+    },
+    "qualcommventures.com": {
+      "{first}.{last}@{domain}": 26
+    },
+    "s2gventures.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "keenventurepartners.com": {
+      "{first}@{domain}": 13
+    },
+    "chicagoventures.com": {
+      "{first}@{domain}": 8
+    },
+    "upside.com": {
+      "{first}.{last}@{domain}": 18
+    },
+    "cambercreek.com": {
+      "{first}.{last}@{domain}": 16
+    },
+    "base10.vc": {
+      "{first}@{domain}": 23
+    },
+    "purestorage.com": {
+      "{first}.{last}@{domain}": 27
+    },
+    "charge.vc": {
+      "{first}@{domain}": 5
+    },
+    "samaipata.vc": {
+      "{first}@{domain}": 28
+    },
+    "southparkcommons.com": {
+      "{first}@{domain}": 6
+    },
+    "icebreaker.vc": {
+      "{first}@{domain}": 5
+    },
+    "emersoncollective.com": {
+      "{first}.{last}@{domain}": 191
+    },
+    "georgian.io": {
+      "{first}.{last}@{domain}": 77
+    },
+    "bullfrogai.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "vanedgecapital.com": {
+      "{first}@{domain}": 8
+    },
+    "newmountaincapital.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "mantisvc.com": {
+      "{first}.{last}@{domain}": 14
+    },
+    "mindworks.vc": {
+      "{first}@{domain}": 16
+    },
+    "22hbg.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "scalevp.com": {
+      "{first}@{domain}": 3
+    },
+    "earlybird.com": {
+      "{first}@{domain}": 14
+    },
+    "s28capital.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "sosv.com": {
+      "{first}.{last}@{domain}": 80
+    },
+    "appworks.tw": {
+      "{first}.{last}@{domain}": 27
+    },
+    "bowcapital.com": {
+      "{first}@{domain}": 10
+    },
+    "meritechcapital.com": {
+      "{first}@{domain}": 19
+    },
+    "acrewcapital.com": {
+      "{first}.{last}@{domain}": 37
+    },
+    "creandum.com": {
+      "{first}@{domain}": 35
+    },
+    "learncapital.com": {
+      "{first}.{last}@{domain}": 7
+    },
+    "insignia.vc": {
+      "{first}.{last}@{domain}": 5
+    },
+    "otpp.com": {
+      "{first}.{last}@{domain}": 3
+    },
+    "seed-db.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "calibratevc.com": {
+      "{first}.{last}@{domain}": 12
+    },
+    "silvertonpartners.com": {
+      "{first}@{domain}": 12
+    },
+    "craftventures.com": {
+      "{first}.{last}@{domain}": 35
+    },
+    "alven.co": {
+      "{first}@{domain}": 2
+    },
+    "airstreet.com": {
+      "{first}@{domain}": 2
+    },
+    "hax.co": {
+      "{first}.{last}@{domain}": 22
+    },
+    "datadoghq.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "inovia.vc": {
+      "{first}.{last}@{domain}": 63
+    },
+    "basisset.com": {
+      "{first}@{domain}": 19
+    },
+    "k5global.com": {
+      "{first}@{domain}": 12
+    },
+    "realventures.com": {
+      "{first}@{domain}": 12
+    },
+    "differential.vc": {
+      "{first}.{last}@{domain}": 7
+    },
+    "aera.vc": {
+      "{first}@{domain}": 10
+    },
+    "luxcapital.com": {
+      "{first}.{last}@{domain}": 24
+    },
+    "floridafunders.com": {
+      "{f}{last}@{domain}": 18
+    },
+    "shopify.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "heavybit.com": {
+      "{first}.{last}@{domain}": 15
+    },
+    "illuminate.com": {
+      "{first}.{last}@{domain}": 3
+    },
+    "gridventures.com": {
+      "{first}@{domain}": 3
+    },
+    "apollo.com": {
+      "{first}.{last}@{domain}": 16
+    },
+    "a16z.com": {
+      "{first}.{last}@{domain}": 7
+    },
+    "forgepointcap.com": {
+      "{first}.{last}@{domain}": 17
+    },
+    "konvoy.vc": {
+      "{first}.{last}@{domain}": 6
+    },
+    "felixcap.com": {
+      "{first}.{last}@{domain}": 42
+    },
+    "aifund.ai": {
+      "{first}@{domain}": 3
+    },
+    "operatorpartners.com": {
+      "{first}@{domain}": 6
+    },
+    "forumvc.com": {
+      "{first}.{last}@{domain}": 37
+    },
+    "globalfounderscapital.com": {
+      "{first}@{domain}": 4
+    },
+    "murata.com": {
+      "{first}.{last}@{domain}": 11
+    },
+    "lasolasvc.com": {
+      "{first}@{domain}": 5
+    },
+    "betaworks.com": {
+      "{first}@{domain}": 6
+    },
+    "deshaw.com": {
+      "{first}.{last}@{domain}": 3
+    },
+    "sevenpeaksventures.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "schoonercapital.com": {
+      "{f}{last}@{domain}": 4
+    },
+    "boost.vc": {
+      "{first}@{domain}": 9
+    },
+    "rockhealth.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "voltaventures.eu": {
+      "{first}@{domain}": 13
+    },
+    "experian.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "aixventures.com": {
+      "{first}@{domain}": 9
+    },
+    "speedinvest.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "boldstart.vc": {
+      "{first}.{last}@{domain}": 3
+    },
+    "valorcapitalgroup.com": {
+      "{first}.{last}@{domain}": 27
+    },
+    "seventysixcapital.com": {
+      "{first}@{domain}": 4
+    },
+    "foresitecapital.com": {
+      "{first}.{last}@{domain}": 32
+    },
+    "provequity.com": {
+      "{f}{last}@{domain}": 148
+    },
+    "lool.vc": {
+      "{first}.{last}@{domain}": 10
+    },
+    "tribecap.co": {
+      "{first}.{last}@{domain}": 28
+    },
+    "645ventures.com": {
+      "{first}@{domain}": 21
+    },
+    "tpg.com": {
+      "{first}.{last}@{domain}": 64
+    },
+    "fuelventurecapital.com": {
+      "{first}@{domain}": 11
+    },
+    "epicvc.com": {
+      "{first}@{domain}": 12
+    },
+    "antler.co": {
+      "{first}@{domain}": 22
+    },
+    "capitalgroup.com": {
+      "{first}.{last}@{domain}": 11
+    },
+    "hackaday.io": {
+      "{first}.{last}@{domain}": 2
+    },
+    "dig.ventures": {
+      "{first}@{domain}": 7
+    },
+    "bondcap.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "decibel.vc": {
+      "{first}@{domain}": 20
+    },
+    "psl.com": {
+      "{first}@{domain}": 16
+    },
+    "fifthwall.com": {
+      "{first}@{domain}": 13
+    },
+    "bowerycap.com": {
+      "{first}.{last}@{domain}": 10
+    },
+    "flybridge.com": {
+      "{first}.{last}@{domain}": 12
+    },
+    "variant.fund": {
+      "{first}.{last}@{domain}": 17
+    },
+    "mosaicventures.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "500.co": {
+      "{first}.{last}@{domain}": 3
+    },
+    "blueyard.com": {
+      "{first}@{domain}": 2
+    },
+    "cohere.com": {
+      "{first}.{last}@{domain}": 16
+    },
+    "communitascapital.com": {
+      "{first}@{domain}": 12
+    },
+    "echovc.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "cendanacapital.com": {
+      "{first}@{domain}": 13
+    },
+    "shift4.com": {
+      "{first}@{domain}": 5
+    },
+    "gildehealthcare.com": {
+      "{first}.{last}@{domain}": 7
+    },
+    "blackstone.com": {
+      "{first}.{last}@{domain}": 7
+    },
+    "twilio.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "matchstickventures.com": {
+      "{first}@{domain}": 5
+    },
+    "longjourney.vc": {
+      "{first}.{last}@{domain}": 19
+    },
+    "pillar.vc": {
+      "{first}.{last}@{domain}": 25
+    },
+    "vineventures.com": {
+      "{first}.{last}@{domain}": 14
+    },
+    "operatorcollective.com": {
+      "{first}.{last}@{domain}": 18
+    },
+    "theimpactengine.com": {
+      "{first}@{domain}": 17
+    },
+    "hyndmanlaw.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "ycombinator.com": {
+      "{first}@{domain}": 6
+    },
+    "google.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "warburgpincus.com": {
+      "{first}.{last}@{domain}": 15
+    },
+    "vulcan.com": {
+      "{first}.{last}@{domain}": 23
+    },
+    "canary.com.br": {
+      "{first}@{domain}": 34
+    },
+    "inspiredcapital.com": {
+      "{first}@{domain}": 15
+    },
+    "originventures.com": {
+      "{first}@{domain}": 11
+    },
+    "accel.com": {
+      "{first}.{last}@{domain}": 113
+    },
+    "stripe.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "activecapital.com": {
+      "{first}@{domain}": 65
+    },
+    "cloudappscapital.com": {
+      "{f}{last}@{domain}": 2
+    },
+    "initialized.com": {
+      "{first}.{last}@{domain}": 17
+    },
+    "harlem.capital": {
+      "{first}@{domain}": 8
+    },
+    "upfront.com": {
+      "{first}@{domain}": 27
+    },
+    "cisco.com": {
+      "{first}.{last}@{domain}": 14
+    },
+    "bullpencap.com": {
+      "{first}.{last}@{domain}": 22
+    },
+    "alexandani.com": {
+      "{first}.{last}@{domain}": 10
+    },
+    "parker89.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "flagshippioneering.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "enlightenmentcapital.com": {
+      "{first}.{last}@{domain}": 7
+    },
+    "resolute.vc": {
+      "{first}.{last}@{domain}": 2
+    },
+    "qedinvestors.com": {
+      "{first}.{last}@{domain}": 33
+    },
+    "ventures.swisscom.com": {
+      "{first}.{last}@{domain}": 3
+    },
+    "venturefriends.vc": {
+      "{first}.{last}@{domain}": 20
+    },
+    "vestigoventures.com": {
+      "{first}.{last}@{domain}": 54
+    },
+    "pamlicocapital.com": {
+      "{first}.{last}@{domain}": 12
+    },
+    "s3vc.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "b2venture.vc": {
+      "{first}.{last}@{domain}": 84
+    },
+    "cleanenergyventures.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "finchcapital.com": {
+      "{first}.{last}@{domain}": 3
+    },
+    "bertelsmann-investments.com": {
+      "{first}.{last}@{domain}": 32
+    },
+    "rightsidecapital.com": {
+      "{first}.{last}@{domain}": 24
+    },
+    "paradigm.xyz": {
+      "{first}.{last}@{domain}": 2
+    },
+    "dnx.vc": {
+      "{first}.{last}@{domain}": 3
+    },
+    "wing.vc": {
+      "{first}.{last}@{domain}": 28
+    },
+    "enterprise-ireland.com": {
+      "{first}.{last}@{domain}": 93
+    },
+    "cavalry.vc": {
+      "{first}.{last}@{domain}": 2
+    },
+    "peakspancapital.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "audaxprivateequity.com": {
+      "{first}.{last}@{domain}": 236
+    },
+    "stonepoint.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "amplifypartners.com": {
+      "{first}.{last}@{domain}": 152
+    },
+    "latitudecap.com": {
+      "{first}.{last}@{domain}": 3
+    },
+    "castleisland.vc": {
+      "{first}.{last}@{domain}": 21
+    },
+    "townhallventures.com": {
+      "{first}.{last}@{domain}": 26
+    },
+    "wafra.com": {
+      "{first}.{last}@{domain}": 17
+    },
+    "openmolar.com": {
       "{first}.{last}@{domain}": 1
+    },
+    "paladincapgroup.com": {
+      "{first}.{last}@{domain}": 52
+    },
+    "omnescapital.com": {
+      "{first}.{last}@{domain}": 136
+    },
+    "ohdsi.org": {
+      "{first}.{last}@{domain}": 296
+    },
+    "tcv.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "83north.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "ehrbase.org": {
+      "{first}.{last}@{domain}": 5
+    },
+    "tdk-ventures.com": {
+      "{first}.{last}@{domain}": 124
+    },
+    "ikpartners.com": {
+      "{first}.{last}@{domain}": 18
+    },
+    "lonepinecapital.com": {
+      "{first}.{last}@{domain}": 7
+    },
+    "leonardgreen.com": {
+      "{first}.{last}@{domain}": 205
+    },
+    "octopusventures.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "bluventureinvestors.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "hubspot.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "ecapital.com": {
+      "{first}.{last}@{domain}": 14
+    },
+    "matrixpartners.in": {
+      "{first}.{last}@{domain}": 3
+    },
+    "springlanecapital.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "usvp.com": {
+      "{first}.{last}@{domain}": 16
+    },
+    "americansecurities.com": {
+      "{first}.{last}@{domain}": 3
+    },
+    "correlationvc.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "global.vc": {
+      "{first}.{last}@{domain}": 21
+    },
+    "battery.com": {
+      "{first}.{last}@{domain}": 236
+    },
+    "valorep.com": {
+      "{first}.{last}@{domain}": 36
+    },
+    "backstagecapital.com": {
+      "{first}.{last}@{domain}": 136
+    },
+    "drivecapital.com": {
+      "{first}.{last}@{domain}": 38
+    },
+    "elaia.com": {
+      "{first}.{last}@{domain}": 7
+    },
+    "inferno-framework.github.io": {
+      "{first}.{last}@{domain}": 1
+    },
+    "thirdrockventures.com": {
+      "{first}.{last}@{domain}": 140
+    },
+    "volitioncapital.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "conviction.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "fi.co": {
+      "{first}.{last}@{domain}": 40
+    },
+    "dicom.offis.de": {
+      "{first}.{last}@{domain}": 2
+    },
+    "tigerglobal.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "ivp.com": {
+      "{first}.{last}@{domain}": 54
+    },
+    "coralcap.co": {
+      "{first}.{last}@{domain}": 4
+    },
+    "engage.vc": {
+      "{first}.{last}@{domain}": 4
+    },
+    "kaporcapital.com": {
+      "{first}.{last}@{domain}": 16
+    },
+    "indexventures.com": {
+      "{first}.{last}@{domain}": 7
+    },
+    "venrock.com": {
+      "{first}.{last}@{domain}": 14,
+      "{first}{last}@{domain}": 2
+    },
+    "ldv.co": {
+      "{first}.{last}@{domain}": 3
+    },
+    "fusionfund.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "notation.vc": {
+      "{first}.{last}@{domain}": 142
+    },
+    "alberta-enterprise.ca": {
+      "{first}.{last}@{domain}": 38
+    },
+    "rippleventures.com": {
+      "{first}.{last}@{domain}": 46
+    },
+    "ventureguides.com": {
+      "{first}.{last}@{domain}": 62
+    },
+    "madrona.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "horizonsventures.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "innovacap.com": {
+      "{first}.{last}@{domain}": 60
+    },
+    "moltenventures.com": {
+      "{first}.{last}@{domain}": 66
+    },
+    "draperdragon.com": {
+      "{first}.{last}@{domain}": 12
+    },
+    "collaborativefund.com": {
+      "{first}.{last}@{domain}": 42
+    },
+    "angularventures.com": {
+      "{first}.{last}@{domain}": 35
+    },
+    "venture.angellist.com": {
+      "{first}.{last}@{domain}": 1
+    },
+    "rallyventures.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "copperstreet.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "shieldcap.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "mfvpartners.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "greylock.com": {
+      "{first}.{last}@{domain}": 35
+    },
+    "polychain.capital": {
+      "{first}.{last}@{domain}": 2
+    },
+    "bipcapital.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "plugandplaytechcenter.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "energyimpactpartners.com": {
+      "{first}.{last}@{domain}": 250
+    },
+    "iganpartners.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "hummingbird.vc": {
+      "{first}.{last}@{domain}": 21
+    },
+    "m12.vc": {
+      "{first}.{last}@{domain}": 8
+    },
+    "sogalventures.com": {
+      "{first}.{last}@{domain}": 18
+    },
+    "opendental.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "hyperplane.vc": {
+      "{first}.{last}@{domain}": 13
+    },
+    "bvca.co.uk": {
+      "{first}.{last}@{domain}": 8
+    },
+    "nbim.no": {
+      "{first}.{last}@{domain}": 4
+    },
+    "openmrs.org": {
+      "{first}.{last}@{domain}": 2
+    },
+    "bvp.com": {
+      "{first}.{last}@{domain}": 495
+    },
+    "greatoaksvc.com": {
+      "{first}.{last}@{domain}": 26
+    },
+    "threshold.vc": {
+      "{first}.{last}@{domain}": 2
+    },
+    "plazaventures.com": {
+      "{first}.{last}@{domain}": 7
+    },
+    "compound.vc": {
+      "{first}.{last}@{domain}": 3
+    },
+    "cdpq.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "causewaycapital.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "pegasusventures.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "fifty.vc": {
+      "{first}.{last}@{domain}": 5
+    },
+    "open-emr.org": {
+      "{first}.{last}@{domain}": 2
+    },
+    "seaeventures.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "archventure.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "adaventures.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "kelso.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "bluehaveninitiative.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "stephensgroup.com": {
+      "{first}.{last}@{domain}": 46
+    },
+    "fhirbase.github.io": {
+      "{first}.{last}@{domain}": 1
+    },
+    "vertexventures.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "cinven.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "ggvc.com": {
+      "{first}.{last}@{domain}": 60
+    },
+    "trinityventures.com": {
+      "{first}.{last}@{domain}": 16
+    },
+    "novuscapitalcorporation.com": {
+      "{first}.{last}@{domain}": 1
+    },
+    "newfundcap.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "draper.vc": {
+      "{first}.{last}@{domain}": 6
+    },
+    "415capital.com": {
+      "{first}.{last}@{domain}": 30
+    },
+    "fprimecapital.com": {
+      "{first}.{last}@{domain}": 150
+    },
+    "openspace.vc": {
+      "{first}.{last}@{domain}": 3
+    },
+    "sgep.com": {
+      "{first}.{last}@{domain}": 56
+    },
+    "east.vc": {
+      "{first}.{last}@{domain}": 10
+    },
+    "thirdpointventures.com": {
+      "{first}.{last}@{domain}": 12
+    },
+    "vertexventures.co.il": {
+      "{first}.{last}@{domain}": 2
+    },
+    "406ventures.com": {
+      "{first}.{last}@{domain}": 32
+    },
+    "crosslinkcapital.com": {
+      "{first}.{last}@{domain}": 46
+    },
+    "gauntlet.network": {
+      "{first}.{last}@{domain}": 2
+    },
+    "sequoiacap.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "9yardscapital.com": {
+      "{first}.{last}@{domain}": 70
+    },
+    "fjlabs.com": {
+      "{first}.{last}@{domain}": 56
+    },
+    "paipartners.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "nordiccapital.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "stepstoneglobal.com": {
+      "{first}.{last}@{domain}": 13
+    },
+    "investdetroit.com": {
+      "{first}.{last}@{domain}": 104
+    },
+    "cottagemed.org": {
+      "{first}.{last}@{domain}": 4
+    },
+    "aspectventures.com": {
+      "{first}.{last}@{domain}": 16
+    },
+    "alphajwc.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "arsenalcapital.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "allegionventures.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "vtk.org": {
+      "{first}.{last}@{domain}": 8
+    },
+    "owlvc.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "cathayinnovation.com": {
+      "{first}.{last}@{domain}": 89
+    },
+    "balderton.com": {
+      "{first}.{last}@{domain}": 48
+    },
+    "7wireventures.com": {
+      "{first}.{last}@{domain}": 3
+    },
+    "baincapitalprivateequity.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "pitango.com": {
+      "{first}.{last}@{domain}": 77
+    },
+    "sourceforge.net": {
+      "{first}.{last}@{domain}": 17
+    },
+    "microsoft.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "vintage-ip.com": {
+      "{first}.{last}@{domain}": 14
+    },
+    "a16zcrypto.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "oracle.com": {
+      "{first}.{last}@{domain}": 7
+    },
+    "slicer.org": {
+      "{first}.{last}@{domain}": 2
+    },
+    "mayfield.com": {
+      "{first}.{last}@{domain}": 18
+    },
+    "adamsstreetpartners.com": {
+      "{first}.{last}@{domain}": 15
+    },
+    "voyagercapital.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "triton-partners.com": {
+      "{first}.{last}@{domain}": 120
+    },
+    "momentventures.com": {
+      "{first}.{last}@{domain}": 9
+    },
+    "emcap.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "crane.vc": {
+      "{first}.{last}@{domain}": 53
+    },
+    "inventure.fi": {
+      "{first}.{last}@{domain}": 26
+    },
+    "headline.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "levelequity.com": {
+      "{first}.{last}@{domain}": 118
+    },
+    "tektonventures.com": {
+      "{first}.{last}@{domain}": 14
+    },
+    "bioadvance.com": {
+      "{first}.{last}@{domain}": 10
+    },
+    "leadedgecapital.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "sharedesk.net": {
+      "{first}.{last}@{domain}": 2
+    },
+    "leftlane.com": {
+      "{first}.{last}@{domain}": 72
+    },
+    "silverlake.com": {
+      "{first}.{last}@{domain}": 314
+    },
+    "flyingfish.vc": {
+      "{first}.{last}@{domain}": 13
+    },
+    "kleinerperkins.com": {
+      "{first}.{last}@{domain}": 55
+    },
+    "8vc.com": {
+      "{first}.{last}@{domain}": 130
+    },
+    "iconiqcapital.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "dcvc.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "jetblueventures.com": {
+      "{first}.{last}@{domain}": 17
+    },
+    "equal.vc": {
+      "{first}.{last}@{domain}": 2
+    },
+    "gimv.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "glasswing.vc": {
+      "{first}.{last}@{domain}": 30
+    },
+    "sbinvestment.co.jp": {
+      "{first}.{last}@{domain}": 2
+    },
+    "raptorgroup.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "bdc.ca": {
+      "{first}.{last}@{domain}": 14
+    },
+    "firstround.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "tdfventures.com": {
+      "{first}.{last}@{domain}": 24
+    },
+    "bahmni.org": {
+      "{first}.{last}@{domain}": 3
+    },
+    "augustcap.com": {
+      "{first}.{last}@{domain}": 16
+    },
+    "reinventure.com.au": {
+      "{first}.{last}@{domain}": 4
+    },
+    "amazon.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "kametventures.com": {
+      "{first}.{last}@{domain}": 3
+    },
+    "maverickventures.com": {
+      "{first}.{last}@{domain}": 20
+    },
+    "january.ventures": {
+      "{first}.{last}@{domain}": 9
+    },
+    "crv.com": {
+      "{first}.{last}@{domain}": 7
+    },
+    "m13.co": {
+      "{first}.{last}@{domain}": 4
+    },
+    "gnuhealth.org": {
+      "{first}.{last}@{domain}": 2
+    },
+    "ourcrowd.com": {
+      "{first}.{last}@{domain}": 24
+    },
+    "github.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "k1im.com": {
+      "{first}.{last}@{domain}": 9
+    },
+    "charterhouse.co.uk": {
+      "{first}.{last}@{domain}": 90
+    },
+    "lererhippeau.com": {
+      "{first}.{last}@{domain}": 39
+    },
+    "glynncapital.com": {
+      "{first}.{last}@{domain}": 50
+    },
+    "elsewhere.partners": {
+      "{first}.{last}@{domain}": 59
+    },
+    "indie.vc": {
+      "{first}.{last}@{domain}": 2
+    },
+    "kalaari.com": {
+      "{first}.{last}@{domain}": 50
+    },
+    "greathillpartners.com": {
+      "{first}.{last}@{domain}": 214
+    },
+    "25madison.com": {
+      "{first}.{last}@{domain}": 75
+    },
+    "floodgate.com": {
+      "{first}.{last}@{domain}": 14
+    },
+    "picuscap.com": {
+      "{first}.{last}@{domain}": 56
+    },
+    "dicom.innolitics.com": {
+      "{first}.{last}@{domain}": 1
+    },
+    "iqt.org": {
+      "{first}.{last}@{domain}": 19
+    },
+    "metaprop.vc": {
+      "{first}.{last}@{domain}": 28
+    },
+    "nea.com": {
+      "{first}.{last}@{domain}": 86
+    },
+    "generalatlantic.com": {
+      "{first}.{last}@{domain}": 5
+    },
+    "primevp.in": {
+      "{first}.{last}@{domain}": 6
+    },
+    "generalcatalyst.com": {
+      "{first}.{last}@{domain}": 42
+    },
+    "hearstlab.com": {
+      "{first}.{last}@{domain}": 14
+    },
+    "bluepoolcapital.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "defy.vc": {
+      "{first}.{last}@{domain}": 49
+    },
+    "adventinternational.com": {
+      "{first}.{last}@{domain}": 9
+    },
+    "trilogyequity.com": {
+      "{first}.{last}@{domain}": 18
+    },
+    "partechpartners.com": {
+      "{first}.{last}@{domain}": 9
+    },
+    "viola-group.com": {
+      "{first}.{last}@{domain}": 74
+    },
+    "fiveelms.com": {
+      "{first}.{last}@{domain}": 145
+    },
+    "interplay.vc": {
+      "{first}.{last}@{domain}": 52
+    },
+    "centerbridge.com": {
+      "{first}.{last}@{domain}": 9
+    },
+    "nomadlist.com": {
+      "{first}.{last}@{domain}": 11
+    },
+    "openhim.org": {
+      "{first}.{last}@{domain}": 5
+    },
+    "aboutamazon.com": {
+      "{first}.{last}@{domain}": 1
+    },
+    "riverwoodcapital.com": {
+      "{first}.{last}@{domain}": 10
+    },
+    "innovationendeavors.com": {
+      "{first}.{last}@{domain}": 35
+    },
+    "entreecap.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "apple.com": {
+      "{first}.{last}@{domain}": 88
+    },
+    "lightstonevc.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "actoncapital.com": {
+      "{first}.{last}@{domain}": 31
+    },
+    "apax.com": {
+      "{first}.{last}@{domain}": 84
+    },
+    "blackbird.vc": {
+      "{first}.{last}@{domain}": 105
+    },
+    "petersonventures.com": {
+      "{first}.{last}@{domain}": 16
+    },
+    "capitolmeridian.com": {
+      "{first}.{last}@{domain}": 29
+    },
+    "fancapital.com.br": {
+      "{first}.{last}@{domain}": 5
+    },
+    "e14.vc": {
+      "{first}.{last}@{domain}": 33
+    },
+    "quadrille.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "flarecapital.com": {
+      "{first}.{last}@{domain}": 43
+    },
+    "usa.visa.com": {
+      "{first}.{last}@{domain}": 1
+    },
+    "runacap.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "clocktowertech.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "highalpha.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "uvcpartners.com": {
+      "{first}.{last}@{domain}": 27
+    },
+    "tribecavp.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "mangrove.vc": {
+      "{first}.{last}@{domain}": 3
+    },
+    "redalpine.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "gtcr.com": {
+      "{first}.{last}@{domain}": 306
+    },
+    "tencentcloud.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "scoutventures.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "bellushealth.com": {
+      "{first}.{last}@{domain}": 25
+    },
+    "samsung.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "fin.capital": {
+      "{first}.{last}@{domain}": 42
+    },
+    "dallasvc.com": {
+      "{first}.{last}@{domain}": 12
+    },
+    "biogenerationventures.com": {
+      "{first}.{last}@{domain}": 3
+    },
+    "ngp.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "av.vc": {
+      "{first}.{last}@{domain}": 17
+    },
+    "cedarfund.com": {
+      "{first}.{last}@{domain}": 12
+    },
+    "redpoint.com": {
+      "{first}.{last}@{domain}": 91
+    },
+    "whitestarcp.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "crosscut.vc": {
+      "{first}.{last}@{domain}": 2
+    },
+    "edisonpartners.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "khoslaventures.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "wcas.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "breakout.vc": {
+      "{first}.{last}@{domain}": 8
+    },
+    "liquid2.vc": {
+      "{first}.{last}@{domain}": 22
+    },
+    "mumtalakat.bh": {
+      "{first}.{last}@{domain}": 20
+    },
+    "ta.com": {
+      "{first}.{last}@{domain}": 268
+    },
+    "mubadala.com": {
+      "{first}.{last}@{domain}": 12
+    },
+    "dcm.com": {
+      "{first}.{last}@{domain}": 28
+    },
+    "preludeventures.com": {
+      "{first}.{last}@{domain}": 26
+    },
+    "nvidia.com": {
+      "{first}.{last}@{domain}": 38
+    },
+    "passioncapital.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "eladgil.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "breyercapital.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "collabfund.com": {
+      "{first}@{domain}": 19
+    },
+    "ahmadnassri.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "abstractvc.com": {
+      "{first}@{domain}": 8
+    },
+    "appianventures.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "energizecap.com": {
+      "{first}.{last}@{domain}": 58
+    },
+    "bsvcapital.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "actoneventures.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "kingsbridgecapital.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "wamda.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "jmeventures.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "dcm4che.org": {
+      "{first}.{last}@{domain}": 2
+    },
+    "canaan.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "rre.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "blockchaincapital.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "dreammachine.vc": {
+      "{first}.{last}@{domain}": 2
+    },
+    "amplefund.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "isai.fr": {
+      "{first}.{last}@{domain}": 2
+    },
+    "apexvp.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "optumventures.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "byteventures.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "advancitcapital.com": {
+      "{first}.{last}@{domain}": 1
+    },
+    "gsrventures.com": {
+      "{first}.{last}@{domain}": 4
+    },
+    "elysiumventures.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "greycroft.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "wildcatventurepartners.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "feld.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "airtree.vc": {
+      "{first}.{last}@{domain}": 2
+    },
+    "episode1.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "leefund.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "skvp.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "franklintempleton.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "rethinkeducation.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "healthcare.ai": {
+      "{first}.{last}@{domain}": 4
+    },
+    "inveready.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "heidcapital.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "nordicmakers.vc": {
+      "{first}.{last}@{domain}": 2
+    },
+    "arcvc.com": {
+      "{first}.{last}@{domain}": 8
+    },
+    "montageventures.com": {
+      "{first}.{last}@{domain}": 6
+    },
+    "matrixpartners.com": {
+      "{first}.{last}@{domain}": 2
+    },
+    "neptunefund.com": {
+      "{first}.{last}@{domain}": 8
     }
   }
 }

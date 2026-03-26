@@ -1,0 +1,207 @@
+{"ts": "2026-03-25T19:39:46.528153+00:00", "level": "INFO", "logger": "crawl.engine", "msg": "Resumed 2730 leads from data/enriched/leads_20260321_141946.csv"}
+{"ts": "2026-03-25T19:39:46.528301+00:00", "level": "INFO", "logger": "pipeline.metrics", "msg": "Stage started: enrichment", "phase": "enrichment", "run_id": "20260325_193946"}
+{"ts": "2026-03-25T19:39:46.528327+00:00", "level": "INFO", "logger": "crawl.engine", "msg": "Starting enrichment pipeline", "phase": "enrichment"}
+
+============================================================
+  ENRICHMENT PIPELINE
+============================================================
+
+  2730 person-level leads remaining
+{"ts": "2026-03-25T19:39:46.657090+00:00", "level": "INFO", "logger": "enrichment.dedup", "msg": "  \ud83d\udccb Loaded dedup index: 21635 entries"}
+{"ts": "2026-03-25T19:39:47.170934+00:00", "level": "INFO", "logger": "enrichment.dedup", "msg": "  \ud83d\udcbe Saved dedup index: 21741 entries"}
+{"ts": "2026-03-25T19:39:47.171164+00:00", "level": "INFO", "logger": "enrichment.dedup", "msg": "Dedup: 106 new, 2624 merged, 190 duplicates removed. Index total: 21741 unique leads"}
+  💾  Saved 2540 leads → data/enriched/checkpoint_dedup.csv
+{"ts": "2026-03-25T19:39:47.255778+00:00", "level": "INFO", "logger": "crawl.engine", "msg": "[PROGRESS] phase=dedup total_leads=2540 with_email=2539 verified=0 target=150000 completion=1%", "phase": "dedup", "lead_count": 2540, "run_id": "20260325_193946", "email_count": 2539}
+  Validating 2540 emails (+ MX check)...
+  Pre-existing emails (scraped from pages): 2535
+  💾  Saved 2540 leads → data/enriched/checkpoint_validation.csv
+{"ts": "2026-03-25T19:40:00.678398+00:00", "level": "INFO", "logger": "crawl.engine", "msg": "[PROGRESS] phase=validation total_leads=2540 with_email=2535 verified=0 target=150000 completion=1%", "phase": "validation", "lead_count": 2540, "run_id": "20260325_193946", "email_count": 2535}
+  Guessing emails for contacts without one...
+{"ts": "2026-03-25T19:40:00.726266+00:00", "level": "INFO", "logger": "enrichment.email_guesser", "msg": "  \u2709\ufe0f  Email guesser: 5 leads without email (of 2540 total)"}
+{"ts": "2026-03-25T19:40:00.726331+00:00", "level": "INFO", "logger": "enrichment.email_guesser", "msg": "  \ud83d\udd11  Patterns learned for 652 domains"}
+{"ts": "2026-03-25T19:40:00.731983+00:00", "level": "INFO", "logger": "enrichment.email_guesser", "msg": "  \u2709\ufe0f  Email guesser complete: 3/5 emails generated (3 from learned patterns, 0 patterns discovered via SMTP, 0 from default pattern, 0 domains had no MX, 2 company names skipped)"}
+  Guesser: 0 found / 0 domains checked
+  Pattern hits: 3 (from learned patterns)
+  Company/fund names skipped: 2
+  TOTAL emails: 2538/2540 (99%)
+  💾  Saved 2540 leads → data/enriched/checkpoint_guesser.csv
+{"ts": "2026-03-25T19:40:00.820508+00:00", "level": "INFO", "logger": "crawl.engine", "msg": "[PROGRESS] phase=guesser total_leads=2540 with_email=2538 verified=0 target=150000 completion=1%", "phase": "guesser", "lead_count": 2540, "run_id": "20260325_193946", "email_count": 2538}
+{"ts": "2026-03-25T19:40:00.820643+00:00", "level": "INFO", "logger": "pipeline.metrics", "msg": "Stage started: greyhat", "phase": "greyhat", "run_id": "20260325_193946"}
+{"ts": "2026-03-25T19:40:00.820688+00:00", "level": "INFO", "logger": "crawl.engine", "msg": "Starting greyhat enrichment", "phase": "greyhat"}
+
+============================================================
+  GREYHAT ENRICHMENT
+============================================================
+
+  2 leads still need emails — running greyhat modules...
+  Running phases 0-6 concurrently...
+{"ts": "2026-03-25T19:40:01.350250+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: querying 2 domains for 2 leads..."}
+{"ts": "2026-03-25T19:40:01.350764+00:00", "level": "INFO", "logger": "enrichment.google_dorker", "msg": "  \ud83d\udd0d  Google dorker: searching 2 domains for 2 leads..."}
+{"ts": "2026-03-25T19:40:01.351880+00:00", "level": "INFO", "logger": "enrichment.gravatar_oracle", "msg": "  \ud83d\udc7b  Gravatar oracle: probing 2 domains for 2 leads..."}
+{"ts": "2026-03-25T19:40:01.352301+00:00", "level": "INFO", "logger": "enrichment.pgp_keyserver", "msg": "  \ud83d\udd11  PGP keyserver: searching 2 names across 2 keyservers..."}
+{"ts": "2026-03-25T19:40:01.352640+00:00", "level": "INFO", "logger": "enrichment.github_miner", "msg": "  \ud83d\udc19  GitHub miner: searching 2 domains for 2 leads..."}
+{"ts": "2026-03-25T19:40:01.352692+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  No GITHUB_TOKEN set \u2014 limited to 60 req/hr (set env var for 5,000/hr)"}
+{"ts": "2026-03-25T19:40:01.353085+00:00", "level": "INFO", "logger": "enrichment.sec_edgar", "msg": "  \ud83d\udccb  SEC EDGAR: searching 2 domains for 2 leads..."}
+{"ts": "2026-03-25T19:40:01.353870+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback enricher: searching 2 domains for 2 leads..."}
+{"ts": "2026-03-25T19:40:01.659151+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for prologis.com"}
+{"ts": "2026-03-25T19:40:01.659301+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST complete: 0 leads enriched, 2 emails found (2 domains queried)"}
+  DNS: 0 enriched, 2 emails found, 2 domains queried
+{"ts": "2026-03-25T19:40:02.289722+00:00", "level": "INFO", "logger": "enrichment.gravatar_oracle", "msg": "  \ud83d\udc7b  Gravatar oracle complete: 0 confirmed out of 16 probes (2 leads checked)"}
+  Gravatar: 0 confirmed out of 16 probes
+{"ts": "2026-03-25T19:40:03.908914+00:00", "level": "INFO", "logger": "enrichment.pgp_keyserver", "msg": "  \ud83d\udd11  PGP scraper complete: 0 enriched, 0 emails extracted (4 queries across 2 leads)"}
+  PGP: 0 enriched, 0 emails extracted (4 queries)
+{"ts": "2026-03-25T19:40:05.910095+00:00", "level": "INFO", "logger": "enrichment.github_miner", "msg": "  \ud83d\udc19  GitHub miner complete: 0 leads enriched, 0 emails found (2 searches, 5 commits inspected, 0 rate-limited)"}
+  GitHub: 0 enriched, 0 emails, 5 commits scanned
+{"ts": "2026-03-25T19:40:12.825612+00:00", "level": "INFO", "logger": "enrichment.sec_edgar", "msg": "  \ud83d\udccb  SEC EDGAR complete: 0 leads enriched, 0 emails found (2 domains, 0 filings scanned)"}
+  EDGAR: 0 enriched, 0 emails, 2 domains searched
+{"ts": "2026-03-25T19:40:27.102478+00:00", "level": "INFO", "logger": "enrichment.google_dorker", "msg": "  \ud83d\udd0d  Google dorker complete: 0 leads enriched, 0 emails found across 2 domains (10 queries, 0 rate-limited)"}
+  Dorker: 0 enriched, 0 emails, 10 queries
+{"ts": "2026-03-25T19:43:23.445475+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback enricher complete: 0 leads enriched, 0 emails found (2 domains, 12 snapshots fetched)"}
+  Wayback: 0 enriched, 0 emails, 12 snapshots fetched
+  Phase 7: Catch-All Detection & JS Scraping...
+{"ts": "2026-03-25T19:43:23.465009+00:00", "level": "INFO", "logger": "enrichment.catchall_detector", "msg": "  \ud83d\uded1  CATCH-ALL: checking 2 domains for 2 leads..."}
+{"ts": "2026-03-25T19:43:25.158676+00:00", "level": "INFO", "logger": "enrichment.catchall_detector", "msg": "  \ud83d\udd77\ufe0f  JS SCRAPE: rendering 2 domains..."}
+{"ts": "2026-03-25T19:44:53.360760+00:00", "level": "INFO", "logger": "enrichment.catchall_detector", "msg": "  \ud83d\uded1  CATCH-ALL/JS complete: 0 catch-all, 0 js-scraped (2 domains checked, 0 were catch-all)"}
+  Catch-All/JS: 0 catch-all enriched, 0 JS-scraped (0 catch-all domains detected)
+
+  Greyhat enrichment complete: 0 emails recovered (2 -> 2 missing)
+{"ts": "2026-03-25T19:44:53.363353+00:00", "level": "INFO", "logger": "pipeline.metrics", "msg": "Stage completed: greyhat in 292.5s (leads=0, errors=0)", "phase": "greyhat", "duration_s": 292.54, "lead_count": 0, "error_count": 0, "run_id": "20260325_193946"}
+  💾  Saved 2540 leads → data/enriched/checkpoint_greyhat.csv
+{"ts": "2026-03-25T19:44:53.456110+00:00", "level": "INFO", "logger": "crawl.engine", "msg": "[PROGRESS] phase=greyhat total_leads=2540 with_email=2538 verified=0 target=150000 completion=1%", "phase": "greyhat", "lead_count": 2540, "run_id": "20260325_193946", "email_count": 2538}
+/Users/neil/crawler-26-public/enrichment/page_extractors.py:833: XMLParsedAsHTMLWarning: It looks like you're using an HTML parser to parse an XML document.
+
+Assuming this really is an XML document, what you're doing might work, but you should know that using an XML parser will be more reliable. To parse this document as XML, make sure you have the Python package 'lxml' installed, and pass the keyword argument `features="xml"` into the BeautifulSoup constructor.
+
+If you want or need to use an HTML parser on this document, you can make this warning go away by filtering it. To do that, run this code before calling the BeautifulSoup constructor:
+
+    from bs4 import XMLParsedAsHTMLWarning
+    import warnings
+
+    warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+
+  soup = BeautifulSoup(html, "html.parser")
+/Users/neil/crawler-26-public/enrichment/page_extractors.py:357: XMLParsedAsHTMLWarning: It looks like you're using an HTML parser to parse an XML document.
+
+Assuming this really is an XML document, what you're doing might work, but you should know that using an XML parser will be more reliable. To parse this document as XML, make sure you have the Python package 'lxml' installed, and pass the keyword argument `features="xml"` into the BeautifulSoup constructor.
+
+If you want or need to use an HTML parser on this document, you can make this warning go away by filtering it. To do that, run this code before calling the BeautifulSoup constructor:
+
+    from bs4 import XMLParsedAsHTMLWarning
+    import warnings
+
+    warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+
+  soup = BeautifulSoup(html, "html.parser")
+/Users/neil/crawler-26-public/enrichment/page_extractors.py:561: XMLParsedAsHTMLWarning: It looks like you're using an HTML parser to parse an XML document.
+
+Assuming this really is an XML document, what you're doing might work, but you should know that using an XML parser will be more reliable. To parse this document as XML, make sure you have the Python package 'lxml' installed, and pass the keyword argument `features="xml"` into the BeautifulSoup constructor.
+
+If you want or need to use an HTML parser on this document, you can make this warning go away by filtering it. To do that, run this code before calling the BeautifulSoup constructor:
+
+    from bs4 import XMLParsedAsHTMLWarning
+    import warnings
+
+    warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+
+  soup = BeautifulSoup(html, "html.parser")
+  Running fund intelligence enrichment...
+  Fund intelligence: 183 unique domains to enrich
+  Fund intelligence complete: 183 domains, 4928 portfolio cos, 396 decision makers, 44 active inferred
+  💾  Saved 2540 leads → data/enriched/checkpoint_fund_intel.csv
+{"ts": "2026-03-25T19:51:48.408060+00:00", "level": "INFO", "logger": "crawl.engine", "msg": "[PROGRESS] phase=fund_intel total_leads=2540 with_email=2538 verified=0 target=150000 completion=1%", "phase": "fund_intel", "lead_count": 2540, "run_id": "20260325_193946", "email_count": 2538}
+  SMTP verification on 2538 emails...
+{"ts": "2026-03-25T19:51:48.409312+00:00", "level": "INFO", "logger": "enrichment.email_validator", "msg": "SMTP self-test: testing direct connection to gmail-smtp-in.l.google.com:25"}
+{"ts": "2026-03-25T19:51:58.691769+00:00", "level": "INFO", "logger": "enrichment.email_validator", "msg": "SMTP self-test: port 25 EHLO OK on gmail-smtp-in.l.google.com"}
+  📬  SMTP progress: 100/2538 emails checked...
+  📬  SMTP progress: 200/2538 emails checked...
+  📬  SMTP progress: 300/2538 emails checked...
+  📬  SMTP progress: 400/2538 emails checked...
+  📬  SMTP progress: 500/2538 emails checked...
+  📬  SMTP progress: 600/2538 emails checked...
+  📬  SMTP progress: 700/2538 emails checked...
+  📬  SMTP progress: 800/2538 emails checked...
+  📬  SMTP progress: 900/2538 emails checked...
+  📬  SMTP progress: 1000/2538 emails checked...
+  📬  SMTP progress: 1100/2538 emails checked...
+  📬  SMTP progress: 1200/2538 emails checked...
+  📬  SMTP progress: 1300/2538 emails checked...
+  📬  SMTP progress: 1400/2538 emails checked...
+  📬  SMTP progress: 1500/2538 emails checked...
+  📬  SMTP progress: 1600/2538 emails checked...
+  📬  SMTP progress: 1700/2538 emails checked...
+  📬  SMTP progress: 1800/2538 emails checked...
+  📬  SMTP progress: 1900/2538 emails checked...
+  📬  SMTP progress: 2000/2538 emails checked...
+  📬  SMTP progress: 2100/2538 emails checked...
+  📬  SMTP progress: 2200/2538 emails checked...
+  📬  SMTP progress: 2300/2538 emails checked...
+  📬  SMTP progress: 2400/2538 emails checked...
+  📬  SMTP progress: 2500/2538 emails checked...
+  📬  SMTP batch complete: 2538/2538 emails checked
+  SMTP summary: 385 verified, 1730 undeliverable, 272 catch-all, 151 unknown
+  💾  Saved 2540 leads → data/enriched/checkpoint_smtp.csv
+{"ts": "2026-03-25T20:38:17.581252+00:00", "level": "INFO", "logger": "crawl.engine", "msg": "[PROGRESS] phase=smtp total_leads=2540 with_email=2538 verified=385 target=150000 completion=1%", "phase": "smtp", "lead_count": 2540, "run_id": "20260325_193946", "email_count": 2538}
+{"ts": "2026-03-25T20:38:17.581761+00:00", "level": "INFO", "logger": "enrichment.email_waterfall", "msg": "  \u26a0\ufe0f  No email waterfall providers configured (set API keys via env vars)"}
+  Email waterfall skipped (no API keys configured)
+  Scoring leads...
+  🆕  64 new leads detected (delta from master)
+
+  Writing output...
+  🛡️  Backed up master CSV → investor_leads_master_BACKUP_2540.csv
+  📂  Loaded 17631 existing leads from master CSV
+  🆕  89 new leads merged (total: 17720)
+  💾  Saved 17720 leads → data/enriched/investor_leads_master.csv
+  💾  Saved 17720 leads → data/enriched/leads_20260325_163818.csv
+{"ts": "2026-03-25T20:38:18.766293+00:00", "level": "INFO", "logger": "pipeline.metrics", "msg": "Stage completed: enrichment in 3512.2s (leads=2540, errors=0)", "phase": "enrichment", "duration_s": 3512.21, "lead_count": 2540, "error_count": 0, "run_id": "20260325_193946"}
+
+============================================================
+  CRAWL SUMMARY
+============================================================
+  Run ID:    20260325_193946
+  Duration:  0.0s
+  Total leads: 2540
+  Errors:    0
+  Stages:    enrichment
+
+  EMAIL QUALITY BREAKDOWN:
+       Verified:      385
+       Catch-all:     272
+       Scraped:       149
+       Guessed:       2
+       Undeliverable: 1730
+       Unknown:       2
+       ---
+       USABLE (verified+catch_all+scraped): 806
+       TARGET: 150,000 | Progress: 0%
+
+  Avg score: 51.7
+  HOT leads: 3
+  WARM leads: 565
+  Fingerprints used: 0
+  Proxy requests: 0
+  DB persistence: 0 added, 0 deduped (DB=unavailable)
+
+  TOP 5 LEADS:
+  __________________________________________________
+  🔴 HOT  Arpan Punyani (Garudaventures)
+       Email: arpan.punyani@garudaventures.com | Focus: devtools, enterprise
+       Check: $500K–$1.5M | Score: 100
+
+  🔴 HOT  Rishi Taparia (Garudaventures)
+       Email: rishi.taparia@garudaventures.com | Focus: devtools, enterprise
+       Check: $500K–$1.5M | Score: 100
+
+  🔴 HOT  James Richards (Garudaventures)
+       Email: james.richards@garudaventures.com | Focus: devtools, enterprise
+       Check: $500K–$1.5M | Score: 93
+
+  🟡 WARM  Bob Rowe (Westlygroup)
+       Email: bob.rowe@westlygroup.com | Focus: cybersecurity, mobility
+       Check: N/A | Score: 79
+
+  🟡 WARM  Samantha Lewis (Mercuryfund)
+       Email: samantha.lewis@mercuryfund.com | Focus: crypto_web3, devtools
+       Check: N/A | Score: 79
+
+{"ts": "2026-03-25T20:38:18.776049+00:00", "level": "INFO", "logger": "crawl.engine", "msg": "[PROGRESS] phase=final total_leads=2540 with_email=2538 verified=385 target=150000 completion=1%", "phase": "final", "lead_count": 2540, "run_id": "20260325_193946", "email_count": 2538}
+{"ts": "2026-03-25T20:38:18.776101+00:00", "level": "INFO", "logger": "crawl.engine", "msg": "Pipeline run complete", "duration_s": 0.0, "lead_count": 2540, "error_count": 0, "run_id": "20260325_193946"}

@@ -46,8 +46,8 @@ function DataPreview() {
       {/* Main table card */}
       <div className="flex-1 min-w-0 rounded-[22px] p-[2px] shadow-xl"
         style={{
-          backgroundColor: "#3D6A67",
-          boxShadow: "0 20px 50px -12px rgba(46,90,88,0.25), 0 0 0 1px rgba(46,90,88,0.3)",
+          backgroundColor: "#6B5210",
+          boxShadow: "0 20px 50px -12px rgba(139,105,20,0.25), 0 0 0 1px rgba(139,105,20,0.3)",
         }}
       >
         <div className="rounded-[20px] border overflow-hidden"
@@ -61,7 +61,7 @@ function DataPreview() {
           <div className="px-4 pt-4 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.10)" }}>
             <div className="flex items-center gap-2 rounded-lg px-3 py-2" style={{ backgroundColor: "rgba(255,255,255,0.10)" }}>
               <Search size={14} strokeWidth={1.75} style={{ color: "rgba(255,255,255,0.5)" }} />
-              <span className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>Search funds, partners, sectors...</span>
+              <span className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>Search funds, partners, sectors...</span>
             </div>
           </div>
 
@@ -77,17 +77,17 @@ function DataPreview() {
                 style={
                   activeTab === tab
                     ? { backgroundColor: "rgba(199,155,44,0.35)", color: "#F8F4EC", boxShadow: "inset 0 0 0 1px rgba(199,155,44,0.4)" }
-                    : { color: "rgba(255,255,255,0.5)" }
+                    : { color: "rgba(255,255,255,0.55)" }
                 }
                 onMouseEnter={(e) => {
                   if (activeTab !== tab) {
-                    e.currentTarget.style.color = "rgba(255,255,255,0.7)";
+                    e.currentTarget.style.color = "rgba(255,255,255,0.75)";
                     e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.05)";
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (activeTab !== tab) {
-                    e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+                    e.currentTarget.style.color = "rgba(255,255,255,0.55)";
                     e.currentTarget.style.backgroundColor = "transparent";
                   }
                 }}
@@ -101,8 +101,8 @@ function DataPreview() {
           <div className="overflow-x-auto">
             <div className="min-w-[480px]">
               <div
-                className="px-4 py-2 grid grid-cols-[1fr_0.8fr_0.6fr_0.5fr_0.4fr] gap-2 text-[10px] font-semibold uppercase tracking-wider"
-                style={{ color: "rgba(255,255,255,0.4)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+                className="px-4 py-2 grid grid-cols-[1fr_0.8fr_0.6fr_0.5fr_0.4fr] gap-2 text-[11px] font-semibold uppercase tracking-wider"
+                style={{ color: "rgba(255,255,255,0.5)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}
               >
                 <span>Fund / Partner</span><span>Sector</span><span>Check</span><span>Location</span><span>Score</span>
               </div>
@@ -139,21 +139,21 @@ function DataPreview() {
                         }}
                       >
                         <div>
-                          <div className="text-xs font-semibold leading-snug" style={{ color: isSelected ? "#F8F4EC" : "rgba(255,255,255,0.95)" }}>{row.fund}</div>
-                          <div className="text-[10px]" style={{ color: "rgba(255,255,255,0.5)" }}>{row.partner}</div>
+                          <div className="text-[13px] font-semibold leading-snug" style={{ color: isSelected ? "#F8F4EC" : "rgba(255,255,255,0.95)" }}>{row.fund}</div>
+                          <div className="text-[11px]" style={{ color: "rgba(255,255,255,0.6)" }}>{row.partner}</div>
                         </div>
-                        <div className="text-xs self-center" style={{ color: "rgba(255,255,255,0.7)" }}>{row.sector}</div>
-                        <div className="text-xs self-center" style={{ color: "rgba(255,255,255,0.7)" }}>{row.check}</div>
-                        <div className="text-xs self-center" style={{ color: "rgba(255,255,255,0.7)" }}>{row.location}</div>
+                        <div className="text-[13px] self-center" style={{ color: "rgba(255,255,255,0.75)" }}>{row.sector}</div>
+                        <div className="text-[13px] self-center" style={{ color: "rgba(255,255,255,0.75)" }}>{row.check}</div>
+                        <div className="text-[13px] self-center" style={{ color: "rgba(255,255,255,0.75)" }}>{row.location}</div>
                         <div className="self-center">
                           <span
-                            className="text-[11px] font-bold px-2 py-0.5 rounded-full"
+                            className="text-[12px] font-bold px-2 py-0.5 rounded-full"
                             style={
                               row.score >= 95
                                 ? { backgroundColor: "rgba(199,155,44,0.25)", color: "#E3C56A" }
                                 : row.score >= 90
-                                  ? { backgroundColor: "rgba(46,90,88,0.40)", color: "rgba(255,255,255,0.75)" }
-                                  : { backgroundColor: "rgba(255,255,255,0.10)", color: "rgba(255,255,255,0.7)" }
+                                  ? { backgroundColor: "rgba(199,155,44,0.15)", color: "rgba(255,255,255,0.8)" }
+                                  : { backgroundColor: "rgba(255,255,255,0.10)", color: "rgba(255,255,255,0.75)" }
                             }
                           >
                             {row.score}
@@ -169,8 +169,8 @@ function DataPreview() {
 
           {/* Footer */}
           <div className="px-4 py-2.5 flex items-center justify-between" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-            <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>Showing 3 of 15,548 leads</span>
-            <span className="text-[10px] flex items-center gap-1" style={{ color: "rgba(255,255,255,0.4)" }}>Updated daily <RefreshCw size={9} strokeWidth={1.75} /></span>
+            <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.45)" }}>Showing 3 of 15,548 leads</span>
+            <span className="text-[11px] flex items-center gap-1" style={{ color: "rgba(255,255,255,0.5)" }}>Updated daily <RefreshCw size={9} strokeWidth={1.75} /></span>
           </div>
         </div>
       </div>
@@ -190,7 +190,7 @@ function DataPreview() {
               boxShadow: "0 4px 16px -4px rgba(21,17,14,0.08)",
             }}
           >
-            <div className="text-[11px] font-semibold mb-3" style={{ color: "#1E1916" }}>
+            <div className="text-[12px] font-semibold mb-3" style={{ color: "#1E1916" }}>
               Fit signals
             </div>
             <div className="flex flex-col gap-2.5">
@@ -208,7 +208,7 @@ function DataPreview() {
                   >
                     <Check size={9} strokeWidth={3} style={{ color: "#C79B2C" }} />
                   </div>
-                  <span className="text-[11px] leading-snug" style={{ color: "#5E554C" }}>
+                  <span className="text-[12px] leading-snug" style={{ color: "#5E554C" }}>
                     {signal}
                   </span>
                 </motion.div>
@@ -228,9 +228,13 @@ function DataPreview() {
 export function Hero() {
   return (
     <section className="relative pt-28 pb-16 md:pt-36 md:pb-20 overflow-hidden">
-      {/* Honeycomb pattern -- top-right corner only */}
-      <div className="absolute top-0 right-0 w-[480px] h-[420px] pointer-events-none">
-        <HoneycombPattern opacity={0.03} className="text-text-primary" />
+      {/* Honeycomb pattern -- top-right corner */}
+      <div className="absolute top-0 right-0 w-[600px] h-[520px] pointer-events-none">
+        <HoneycombPattern opacity={0.045} className="text-honey-500" />
+      </div>
+      {/* Honeycomb pattern -- bottom-left subtle */}
+      <div className="absolute bottom-0 left-0 w-[400px] h-[350px] pointer-events-none">
+        <HoneycombPattern opacity={0.025} className="text-text-primary" />
       </div>
 
       <Container className="relative">
@@ -246,7 +250,7 @@ export function Hero() {
               style={{ color: "#1E1916" }}
             >
               Stop guessing which VCs{" "}
-              <span style={{ color: "#2E5A58" }}>fit your raise.</span>
+              <span style={{ color: "#C79B2C" }}>fit your raise.</span>
             </h1>
             <p
               className="mt-5 text-base md:text-[17px] leading-relaxed max-w-lg"
@@ -260,7 +264,7 @@ export function Hero() {
               </ButtonPrimary>
               <ButtonSecondary href="#what-you-get">See what&apos;s included</ButtonSecondary>
             </div>
-            <p className="mt-4 text-xs" style={{ color: "#7A7066" }}>
+            <p className="mt-4 text-[13px]" style={{ color: "#7A7066" }}>
               No spam. 1--2 emails/week. Unsubscribe anytime.
             </p>
           </motion.div>

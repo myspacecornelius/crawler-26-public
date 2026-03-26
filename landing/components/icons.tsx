@@ -159,15 +159,18 @@ export function IconGeo({ className = "" }: { className?: string }) {
 //  SVG PATTERNS & BRAND MARKS
 // ═══════════════════════════════════════════════════
 
+let hcIdCounter = 0;
+
 export function HoneycombPattern({ opacity = 0.05, className = "" }: { opacity?: number; className?: string }) {
+  const id = `hc-${++hcIdCounter}`;
   return (
     <svg className={`absolute inset-0 w-full h-full pointer-events-none ${className}`} style={{ opacity }} xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <pattern id="hc" x="0" y="0" width="56" height="100" patternUnits="userSpaceOnUse">
+        <pattern id={id} x="0" y="0" width="56" height="100" patternUnits="userSpaceOnUse">
           <path d="M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 50L28 34L56 50L56 84L28 100Z" fill="none" stroke="currentColor" strokeWidth="0.5" />
         </pattern>
       </defs>
-      <rect width="100%" height="100%" fill="url(#hc)" />
+      <rect width="100%" height="100%" fill={`url(#${id})`} />
     </svg>
   );
 }

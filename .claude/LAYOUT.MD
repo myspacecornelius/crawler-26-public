@@ -238,6 +238,7 @@ Replace repetitive clipped cards with a product pipeline visualization.
 Layout
 
 3-step or 4-step horizontal flow:
+
  1. input
  2. enrichment
  3. scoring/filtering
@@ -668,5 +669,3 @@ The redesign is successful if:
  • the case studies become a memorable showcase
  • readability issues are fully resolved
  • the page feels more like a serious product experience and less like a styled marketing mockup
-
-?

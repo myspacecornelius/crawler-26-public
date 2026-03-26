@@ -38,7 +38,7 @@ export function CoverageBand() {
                 }}
               >
                 <div className="text-2xl md:text-3xl font-[700] text-honey-500 mb-1">{s.value}</div>
-                <div className="text-xs text-charcoal-text/50 uppercase tracking-wider">{s.label}</div>
+                <div className="text-[13px] text-charcoal-text/70 uppercase tracking-wider">{s.label}</div>
               </div>
             ))}
           </div>

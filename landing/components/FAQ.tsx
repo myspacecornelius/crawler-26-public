@@ -15,7 +15,7 @@ function FAQItem({ question, answer, isLast }: { question: string; answer: strin
         className="w-full flex items-center justify-between py-5 text-left group"
         aria-expanded={open}
       >
-        <span className="text-[15px] font-semibold text-[#1E1916] group-hover:text-[#2E5A58] transition-colors pr-4">
+        <span className="text-[15px] font-semibold text-[#1E1916] group-hover:text-[#C79B2C] transition-colors pr-4">
           {question}
         </span>
         <span className="flex-shrink-0 text-[#7A7066] transition-transform duration-[220ms] ease-out" style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}>

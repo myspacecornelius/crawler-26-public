@@ -1,0 +1,589 @@
+{"ts": "2026-03-25T21:03:59.280306+00:00", "level": "INFO", "logger": "crawl.engine", "msg": "Resumed 11750 leads from data/enriched/checkpoint_march24_recovered.csv"}
+{"ts": "2026-03-25T21:03:59.280812+00:00", "level": "INFO", "logger": "pipeline.metrics", "msg": "Stage started: enrichment", "phase": "enrichment", "run_id": "20260325_210358"}
+{"ts": "2026-03-25T21:03:59.280966+00:00", "level": "INFO", "logger": "crawl.engine", "msg": "Starting enrichment pipeline", "phase": "enrichment"}
+
+============================================================
+  ENRICHMENT PIPELINE
+============================================================
+
+  Filtered 1 fund-level rows (name == fund name)
+  11749 person-level leads remaining
+{"ts": "2026-03-25T21:03:59.638474+00:00", "level": "INFO", "logger": "enrichment.dedup", "msg": "  \ud83d\udccb Loaded dedup index: 21741 entries"}
+{"ts": "2026-03-25T21:04:02.220615+00:00", "level": "INFO", "logger": "enrichment.dedup", "msg": "  \ud83d\udcbe Saved dedup index: 22244 entries"}
+{"ts": "2026-03-25T21:04:02.221242+00:00", "level": "INFO", "logger": "enrichment.dedup", "msg": "Dedup: 503 new, 11246 merged, 374 duplicates removed. Index total: 22244 unique leads"}
+  💾  Saved 11375 leads → data/enriched/checkpoint_dedup.csv
+{"ts": "2026-03-25T21:04:03.239687+00:00", "level": "INFO", "logger": "crawl.engine", "msg": "[PROGRESS] phase=dedup total_leads=11375 with_email=2725 verified=0 target=150000 completion=1%", "phase": "dedup", "lead_count": 11375, "run_id": "20260325_210358", "email_count": 2725}
+  Validating 11375 emails (+ MX check)...
+  Pre-existing emails (scraped from pages): 2720
+  💾  Saved 11375 leads → data/enriched/checkpoint_validation.csv
+{"ts": "2026-03-25T21:04:05.547614+00:00", "level": "INFO", "logger": "crawl.engine", "msg": "[PROGRESS] phase=validation total_leads=11375 with_email=2720 verified=0 target=150000 completion=1%", "phase": "validation", "lead_count": 11375, "run_id": "20260325_210358", "email_count": 2720}
+  Guessing emails for contacts without one...
+{"ts": "2026-03-25T21:04:05.701400+00:00", "level": "INFO", "logger": "enrichment.email_guesser", "msg": "  \u2709\ufe0f  Email guesser: 8655 leads without email (of 11375 total)"}
+{"ts": "2026-03-25T21:04:05.702050+00:00", "level": "INFO", "logger": "enrichment.email_guesser", "msg": "  \ud83d\udd11  Patterns learned for 652 domains"}
+{"ts": "2026-03-25T21:04:05.963245+00:00", "level": "INFO", "logger": "enrichment.email_guesser", "msg": "  \ud83d\udd0d  Probing 42 domains for email patterns via SMTP..."}
+{"ts": "2026-03-25T21:04:05.963640+00:00", "level": "INFO", "logger": "enrichment.email_validator", "msg": "SMTP self-test: testing direct connection to gmail-smtp-in.l.google.com:25"}
+{"ts": "2026-03-25T21:04:16.219169+00:00", "level": "INFO", "logger": "enrichment.email_validator", "msg": "SMTP self-test: port 25 EHLO OK on gmail-smtp-in.l.google.com"}
+{"ts": "2026-03-25T21:05:10.194280+00:00", "level": "INFO", "logger": "enrichment.email_guesser", "msg": "  \ud83d\udd0d  Discovered pattern for eladgil.com: {first}.{last}@{domain} (via elad.gil@eladgil.com)"}
+{"ts": "2026-03-25T21:20:11.520581+00:00", "level": "INFO", "logger": "enrichment.email_guesser", "msg": "  \ud83d\udd0d  Discovered pattern for breyercapital.com: {first}.{last}@{domain} (via general.inquiries@breyercapital.com)"}
+{"ts": "2026-03-25T21:33:06.553897+00:00", "level": "INFO", "logger": "enrichment.email_guesser", "msg": "  \ud83d\udd0d  Discovered pattern for collabfund.com: {first}@{domain} (via ben@collabfund.com)"}
+{"ts": "2026-03-25T21:55:48.088656+00:00", "level": "INFO", "logger": "enrichment.email_guesser", "msg": "  \ud83d\udd0d  Discovered pattern for ahmadnassri.com: {first}.{last}@{domain} (via ahmad.nassri@ahmadnassri.com)"}
+{"ts": "2026-03-25T22:05:31.160301+00:00", "level": "INFO", "logger": "enrichment.email_guesser", "msg": "  \ud83d\udd0d  Discovered pattern for abstractvc.com: {first}@{domain} (via alex@abstractvc.com)"}
+{"ts": "2026-03-25T22:24:49.653305+00:00", "level": "INFO", "logger": "enrichment.email_guesser", "msg": "  \ud83d\udd0d  Pattern discovery complete: 5 patterns found"}
+{"ts": "2026-03-25T22:24:50.864405+00:00", "level": "INFO", "logger": "enrichment.email_guesser", "msg": "  \u2709\ufe0f  Email guesser complete: 7972/8655 emails generated (7800 from learned patterns, 5 patterns discovered via SMTP, 172 from default pattern, 0 domains had no MX, 683 company names skipped)"}
+  Guesser: 172 found / 172 domains checked
+  Pattern hits: 7800 (from learned patterns)
+  Default pattern (first.last@domain): 172
+  Company/fund names skipped: 683
+  TOTAL emails: 10692/11375 (93%)
+  💾  Saved 11375 leads → data/enriched/checkpoint_guesser.csv
+{"ts": "2026-03-25T22:24:51.790939+00:00", "level": "INFO", "logger": "crawl.engine", "msg": "[PROGRESS] phase=guesser total_leads=11375 with_email=10692 verified=0 target=150000 completion=7%", "phase": "guesser", "lead_count": 11375, "run_id": "20260325_210358", "email_count": 10692}
+{"ts": "2026-03-25T22:24:51.791126+00:00", "level": "INFO", "logger": "pipeline.metrics", "msg": "Stage started: greyhat", "phase": "greyhat", "run_id": "20260325_210358"}
+{"ts": "2026-03-25T22:24:51.791216+00:00", "level": "INFO", "logger": "crawl.engine", "msg": "Starting greyhat enrichment", "phase": "greyhat"}
+
+============================================================
+  GREYHAT ENRICHMENT
+============================================================
+
+  683 leads still need emails — running greyhat modules...
+  Running phases 0-6 concurrently...
+{"ts": "2026-03-25T22:24:58.036931+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: querying 325 domains for 683 leads..."}
+{"ts": "2026-03-25T22:24:58.050368+00:00", "level": "INFO", "logger": "enrichment.google_dorker", "msg": "  \ud83d\udd0d  Google dorker: searching 325 domains for 683 leads..."}
+{"ts": "2026-03-25T22:24:58.063601+00:00", "level": "INFO", "logger": "enrichment.gravatar_oracle", "msg": "  \ud83d\udc7b  Gravatar oracle: probing 325 domains for 683 leads..."}
+{"ts": "2026-03-25T22:24:58.067578+00:00", "level": "INFO", "logger": "enrichment.pgp_keyserver", "msg": "  \ud83d\udd11  PGP keyserver: searching 683 names across 2 keyservers..."}
+{"ts": "2026-03-25T22:24:58.077953+00:00", "level": "INFO", "logger": "enrichment.github_miner", "msg": "  \ud83d\udc19  GitHub miner: searching 325 domains for 683 leads..."}
+{"ts": "2026-03-25T22:24:58.078091+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  No GITHUB_TOKEN set \u2014 limited to 60 req/hr (set env var for 5,000/hr)"}
+{"ts": "2026-03-25T22:24:58.089475+00:00", "level": "INFO", "logger": "enrichment.sec_edgar", "msg": "  \ud83d\udccb  SEC EDGAR: searching 325 domains for 683 leads..."}
+{"ts": "2026-03-25T22:24:58.097988+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback enricher: searching 325 domains for 683 leads..."}
+{"ts": "2026-03-25T22:24:58.277587+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for labkey.com"}
+{"ts": "2026-03-25T22:24:58.279953+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for pamlicocapital.com"}
+{"ts": "2026-03-25T22:24:58.280182+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for amplifypartners.com"}
+{"ts": "2026-03-25T22:24:58.465731+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for forteventures.com"}
+{"ts": "2026-03-25T22:24:58.466049+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for atapco.com"}
+{"ts": "2026-03-25T22:24:58.466205+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for obvious.com"}
+{"ts": "2026-03-25T22:24:58.466390+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for lunar.vc"}
+{"ts": "2026-03-25T22:24:58.466476+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for ehrbase.org"}
+{"ts": "2026-03-25T22:24:58.466608+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for tdk-ventures.com"}
+{"ts": "2026-03-25T22:24:58.466720+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for socialleverage.com"}
+{"ts": "2026-03-25T22:24:58.466885+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for enlightenmentcapital.com"}
+{"ts": "2026-03-25T22:24:58.467016+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for cowboy.vc"}
+{"ts": "2026-03-25T22:24:58.467116+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for appianventures.com"}
+{"ts": "2026-03-25T22:24:58.468091+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for hospitalrun.io"}
+{"ts": "2026-03-25T22:24:58.516631+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for bluventureinvestors.com"}
+{"ts": "2026-03-25T22:24:58.516759+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for resolute.vc"}
+{"ts": "2026-03-25T22:24:58.516869+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for qedinvestors.com"}
+{"ts": "2026-03-25T22:24:58.516948+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for ikpartners.com"}
+{"ts": "2026-03-25T22:24:58.529073+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for lonepinecapital.com"}
+{"ts": "2026-03-25T22:24:58.565653+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 4 emails for signalfire.com"}
+{"ts": "2026-03-25T22:24:58.570163+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for linkedin.com"}
+{"ts": "2026-03-25T22:24:58.570360+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for revolution.com"}
+{"ts": "2026-03-25T22:24:58.570700+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for kkr.com"}
+{"ts": "2026-03-25T22:24:58.571485+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for aig.com"}
+{"ts": "2026-03-25T22:24:58.572745+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for spectrumequity.com"}
+{"ts": "2026-03-25T22:24:58.632195+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for tcv.com"}
+{"ts": "2026-03-25T22:24:58.633468+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for zoom.us"}
+{"ts": "2026-03-25T22:24:58.633906+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for summitpartners.com"}
+{"ts": "2026-03-25T22:24:58.634957+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for vistaequitypartners.com"}
+{"ts": "2026-03-25T22:24:58.655095+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for audaxprivateequity.com"}
+{"ts": "2026-03-25T22:24:58.663074+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for apfc.org"}
+{"ts": "2026-03-25T22:24:58.703628+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for usvp.com"}
+{"ts": "2026-03-25T22:24:58.703715+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for americansecurities.com"}
+{"ts": "2026-03-25T22:24:58.703778+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for biomaticscapital.com"}
+{"ts": "2026-03-25T22:24:58.703853+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for sterlingroad.com"}
+{"ts": "2026-03-25T22:24:58.703937+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for leonardgreen.com"}
+{"ts": "2026-03-25T22:24:58.704069+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for global.vc"}
+{"ts": "2026-03-25T22:24:58.713106+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for bsvcapital.com"}
+{"ts": "2026-03-25T22:24:58.713328+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for volitioncapital.com"}
+{"ts": "2026-03-25T22:24:58.713404+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for kingsbridgecapital.com"}
+{"ts": "2026-03-25T22:24:59.016804+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for elaia.com"}
+{"ts": "2026-03-25T22:24:59.033044+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for starburst.aero"}
+{"ts": "2026-03-25T22:24:59.033291+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for maveron.com"}
+{"ts": "2026-03-25T22:24:59.043468+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for wafra.com"}
+{"ts": "2026-03-25T22:24:59.043685+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for pritzkergroup.com"}
+{"ts": "2026-03-25T22:24:59.044656+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for omnescapital.com"}
+{"ts": "2026-03-25T22:24:59.060742+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for guardiancapital.com"}
+{"ts": "2026-03-25T22:24:59.068055+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for breyercapital.com"}
+{"ts": "2026-03-25T22:24:59.095881+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for qualcommventures.com"}
+{"ts": "2026-03-25T22:24:59.096062+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for beepartners.vc"}
+{"ts": "2026-03-25T22:24:59.099504+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for snowflake.com"}
+{"ts": "2026-03-25T22:24:59.101132+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for targetglobal.vc"}
+{"ts": "2026-03-25T22:24:59.103465+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for samsungnext.com"}
+{"ts": "2026-03-25T22:24:59.104914+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for coralcap.co"}
+{"ts": "2026-03-25T22:24:59.105008+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for keenventurepartners.com"}
+{"ts": "2026-03-25T22:24:59.105093+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for accessvp.com"}
+{"ts": "2026-03-25T22:24:59.105167+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for susaventures.com"}
+{"ts": "2026-03-25T22:24:59.107753+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for octopusventures.com"}
+{"ts": "2026-03-25T22:24:59.165324+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for meta.com"}
+{"ts": "2026-03-25T22:24:59.165628+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for flagshippioneering.com"}
+{"ts": "2026-03-25T22:24:59.166336+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for unitedtalent.com"}
+{"ts": "2026-03-25T22:24:59.167627+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 4 emails for racap.com"}
+{"ts": "2026-03-25T22:24:59.254621+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for battery.com"}
+{"ts": "2026-03-25T22:24:59.255240+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for hubspot.com"}
+{"ts": "2026-03-25T22:24:59.255371+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for drivecapital.com"}
+{"ts": "2026-03-25T22:24:59.267345+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for hvcapital.com"}
+{"ts": "2026-03-25T22:24:59.270974+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for horizonsventures.com"}
+{"ts": "2026-03-25T22:24:59.271197+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for jmeventures.com"}
+{"ts": "2026-03-25T22:24:59.271336+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for fuelcapital.com"}
+{"ts": "2026-03-25T22:24:59.299825+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for felicis.com"}
+{"ts": "2026-03-25T22:24:59.307830+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for notation.vc"}
+{"ts": "2026-03-25T22:24:59.307945+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for draperdragon.com"}
+{"ts": "2026-03-25T22:24:59.308022+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for ldv.co"}
+{"ts": "2026-03-25T22:24:59.321384+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for groveventures.com"}
+{"ts": "2026-03-25T22:24:59.321501+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for rallyventures.com"}
+{"ts": "2026-03-25T22:24:59.321590+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for innovacap.com"}
+{"ts": "2026-03-25T22:24:59.321652+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for vanedgecapital.com"}
+{"ts": "2026-03-25T22:24:59.321728+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for collaborativefund.com"}
+{"ts": "2026-03-25T22:24:59.339571+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for moltenventures.com"}
+{"ts": "2026-03-25T22:24:59.339677+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for mindworks.vc"}
+{"ts": "2026-03-25T22:24:59.349344+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for samaipata.vc"}
+{"ts": "2026-03-25T22:24:59.349502+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for alberta-enterprise.ca"}
+{"ts": "2026-03-25T22:24:59.354462+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for omersventures.com"}
+{"ts": "2026-03-25T22:24:59.356808+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for canaan.com"}
+{"ts": "2026-03-25T22:24:59.361031+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for ivp.com"}
+{"ts": "2026-03-25T22:24:59.421723+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for m12.vc"}
+{"ts": "2026-03-25T22:24:59.422807+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for upside.com"}
+{"ts": "2026-03-25T22:24:59.424848+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for venrock.com"}
+{"ts": "2026-03-25T22:24:59.425205+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for indexventures.com"}
+{"ts": "2026-03-25T22:24:59.425445+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for kaporcapital.com"}
+{"ts": "2026-03-25T22:24:59.425807+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for thirdrockventures.com"}
+{"ts": "2026-03-25T22:24:59.502970+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for purestorage.com"}
+{"ts": "2026-03-25T22:24:59.503327+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for georgian.io"}
+{"ts": "2026-03-25T22:24:59.503564+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for learncapital.com"}
+{"ts": "2026-03-25T22:24:59.508344+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for shieldcap.com"}
+{"ts": "2026-03-25T22:24:59.511094+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for newfundcap.com"}
+{"ts": "2026-03-25T22:24:59.511230+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for amplefund.com"}
+{"ts": "2026-03-25T22:24:59.526201+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for baincapitalventures.com"}
+{"ts": "2026-03-25T22:24:59.550107+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for bowcapital.com"}
+{"ts": "2026-03-25T22:24:59.550319+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for bluehaveninitiative.com"}
+{"ts": "2026-03-25T22:24:59.565007+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for silvertonpartners.com"}
+{"ts": "2026-03-25T22:24:59.565265+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for open-emr.org"}
+{"ts": "2026-03-25T22:24:59.565469+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for pegasusventures.com"}
+{"ts": "2026-03-25T22:24:59.610484+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for crowdstrike.com"}
+{"ts": "2026-03-25T22:24:59.630946+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for plugandplaytechcenter.com"}
+{"ts": "2026-03-25T22:24:59.639543+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for fprimecapital.com"}
+{"ts": "2026-03-25T22:24:59.648220+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for scalevp.com"}
+{"ts": "2026-03-25T22:24:59.648773+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for bipcapital.com"}
+{"ts": "2026-03-25T22:24:59.649304+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for 415capital.com"}
+{"ts": "2026-03-25T22:24:59.664451+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for base10.vc"}
+{"ts": "2026-03-25T22:24:59.671656+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 4 emails for inovia.vc"}
+{"ts": "2026-03-25T22:24:59.682172+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for insignia.vc"}
+{"ts": "2026-03-25T22:24:59.705023+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for hummingbird.vc"}
+{"ts": "2026-03-25T22:24:59.728410+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for 9yardscapital.com"}
+{"ts": "2026-03-25T22:24:59.728824+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for investdetroit.com"}
+{"ts": "2026-03-25T22:24:59.745395+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for earlybird.com"}
+{"ts": "2026-03-25T22:24:59.750317+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for differential.vc"}
+{"ts": "2026-03-25T22:24:59.761265+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for arsenalcapital.com"}
+{"ts": "2026-03-25T22:24:59.761786+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for allegionventures.com"}
+{"ts": "2026-03-25T22:24:59.779868+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for cdpq.com"}
+{"ts": "2026-03-25T22:24:59.785044+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for apexvp.com"}
+{"ts": "2026-03-25T22:24:59.796517+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for caaventures.com"}
+{"ts": "2026-03-25T22:24:59.807026+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for marsdd.com"}
+{"ts": "2026-03-25T22:24:59.808727+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for illuminate.com"}
+{"ts": "2026-03-25T22:24:59.809030+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for baincapitalprivateequity.com"}
+{"ts": "2026-03-25T22:24:59.840852+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for 7wireventures.com"}
+{"ts": "2026-03-25T22:24:59.846454+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for thomvest.com"}
+{"ts": "2026-03-25T22:24:59.852367+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for thirdpointventures.com"}
+{"ts": "2026-03-25T22:24:59.853136+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for acrewcapital.com"}
+{"ts": "2026-03-25T22:24:59.853275+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for archventure.com"}
+{"ts": "2026-03-25T22:24:59.868377+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for bvca.co.uk"}
+{"ts": "2026-03-25T22:24:59.871641+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for paipartners.com"}
+{"ts": "2026-03-25T22:24:59.874156+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for openmrs.org"}
+{"ts": "2026-03-25T22:24:59.878494+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for realventures.com"}
+{"ts": "2026-03-25T22:24:59.963890+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for forumvc.com"}
+{"ts": "2026-03-25T22:24:59.964020+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for globalfounderscapital.com"}
+{"ts": "2026-03-25T22:24:59.964087+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for voyagercapital.com"}
+{"ts": "2026-03-25T22:25:00.012387+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for byteventures.com"}
+{"ts": "2026-03-25T22:25:00.016139+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for nordiccapital.com"}
+{"ts": "2026-03-25T22:25:00.016828+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for datadoghq.com"}
+{"ts": "2026-03-25T22:25:00.016946+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for openspace.vc"}
+{"ts": "2026-03-25T22:25:00.025517+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for rockhealth.com"}
+{"ts": "2026-03-25T22:25:00.030740+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for sourceforge.net"}
+{"ts": "2026-03-25T22:25:00.063433+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for stepstoneglobal.com"}
+{"ts": "2026-03-25T22:25:00.063801+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for balderton.com"}
+{"ts": "2026-03-25T22:25:00.070637+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for pitango.com"}
+{"ts": "2026-03-25T22:25:00.071254+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 7 emails for apollo.com"}
+{"ts": "2026-03-25T22:25:00.071415+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for forgepointcap.com"}
+{"ts": "2026-03-25T22:25:00.072186+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for microsoft.com"}
+{"ts": "2026-03-25T22:25:00.075807+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for gsrventures.com"}
+{"ts": "2026-03-25T22:25:00.076754+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for sharedesk.net"}
+{"ts": "2026-03-25T22:25:00.077401+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for elysiumventures.com"}
+{"ts": "2026-03-25T22:25:00.113123+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 4 emails for crosslinkcapital.com"}
+{"ts": "2026-03-25T22:25:00.116252+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for schoonercapital.com"}
+{"ts": "2026-03-25T22:25:00.116434+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for sevenpeaksventures.com"}
+{"ts": "2026-03-25T22:25:00.149053+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for franciscopartners.com"}
+{"ts": "2026-03-25T22:25:00.155252+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for jetblueventures.com"}
+{"ts": "2026-03-25T22:25:00.165944+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for mayfield.com"}
+{"ts": "2026-03-25T22:25:00.167264+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for oracle.com"}
+{"ts": "2026-03-25T22:25:00.173004+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for nbim.no"}
+{"ts": "2026-03-25T22:25:00.174175+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for aixventures.com"}
+{"ts": "2026-03-25T22:25:00.205638+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for wildcatventurepartners.com"}
+{"ts": "2026-03-25T22:25:00.210065+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for deshaw.com"}
+{"ts": "2026-03-25T22:25:00.211736+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for triton-partners.com"}
+{"ts": "2026-03-25T22:25:00.217488+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for inveready.com"}
+{"ts": "2026-03-25T22:25:00.224914+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for uipath.com"}
+{"ts": "2026-03-25T22:25:00.225834+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for kleinerperkins.com"}
+{"ts": "2026-03-25T22:25:00.232897+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for ribbitcap.com"}
+{"ts": "2026-03-25T22:25:00.248350+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for iconiqcapital.com"}
+{"ts": "2026-03-25T22:25:00.250021+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for relayventures.com"}
+{"ts": "2026-03-25T22:25:00.265562+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for greycroft.com"}
+{"ts": "2026-03-25T22:25:00.269491+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for chiratae.com"}
+{"ts": "2026-03-25T22:25:00.269612+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for maverickventures.com"}
+{"ts": "2026-03-25T22:25:00.269699+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for seventysixcapital.com"}
+{"ts": "2026-03-25T22:25:00.269790+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for tdfventures.com"}
+{"ts": "2026-03-25T22:25:00.298483+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for k1im.com"}
+{"ts": "2026-03-25T22:25:00.298701+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for bahmni.org"}
+{"ts": "2026-03-25T22:25:00.322637+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for wondervc.com"}
+{"ts": "2026-03-25T22:25:00.353145+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for leefund.com"}
+{"ts": "2026-03-25T22:25:00.353261+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for elsewhere.partners"}
+{"ts": "2026-03-25T22:25:00.357205+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for dcvc.com"}
+{"ts": "2026-03-25T22:25:00.371361+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for hillhousecap.com"}
+{"ts": "2026-03-25T22:25:00.387434+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for silverlake.com"}
+{"ts": "2026-03-25T22:25:00.448795+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for experian.com"}
+{"ts": "2026-03-25T22:25:00.519127+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for skvp.com"}
+{"ts": "2026-03-25T22:25:00.519346+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for primevp.in"}
+{"ts": "2026-03-25T22:25:00.519584+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for metaprop.vc"}
+{"ts": "2026-03-25T22:25:00.531673+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for foresitecapital.com"}
+{"ts": "2026-03-25T22:25:00.550501+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for dig.ventures"}
+{"ts": "2026-03-25T22:25:00.557550+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for bloombergbeta.com"}
+{"ts": "2026-03-25T22:25:00.592751+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for parameter.vc"}
+{"ts": "2026-03-25T22:25:00.595841+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for tpg.com"}
+{"ts": "2026-03-25T22:25:00.596387+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for greathillpartners.com"}
+{"ts": "2026-03-25T22:25:00.596699+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for ourcrowd.com"}
+{"ts": "2026-03-25T22:25:00.596910+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for antler.co"}
+{"ts": "2026-03-25T22:25:00.597115+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for github.com"}
+{"ts": "2026-03-25T22:25:00.597424+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for healthcare.ai"}
+{"ts": "2026-03-25T22:25:00.597478+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for openhim.org"}
+{"ts": "2026-03-25T22:25:00.601935+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for crv.com"}
+{"ts": "2026-03-25T22:25:00.604009+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for bdc.ca"}
+{"ts": "2026-03-25T22:25:00.628412+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for capitalgroup.com"}
+{"ts": "2026-03-25T22:25:00.635923+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for lererhippeau.com"}
+{"ts": "2026-03-25T22:25:00.636738+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for reinventure.com.au"}
+{"ts": "2026-03-25T22:25:00.636898+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for variant.fund"}
+{"ts": "2026-03-25T22:25:00.642402+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for glynncapital.com"}
+{"ts": "2026-03-25T22:25:00.651459+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for nea.com"}
+{"ts": "2026-03-25T22:25:00.685195+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for adventinternational.com"}
+{"ts": "2026-03-25T22:25:00.686598+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for 25madison.com"}
+{"ts": "2026-03-25T22:25:00.686819+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for echovc.com"}
+{"ts": "2026-03-25T22:25:00.713043+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for arcvc.com"}
+{"ts": "2026-03-25T22:25:00.717305+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 5 emails for centerbridge.com"}
+{"ts": "2026-03-25T22:25:00.721629+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for heidcapital.com"}
+{"ts": "2026-03-25T22:25:00.745575+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for usa.visa.com"}
+{"ts": "2026-03-25T22:25:00.755460+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 4 emails for generalcatalyst.com"}
+{"ts": "2026-03-25T22:25:00.760757+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for quadrille.com"}
+{"ts": "2026-03-25T22:25:00.760943+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for capitolmeridian.com"}
+{"ts": "2026-03-25T22:25:00.761026+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for flarecapital.com"}
+{"ts": "2026-03-25T22:25:00.761657+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for triplepointcapital.com"}
+{"ts": "2026-03-25T22:25:00.793785+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for mongodb.com"}
+{"ts": "2026-03-25T22:25:00.816236+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for apple.com"}
+{"ts": "2026-03-25T22:25:00.819644+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for acu.edu"}
+{"ts": "2026-03-25T22:25:00.846281+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for neptunefund.com"}
+{"ts": "2026-03-25T22:25:00.857704+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for maki.vc"}
+{"ts": "2026-03-25T22:25:00.860978+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for charterhouse.co.uk"}
+{"ts": "2026-03-25T22:25:00.864582+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for gildehealthcare.com"}
+{"ts": "2026-03-25T22:25:00.864901+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for highalpha.com"}
+{"ts": "2026-03-25T22:25:00.868529+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for mosaicventures.com"}
+{"ts": "2026-03-25T22:25:00.872655+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for ylventures.com"}
+{"ts": "2026-03-25T22:25:00.876406+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 5 emails for cohere.com"}
+{"ts": "2026-03-25T22:25:00.878837+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for murata.com"}
+{"ts": "2026-03-25T22:25:00.880978+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for clocktowertech.com"}
+{"ts": "2026-03-25T22:25:00.886960+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for aboutamazon.com"}
+{"ts": "2026-03-25T22:25:00.887331+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for franklintempleton.com"}
+{"ts": "2026-03-25T22:25:00.897422+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for uvcpartners.com"}
+{"ts": "2026-03-25T22:25:00.897524+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for matchstickventures.com"}
+{"ts": "2026-03-25T22:25:00.899164+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for apax.com"}
+{"ts": "2026-03-25T22:25:00.903043+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for stormventures.com"}
+{"ts": "2026-03-25T22:25:00.903619+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for theimpactengine.com"}
+{"ts": "2026-03-25T22:25:00.903716+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for vineventures.com"}
+{"ts": "2026-03-25T22:25:00.911957+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for mangrove.vc"}
+{"ts": "2026-03-25T22:25:00.922257+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for hillsven.com"}
+{"ts": "2026-03-25T22:25:00.928931+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for adamsstreetpartners.com"}
+{"ts": "2026-03-25T22:25:00.931693+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for bellushealth.com"}
+{"ts": "2026-03-25T22:25:00.955912+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for svb.com"}
+{"ts": "2026-03-25T22:25:00.975204+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for brandcapital.co"}
+{"ts": "2026-03-25T22:25:00.982535+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for softtechvc.com"}
+{"ts": "2026-03-25T22:25:00.982934+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for whitestarcp.com"}
+{"ts": "2026-03-25T22:25:00.987962+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for twilio.com"}
+{"ts": "2026-03-25T22:25:00.988577+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for blackstone.com"}
+{"ts": "2026-03-25T22:25:00.990052+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for matrixpartners.com"}
+{"ts": "2026-03-25T22:25:01.008998+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for blackbird.vc"}
+{"ts": "2026-03-25T22:25:01.014423+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for materialimpact.com"}
+{"ts": "2026-03-25T22:25:01.014775+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for kinnevik.com"}
+{"ts": "2026-03-25T22:25:01.020905+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for activecapital.com"}
+{"ts": "2026-03-25T22:25:01.021075+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for cedarfund.com"}
+{"ts": "2026-03-25T22:25:01.027955+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for liquid2.vc"}
+{"ts": "2026-03-25T22:25:01.029818+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 3 emails for vulcan.com"}
+{"ts": "2026-03-25T22:25:01.030029+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for cloudappscapital.com"}
+{"ts": "2026-03-25T22:25:01.030522+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for warburgpincus.com"}
+{"ts": "2026-03-25T22:25:01.031194+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for google.com"}
+{"ts": "2026-03-25T22:25:01.031365+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for breakout.vc"}
+{"ts": "2026-03-25T22:25:01.036014+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 4 emails for khoslaventures.com"}
+{"ts": "2026-03-25T22:25:01.041951+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for wcas.com"}
+{"ts": "2026-03-25T22:25:01.071945+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for nvidia.com"}
+{"ts": "2026-03-25T22:25:01.079282+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for longjourney.vc"}
+{"ts": "2026-03-25T22:25:01.082931+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for redpoint.com"}
+{"ts": "2026-03-25T22:25:01.137996+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for av.vc"}
+{"ts": "2026-03-25T22:25:01.172231+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for stripe.com"}
+{"ts": "2026-03-25T22:25:01.195061+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for shift4.com"}
+{"ts": "2026-03-25T22:25:01.552182+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for viola-group.com"}
+{"ts": "2026-03-25T22:25:01.556355+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for nvp.com"}
+{"ts": "2026-03-25T22:25:02.179852+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for samsung.com"}
+{"ts": "2026-03-25T22:25:02.198917+00:00", "level": "INFO", "logger": "enrichment.gravatar_oracle", "msg": "  \ud83d\udc7b  Gravatar CONFIRMED: Colleague Programs \u2192 programs@aig.com"}
+{"ts": "2026-03-25T22:25:02.350661+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for adaventures.com"}
+{"ts": "2026-03-25T22:25:02.357319+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 2 emails for stephensgroup.com"}
+{"ts": "2026-03-25T22:25:02.362359+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for collabfund.com"}
+{"ts": "2026-03-25T22:25:02.362952+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for draper.vc"}
+{"ts": "2026-03-25T22:25:02.364838+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST: found 1 emails for novuscapitalcorporation.com"}
+{"ts": "2026-03-25T22:25:02.365329+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Venture Capital: dnsadmin@revolution.com"}
+{"ts": "2026-03-25T22:25:02.365462+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Private Client Group: annasupport@aig.com"}
+{"ts": "2026-03-25T22:25:02.367751+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Property Management: securitycompliance@atapco.com"}
+{"ts": "2026-03-25T22:25:02.368244+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST email for ACU Resources: acunet@acu.edu (score=0.40)"}
+{"ts": "2026-03-25T22:25:02.368627+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Worshiping Together: dmarc@acu.edu"}
+{"ts": "2026-03-25T22:25:02.369401+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Select Your Experience: dmarc_ruf@kkr.com"}
+{"ts": "2026-03-25T22:25:02.369702+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Resolute Ventures: admin@resolute.vc"}
+{"ts": "2026-03-25T22:25:02.369867+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Operating Team: dmarc_rua@samsungnext.com"}
+{"ts": "2026-03-25T22:25:02.369928+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Samsung Next: dmarc_ruf@samsungnext.com"}
+{"ts": "2026-03-25T22:25:02.370216+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Beyond Capital: amartinez-forte@racap.com"}
+{"ts": "2026-03-25T22:25:02.370278+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for RA CAPITAL MANAGEMENT: dmarc-reports@racap.com"}
+{"ts": "2026-03-25T22:25:02.370659+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Guardian Capital LP: dmarcreports@guardiancapital.com"}
+{"ts": "2026-03-25T22:25:02.370750+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Cookie Preference Center: sesbounce@zoom.us"}
+{"ts": "2026-03-25T22:25:02.371828+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Next Page: dmarc@amplifypartners.com"}
+{"ts": "2026-03-25T22:25:02.371937+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Managing Partners: dmarc-reports@socialleverage.com"}
+{"ts": "2026-03-25T22:25:02.372136+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Social Links: dkiminsight@tcv.com"}
+{"ts": "2026-03-25T22:25:02.372267+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Platform Team: tdk-ventures.dmarc@tdk-ventures.com"}
+{"ts": "2026-03-25T22:25:02.372393+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Privacy Settings: dmarc@signalfire.com"}
+{"ts": "2026-03-25T22:25:02.372597+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for OFFICES AROUND THE WORLD: itstarburst@starburst.aero"}
+{"ts": "2026-03-25T22:25:02.372769+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Getting Help From Your Investors: dmarc@sterlingroad.com"}
+{"ts": "2026-03-25T22:25:02.372844+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Cookie Notice: dmarc-reports@usvp.com"}
+{"ts": "2026-03-25T22:25:02.372888+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Arrow Labs: admin@global.vc"}
+{"ts": "2026-03-25T22:25:02.373590+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Isabel Chirase Drive Capital: dmarc@drivecapital.com"}
+{"ts": "2026-03-25T22:25:02.373678+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Columbia Green Technologies: michael@beepartners.vc"}
+{"ts": "2026-03-25T22:25:02.373997+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for General Partners: cseadministrator@canaan.com"}
+{"ts": "2026-03-25T22:25:02.374106+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for IVP Navigation Menu: dmarcrua@ivp.com"}
+{"ts": "2026-03-25T22:25:02.374171+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Professional Bio: desktoptowork@keenventurepartners.com"}
+{"ts": "2026-03-25T22:25:02.374241+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Privacy Preference Center: dmarc@upside.com"}
+{"ts": "2026-03-25T22:25:02.374378+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for All Day Kitchens: dmarc@base10.vc"}
+{"ts": "2026-03-25T22:25:02.374422+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Managing Team: dmarc-reports@ldv.co"}
+{"ts": "2026-03-25T22:25:02.374516+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Accolade Partners: dmarc-reports@notation.vc"}
+{"ts": "2026-03-25T22:25:02.374567+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Pulling Together: info@alberta-enterprise.ca"}
+{"ts": "2026-03-25T22:25:02.374712+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Rally Ventures: marketing@rallyventures.com"}
+{"ts": "2026-03-25T22:25:02.374753+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Read Next: dmarc-reports@georgian.io"}
+{"ts": "2026-03-25T22:25:02.374857+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for View Map: rbedal@nvp.com"}
+{"ts": "2026-03-25T22:25:02.374991+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Going International: dmarc@plugandplaytechcenter.com"}
+{"ts": "2026-03-25T22:25:02.375235+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for HERE'S HOW WE WORK: dmarc-fail@earlybird.com"}
+{"ts": "2026-03-25T22:25:02.375278+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for DIVERSE TEAM: dmarc-rep@earlybird.com"}
+{"ts": "2026-03-25T22:25:02.375465+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for OpenMRS Inc.: dmarc@openmrs.org"}
+{"ts": "2026-03-25T22:25:02.375545+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Norges Bank Investment Management: exchange-rua@nbim.no"}
+{"ts": "2026-03-25T22:25:02.375608+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Venture Advisors: dmarcreports@acrewcapital.com"}
+{"ts": "2026-03-25T22:25:02.375693+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Content Platform: dev@insignia.vc"}
+{"ts": "2026-03-25T22:25:02.376015+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for \u0421\u0435\u0440\u044b\u0439 Facebook Icon: jlim@pegasusventures.com"}
+{"ts": "2026-03-25T22:25:02.376166+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Genuine Partners: info11@arsenalcapital.com"}
+{"ts": "2026-03-25T22:25:02.376454+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Contact Request Form: sgit@stephensgroup.com"}
+{"ts": "2026-03-25T22:25:02.376736+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Join MaRS: dmarc@marsdd.com"}
+{"ts": "2026-03-25T22:25:02.377053+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for FOR MORE INFORMATION: dmarc-reports@inovia.vc"}
+{"ts": "2026-03-25T22:25:02.377147+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Linkedin Link: dmarc@openspace.vc"}
+{"ts": "2026-03-25T22:25:02.377328+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Differential Ventures: nick@differential.vc"}
+{"ts": "2026-03-25T22:25:02.377542+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Check Icon Bronze: dmarcreports@nordiccapital.com"}
+{"ts": "2026-03-25T22:25:02.377857+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Venture Partners: dmarc@pitango.com"}
+{"ts": "2026-03-25T22:25:02.377908+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Microsoft Learn Educator Center: itex-ruf@microsoft.com"}
+{"ts": "2026-03-25T22:25:02.377937+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Follow Microsoft Education: itex-rua@microsoft.com"}
+{"ts": "2026-03-25T22:25:02.378094+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Clarip Cookie Consent Banner: dmarc-ruf@apollo.com"}
+{"ts": "2026-03-25T22:25:02.378123+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Asset Management: dmarc-rua@apollo.com"}
+{"ts": "2026-03-25T22:25:02.378317+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Global Founders Capital: dmarc@globalfounderscapital.com"}
+{"ts": "2026-03-25T22:25:02.378485+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Cell Design Labs: dmarc@kleinerperkins.com"}
+{"ts": "2026-03-25T22:25:02.378553+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Wealth Management: jmsoriano@inveready.com"}
+{"ts": "2026-03-25T22:25:02.378611+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Cookie Notice: dmarc-reports@deshaw.com"}
+{"ts": "2026-03-25T22:25:02.378671+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Social Media Cookies: dmarc.reports@uipath.com"}
+{"ts": "2026-03-25T22:25:02.378725+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for SCHOONER CAPITAL: alerts@schoonercapital.com"}
+{"ts": "2026-03-25T22:25:02.378853+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Experian Global Sites: arintech@experian.com"}
+{"ts": "2026-03-25T22:25:02.378909+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Family Advisory: dmarc@iconiqcapital.com"}
+{"ts": "2026-03-25T22:25:02.378993+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST email for DCVC Bio Team: dcvc-d@dmarc.report-uri.com (score=0.40)"}
+{"ts": "2026-03-25T22:25:02.379064+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Hillhouse Global Leadership: ruf@hillhousecap.com"}
+{"ts": "2026-03-25T22:25:02.379118+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Join Bahmni Community Poster: administrator@bahmni.org"}
+{"ts": "2026-03-25T22:25:02.379165+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for AIX Ventures: dmarc@aixventures.com"}
+{"ts": "2026-03-25T22:25:02.379266+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Privacy Preference Center: dmarc-reports@reinventure.com.au"}
+{"ts": "2026-03-25T22:25:02.379451+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Chiratae Ventures: itsupport@chiratae.com"}
+{"ts": "2026-03-25T22:25:02.379696+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Social Media Cookies: dmarc_reports@mongodb.com"}
+{"ts": "2026-03-25T22:25:02.379778+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for GitHub Team: dmarc@github.com"}
+{"ts": "2026-03-25T22:25:02.379961+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for ElseWhere Partners: dmarc@elsewhere.partners"}
+{"ts": "2026-03-25T22:25:02.380033+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for LAUNCH YOUR STARTUP WITHANTLER RESIDENCY: dmarc@antler.co"}
+{"ts": "2026-03-25T22:25:02.380104+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Prodeko Ventures: dmarc@maki.vc"}
+{"ts": "2026-03-25T22:25:02.380216+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Cookie Preferences: hello@dig.ventures"}
+{"ts": "2026-03-25T22:25:02.380539+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Viola Platform: dmarcreport@viola-group.com"}
+{"ts": "2026-03-25T22:25:02.380630+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Enable Functional: dmarc@centerbridge.com"}
+{"ts": "2026-03-25T22:25:02.380704+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Join Our Newsletter: dmarc_reports@mosaicventures.com"}
+{"ts": "2026-03-25T22:25:02.380753+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST email for Housing Equity Fund Impact Report: report@dmarc.amazon.com (score=0.60)"}
+{"ts": "2026-03-25T22:25:02.380861+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Get Help: dnscontact@apple.com"}
+{"ts": "2026-03-25T22:25:02.380920+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Dell Technologies Logo: quarantine@cohere.com"}
+{"ts": "2026-03-25T22:25:02.381011+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Next Page: admin@matrixpartners.com"}
+{"ts": "2026-03-25T22:25:02.381079+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Business Development Analyst: dmarc@ylventures.com"}
+{"ts": "2026-03-25T22:25:02.381147+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Expect More: dmarc@highalpha.com"}
+{"ts": "2026-03-25T22:25:02.381364+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for All-in-One Platform: dmarc@shift4.com"}
+{"ts": "2026-03-25T22:25:02.381529+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Cookie Preferences: dmarc@twilio.com"}
+{"ts": "2026-03-25T22:25:02.381660+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Company Info: ssdomain@samsung.com"}
+{"ts": "2026-03-25T22:25:02.381766+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Google Labs: mailauth-reports@google.com"}
+{"ts": "2026-03-25T22:25:02.381835+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Privacy Preference Center: dnsadmin@vulcan.com"}
+{"ts": "2026-03-25T22:25:02.381900+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Venture Fellow Program: it@av.vc"}
+{"ts": "2026-03-25T22:25:02.382111+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST strict fallback email for Organizations Connect: dmarc-reports@stripe.com"}
+{"ts": "2026-03-25T22:25:02.382263+00:00", "level": "INFO", "logger": "enrichment.dns_harvester", "msg": "  \ud83d\udccb  DNS HARVEST complete: 91 leads enriched, 485 emails found (325 domains queried)"}
+  DNS: 91 enriched, 485 emails found, 325 domains queried
+{"ts": "2026-03-25T22:25:05.787911+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:25:21.054924+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback: found 1 emails for revolution.com"}
+{"ts": "2026-03-25T22:26:12.913175+00:00", "level": "INFO", "logger": "enrichment.gravatar_oracle", "msg": "  \ud83d\udc7b  Gravatar CONFIRMED: Diametric Capital \u2192 diametric_capital@battery.com"}
+{"ts": "2026-03-25T22:26:13.157270+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:27:14.220056+00:00", "level": "INFO", "logger": "enrichment.gravatar_oracle", "msg": "  \ud83d\udc7b  Gravatar CONFIRMED: Growth Equity Investors \u2192 investors@nvp.com"}
+{"ts": "2026-03-25T22:27:20.595138+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:27:48.649252+00:00", "level": "INFO", "logger": "enrichment.gravatar_oracle", "msg": "  \ud83d\udc7b  Gravatar CONFIRMED: Market-Defining Portfolio \u2192 mportfolio@draper.vc"}
+{"ts": "2026-03-25T22:27:50.612042+00:00", "level": "INFO", "logger": "enrichment.gravatar_oracle", "msg": "  \ud83d\udc7b  Gravatar CONFIRMED: Demo Session \u2192 demo@datadoghq.com"}
+{"ts": "2026-03-25T22:27:51.971172+00:00", "level": "INFO", "logger": "enrichment.gravatar_oracle", "msg": "  \ud83d\udc7b  Gravatar CONFIRMED: FOR MORE INFORMATION \u2192 finformation@inovia.vc"}
+{"ts": "2026-03-25T22:28:17.127299+00:00", "level": "INFO", "logger": "enrichment.gravatar_oracle", "msg": "  \ud83d\udc7b  Gravatar CONFIRMED: Investment News \u2192 investment.news@a16z.com"}
+{"ts": "2026-03-25T22:28:19.926277+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback: found 1 emails for linkedin.com"}
+{"ts": "2026-03-25T22:28:21.406595+00:00", "level": "INFO", "logger": "enrichment.github_miner", "msg": "  \ud83d\udc19  GitHub miner: found 1 emails for acu.edu"}
+{"ts": "2026-03-25T22:28:23.237754+00:00", "level": "INFO", "logger": "enrichment.github_miner", "msg": "  \ud83d\udc19  GitHub email for Worshiping Together: oda11a @acu.edu"}
+{"ts": "2026-03-25T22:28:24.486145+00:00", "level": "INFO", "logger": "enrichment.github_miner", "msg": "  \ud83d\udc19  GitHub email for ACU Resources: oda11a @acu.edu"}
+{"ts": "2026-03-25T22:28:25.758626+00:00", "level": "INFO", "logger": "enrichment.github_miner", "msg": "  \ud83d\udc19  GitHub email for Energy Management: oda11a @acu.edu"}
+{"ts": "2026-03-25T22:28:27.717409+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:28:58.368560+00:00", "level": "INFO", "logger": "enrichment.gravatar_oracle", "msg": "  \ud83d\udc7b  Gravatar CONFIRMED: Education Partners \u2192 education@github.com"}
+{"ts": "2026-03-25T22:29:17.256621+00:00", "level": "INFO", "logger": "enrichment.gravatar_oracle", "msg": "  \ud83d\udc7b  Gravatar CONFIRMED: Prime Venture Partners \u2192 partners@primevp.in"}
+{"ts": "2026-03-25T22:29:35.029221+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:29:49.164846+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:30:00.560243+00:00", "level": "INFO", "logger": "enrichment.gravatar_oracle", "msg": "  \ud83d\udc7b  Gravatar CONFIRMED: Help Center \u2192 help@twilio.com"}
+{"ts": "2026-03-25T22:30:12.681198+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:30:12.699766+00:00", "level": "INFO", "logger": "enrichment.gravatar_oracle", "msg": "  \ud83d\udc7b  Gravatar CONFIRMED: Select Investments \u2192 investments.select@warburgpincus.com"}
+{"ts": "2026-03-25T22:30:28.931978+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:30:35.343830+00:00", "level": "INFO", "logger": "enrichment.gravatar_oracle", "msg": "  \ud83d\udc7b  Gravatar oracle complete: 11 confirmed out of 10717 probes (683 leads checked)"}
+  Gravatar: 11 confirmed out of 10717 probes
+{"ts": "2026-03-25T22:30:37.785847+00:00", "level": "INFO", "logger": "enrichment.pgp_keyserver", "msg": "  \ud83d\udd11  PGP scraper complete: 0 enriched, 0 emails extracted (1366 queries across 683 leads)"}
+  PGP: 0 enriched, 0 emails extracted (1366 queries)
+{"ts": "2026-03-25T22:30:42.545914+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:30:47.632308+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:31:03.319163+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:31:23.872951+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:31:46.331927+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:31:49.624175+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:32:05.767111+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:32:15.609033+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback: found 2 emails for resolute.vc"}
+{"ts": "2026-03-25T22:32:28.812944+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:32:46.124391+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:32:57.173098+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:33:06.011057+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:33:26.464206+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:33:38.331796+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback: found 1 emails for samsungnext.com"}
+{"ts": "2026-03-25T22:33:43.837615+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:33:57.923945+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:34:04.457768+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:34:14.504451+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:34:33.059561+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:34:54.052249+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:35:12.058496+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:35:17.161720+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:35:33.179374+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:35:51.789690+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:36:06.179043+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:36:19.377210+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:36:19.899047+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:36:35.826098+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:36:50.118799+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:37:10.907993+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:37:26.235541+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:37:33.221404+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:37:49.208522+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:38:06.333012+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:38:22.988231+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:38:33.761916+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:38:38.308808+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:38:59.686829+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:39:18.449406+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:39:34.727250+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:39:40.840707+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:39:55.025692+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:40:12.838887+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:40:32.778067+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:40:46.950989+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:40:48.580217+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:41:01.427347+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:41:15.432393+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback: found 1 emails for finchcapital.com"}
+{"ts": "2026-03-25T22:41:19.424450+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:41:41.822654+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:41:55.616743+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:42:07.827311+00:00", "level": "INFO", "logger": "enrichment.sec_edgar", "msg": "  \ud83d\udccb  SEC EDGAR complete: 0 leads enriched, 0 emails found (325 domains, 3 filings scanned)"}
+  EDGAR: 0 enriched, 0 emails, 325 domains searched
+{"ts": "2026-03-25T22:42:23.433066+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback: found 1 emails for snowflake.com"}
+{"ts": "2026-03-25T22:42:52.299708+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback: found 1 emails for guardiancapital.com"}
+{"ts": "2026-03-25T22:43:03.398961+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:43:18.043415+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback: found 1 emails for cowboy.vc"}
+{"ts": "2026-03-25T22:44:10.542545+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:45:18.069180+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:46:25.629779+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:46:33.300023+00:00", "level": "INFO", "logger": "enrichment.google_dorker", "msg": "  \ud83d\udd0d  Dorked email for Next Page: %22next+page%22+%22@amplifypartners.com"}
+{"ts": "2026-03-25T22:46:37.321838+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback: found 1 emails for hypothesisvc.com"}
+{"ts": "2026-03-25T22:46:39.642478+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:46:56.833543+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:47:02.077074+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback: found 1 emails for targetglobal.vc"}
+{"ts": "2026-03-25T22:47:14.808973+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:47:28.862179+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:47:33.278923+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:47:44.843134+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:48:04.258347+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:48:17.856315+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:48:32.127454+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:48:40.663897+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:48:51.409478+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:49:10.884244+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:49:23.943328+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:49:42.832233+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:49:43.335536+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback: found 1 emails for socialleverage.com"}
+{"ts": "2026-03-25T22:49:48.252071+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:50:03.124805+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:50:16.373932+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:50:32.278852+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:50:55.206135+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:50:55.567702+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:51:14.383009+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:51:30.699895+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:51:43.441942+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback: found 1 emails for townhallventures.com"}
+{"ts": "2026-03-25T22:51:49.783922+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:52:00.167356+00:00", "level": "INFO", "logger": "enrichment.github_miner", "msg": "  \ud83d\udc19  GitHub miner: found 1 emails for meta.com"}
+{"ts": "2026-03-25T22:52:02.122948+00:00", "level": "INFO", "logger": "enrichment.github_miner", "msg": "  \ud83d\udc19  GitHub email for Facebook Drone: @meta.com"}
+{"ts": "2026-03-25T22:52:02.854397+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:52:10.466970+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:52:25.001136+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:52:45.842538+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:53:07.826598+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:53:09.685770+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:53:22.263589+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:53:39.093060+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:53:59.217835+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:54:02.803709+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback: found 1 emails for lunar.vc"}
+{"ts": "2026-03-25T22:54:14.696273+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:54:16.724581+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:54:29.690675+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:54:30.447369+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback: found 3 emails for tcv.com"}
+{"ts": "2026-03-25T22:54:44.310167+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:55:04.885564+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:55:23.775857+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:55:25.740977+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:55:41.119537+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:56:00.859931+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:56:11.962486+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback: found 3 emails for signalfire.com"}
+{"ts": "2026-03-25T22:56:15.299628+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:56:31.328144+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:56:35.821505+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:56:54.425904+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:57:12.276057+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:57:29.607139+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:57:37.878311+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:57:51.560717+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:58:08.805780+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:58:21.500633+00:00", "level": "INFO", "logger": "enrichment.wayback_enricher", "msg": "  \ud83d\udd70\ufe0f  Wayback: found 22 emails for octopusventures.com"}
+{"ts": "2026-03-25T22:58:26.706178+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:58:45.218646+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:58:47.075445+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:59:05.504805+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:59:19.973368+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:59:35.979624+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T22:59:52.615878+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T22:59:57.915327+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T23:00:18.541566+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T23:00:40.443384+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T23:00:55.019288+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}
+{"ts": "2026-03-25T23:00:59.723623+00:00", "level": "WARNING", "logger": "enrichment.github_miner", "msg": "  \u26a0\ufe0f  GitHub rate-limited, waiting 60s..."}
+{"ts": "2026-03-25T23:01:12.457706+00:00", "level": "WARNING", "logger": "enrichment.google_dorker", "msg": "  \u26a0\ufe0f  Google rate-limited, backing off..."}

@@ -37,11 +37,11 @@ const config: Config = {
           glow: "rgba(199,155,44,0.20)",
           tint: "rgba(199,155,44,0.10)",
         },
-        petrol: {
-          600: "#2E5A58",
-          700: "#3D6A67",
-          800: "#1A3538",
-          mist: "#D8E5E4",
+        accent: {
+          600: "#8B6914",
+          700: "#6B5210",
+          800: "#4A3A0C",
+          mist: "#F5ECD4",
         },
         charcoal: {
           900: "#15110E",
@@ -55,7 +55,7 @@ const config: Config = {
           strong: "#C5B9A8",
           warm: "#DDD1BE",
         },
-        success: "#567A5B",
+        success: "#8B7335",
         danger: "#C0392B",
         warning: "#A87922",
       },
@@ -70,7 +70,7 @@ const config: Config = {
         "card-hover": "0 6px 24px rgba(0,0,0,0.08)",
         "honey-ring": "0 0 0 2px rgba(199,155,44,0.30)",
         "honey-glow": "0 0 16px rgba(199,155,44,0.14)",
-        "petrol-glow": "0 0 16px rgba(46,90,88,0.10)",
+        "accent-glow": "0 0 16px rgba(139,105,20,0.12)",
       },
       maxWidth: {
         container: "1200px",

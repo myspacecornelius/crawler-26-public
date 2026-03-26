@@ -2,98 +2,120 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
+## What This Is
 
-LeadFactory is an autonomous investor lead generation platform that discovers, enriches, and activates investor contacts (VCs, PE, family offices) from public web sources. It combines a Python crawling/enrichment pipeline with a Next.js dashboard and FastAPI backend.
+LeadFactory — a full-stack VC lead generation and outreach platform. Discovers investor contacts across fund websites, enriches them through a multi-layer email pipeline, scores/deduplicates leads, and delivers them through a dashboard with campaign management, outreach integrations, and CRM push.
 
 ## Commands
 
 ### Python pipeline
+
 ```bash
 # Setup
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
+pip install -r requirements-dev.txt
 playwright install chromium
 
 # Run full pipeline
 python engine.py --deep --headless --force-recrawl
 
-# Run tests
+# Tests
 python -m pytest tests/ -x -q
-python -m pytest tests/test_adapter_registry.py -v   # single test file
+python -m pytest tests/test_dedup.py -v          # single file
+python -m pytest tests/test_dedup.py::test_name   # single test
 
-# Lint (matches CI)
-pylint $(git ls-files '*.py')
+# Lint (CI runs this on every push, must score ≥7.0)
+pylint $(git ls-files '*.py') --fail-under=7.0
 
-# Start API server
-LEADFACTORY_SECRET_KEY=dev-secret uvicorn api.main:app --reload
+# Database migrations
+alembic upgrade head
+```
+
+### API server (FastAPI)
+
+```bash
+LEADFACTORY_SECRET_KEY=dev-secret uvicorn api.main:app --reload --port 8000
+# Docs at http://localhost:8000/api/docs
 ```
 
 ### Dashboard (Next.js)
+
 ```bash
 cd dashboard && npm install && npm run dev    # localhost:3000
 npm run build
 npm run lint
 ```
 
-### Landing page
+### Landing page (Next.js)
+
 ```bash
 cd landing && npm install && npm run dev      # localhost:3001
+npm run build
 ```
+
+## Code Style
+
+Python: black (line-length 120), isort (black profile), flake8 (120 chars, ignores E203/W503/E501). Config in `pyproject.toml`. Target Python 3.11–3.12.
+
+TypeScript/React: Next.js defaults, Tailwind CSS, no custom ESLint overrides beyond Next.js built-in.
 
 ## Architecture
 
-The system is a 4-stage pipeline orchestrated by `engine.py`:
+### Pipeline (4 stages, orchestrated by `engine.py`)
 
 ```
-Discovery → Enrichment → Scoring/Dedup → Platform (API + Dashboard + Outreach + CRM)
+Discovery → Deep Crawl → Enrichment → Scoring/Dedup → CSV + DB
 ```
 
-### Core pipeline (Python, root level)
+1. **Discovery** (`sources/aggregator.py`, `discovery/`) — aggregates fund URLs from seed CSVs, GitHub lists, HTTP directory scrapers, and search engines
+2. **Deep Crawl** (`deep_crawl.py`) — Playwright-based crawler that detects team pages via keyword matching, renders JS, extracts names/roles. Uses circuit breaker (`scraping/circuit_breaker.py`) and domain rate limiting (`scraping/domain_limiter.py`)
+3. **Enrichment** (`enrichment/`) — 12+ enrichers (DNS harvest, Google dorking, GitHub mining, SEC EDGAR, Wayback, PGP keyserver, Gravatar, etc.) feed into email guesser (8 pattern generators with per-domain learning) → validator (format + MX + SMTP RCPT TO) → waterfall (Hunter → ZeroBounce → MillionVerifier)
+4. **Scoring/Dedup** (`enrichment/scoring.py`, `enrichment/dedup.py`) — weighted scoring (stage 30%, sector 25%, check-size 20%, portfolio 15%, recency 10%) → tier assignment (HOT ≥80, WARM ≥60, COOL ≥40, COLD <40). Two-pass dedup: name+fund merge, then email-based. Weights configured in `config/scoring.yaml`
 
-- **engine.py** — Main orchestrator (~2000 lines). Wires discovery, deep crawl, enrichment, scoring, and output. CLI flags: `--discover`, `--deep`, `--headless`, `--dry-run`, `--force-recrawl`, `--skip-smtp`, `--portfolio`, `--incremental`, `--stale-days`.
-- **deep_crawl.py** — Playwright-based website crawler (~1800 lines). Finds team pages via keyword detection, extracts names/roles/emails with JS rendering. Uses circuit breaker and domain concurrency limiting.
+### Core data model
 
-### Key modules
+`InvestorLead` dataclass in `adapters/base.py` — flows through the entire pipeline. All site adapters extend `BaseSiteAdapter` (same file) and implement `parse_card()`.
 
-- **adapters/** — Site-specific extractors (OpenVC, AngelMatch, Crunchbase, etc.). Each adapter extends `BaseSiteAdapter` from `adapters/base.py`. The `InvestorLead` dataclass in `base.py` is the core data model that flows through the entire pipeline. New adapters follow `adapters/ADAPTER_GUIDE.md`.
-- **adapters/registry.py** — Plugin auto-discovery via `ADAPTER_NAME` class attribute.
-- **enrichment/** — Multi-layer email discovery and validation:
-  - `email_guesser.py` — 8 pattern-based generators
-  - `email_validator.py` — MX lookup + SMTP verification
-  - `email_waterfall.py` — Multi-provider fallback (Hunter → ZeroBounce → MillionVerifier)
-  - `scoring.py` — Weighted lead ranking (stage 30%, sector 25%, check_size 20%, portfolio 15%, recency 10%). Config in `config/scoring.yaml`.
-  - `dedup.py` — Cross-run deduplication with email quality hierarchy. State in `data/dedup_index.json`.
-  - Additional enrichers: `dns_harvester`, `google_dorker`, `github_miner`, `sec_edgar`, `wayback_enricher`, `gravatar_oracle`, `pgp_keyserver`, `catchall_detector`, `portfolio_scraper`
-- **discovery/** — Search-based lead finding via `multi_searcher.py` (Google, Bing, DuckDuckGo)
-- **sources/** — Lead aggregation from seed DB, GitHub lists, directory scrapers
-- **scraping/** — Resilience layer: `circuit_breaker.py`, `domain_limiter.py`, `metrics.py`
-- **stealth/** — Anti-detection: browser fingerprint rotation, human-like behavior simulation, proxy management
-- **output/** — CSV export with checkpoints, Discord/Slack webhooks
+### Adapter plugin system
 
-### API (FastAPI)
+Adapters in `adapters/` are auto-discovered via `ADAPTER_NAME` class attribute — no manual registry. Site-specific CSS selectors and pagination rules live in `config/sites.yaml`. See `adapters/ADAPTER_GUIDE.md` for the template.
 
-- **api/main.py** — Entry point. CORS allows localhost:3000 and :5173.
-- **api/models.py** — SQLAlchemy async ORM. PostgreSQL (prod) or SQLite (dev). Core tables: User, Campaign, Lead, ApiKey, CreditTransaction.
-- **api/routers/** — REST endpoints: users, campaigns, leads, outreach, crm, billing (Stripe), portfolio, verticals.
+### API layer (`api/`)
 
-### Dashboard (Next.js 14 + TypeScript)
+FastAPI with async SQLAlchemy. SQLite for dev (`data/leadfactory.db`), PostgreSQL for prod (set `DATABASE_URL`). JWT auth, Stripe billing, SlowAPI rate limiting. 12 routers mounted in `api/main.py` covering users, campaigns, leads, outreach (Instantly/SmartLead), CRM (HubSpot/Salesforce), billing, portfolio, verticals, config, metrics, notifications, analytics.
 
-Located in `dashboard/`. Uses Tailwind CSS, Recharts for charts, Radix UI primitives. Pages under `app/dashboard/` for campaigns, outreach, CRM, portfolio, settings, verticals.
+### Dashboard (`dashboard/`)
 
-### Configuration
+Next.js + React 18 + Tailwind + Radix UI + Recharts + Framer Motion. Typed API client in `dashboard/lib/api.ts` stores JWT in localStorage, auto-redirects to `/login` on 401. Dashboard pages are under `app/dashboard/` with sidebar layout.
 
-- **config/sites.yaml** — Per-site scraping rules with CSS selectors and pagination config
-- **config/scoring.yaml** — Lead scoring weights and tier thresholds
-- **config/proxies.yaml** — Proxy rotation pool
-- **config/search.yaml** — Search engine query templates
+### Landing page (`landing/`)
 
-## Environment Variables
+Next.js 14 marketing site ("Honeypot"). Design direction documented in `.claude/LAYOUT.MD` — honeycomb motif used sparingly, warm editorial palette, interactive product demos. Key design tokens and motion specs are in that file.
 
-Required: `LEADFACTORY_SECRET_KEY` (JWT signing)
+### Pipeline resilience (`pipeline/`)
 
-Optional: `DATABASE_URL` (defaults to SQLite), `STRIPE_SECRET_KEY`, `INSTANTLY_API_KEY`, `SMARTLEAD_API_KEY`, `SERPAPI_KEY`, `GITHUB_TOKEN`
+- `pipeline/retry.py` — exponential backoff decorator
+- `pipeline/lead_store.py` — streaming DB persistence with memory fallback
+- `pipeline/logging.py` — structured JSON logging with PipelineContext
+- `pipeline/metrics.py` — Prometheus/StatsD metrics
+- `pipeline/tasks.py` — optional Celery/Redis async workers (degrades to threading)
+
+### Stealth layer (`stealth/`)
+
+Browser fingerprint rotation, human-like browsing patterns, proxy pool management. Configured via `config/proxies.yaml`.
+
+## Key Configuration Files
+
+- `config/scoring.yaml` — lead scoring weights, tiers, role modifiers
+- `config/sites.yaml` — per-site CSS selectors, pagination rules, enabled/disabled flags
+- `config/settings.py` — Pydantic BaseSettings, all env vars with defaults
+- `.env.example` — environment variable template (copy to `.env`)
+
+## Database
+
+Migrations via Alembic (`alembic/versions/`). Core tables: users, campaigns, leads, api_keys, credit_transactions. Schema defined in `api/models.py` with cross-DB UUID compatibility.
 
 ## CI
 
-GitHub Actions runs `pylint` on all Python files on every push (`.github/workflows/pylint.yml`, Python 3.14).
+GitHub Actions (`.github/workflows/pylint.yml`): runs `pylint --fail-under=7.0` on every push with Python 3.12.

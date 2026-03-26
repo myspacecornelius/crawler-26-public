@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check } from "lucide-react";
 import { Section, SectionTitle, UnderlineAccent } from "./primitives";
+import { HoneycombPattern } from "./icons";
 
 /* ───────────────────────────────────────────────
    Data
@@ -68,10 +69,9 @@ function ToggleSwitch({ isPrecision, onToggle }: { isPrecision: boolean; onToggl
       <button
         type="button"
         onClick={onToggle}
-        className="relative w-14 h-7 rounded-full transition-colors duration-400 focus:outline-none focus:ring-2 focus:ring-offset-2"
+        className="relative w-14 h-7 rounded-full transition-colors duration-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#C79B2C]"
         style={{
           backgroundColor: isPrecision ? "#C79B2C" : "#7A7066",
-          focusRingColor: "#C79B2C",
         }}
         aria-label={isPrecision ? "Switch to spray and pray mode" : "Switch to precision mode"}
       >
@@ -106,7 +106,7 @@ function SprayPanel({ dimmed }: { dimmed: boolean }) {
     >
       <div className="px-5 py-4 border-b border-black/[0.06]">
         <h3 className="text-[15px] font-semibold" style={{ color: "#1E1916" }}>Generic list</h3>
-        <p className="text-[12px] mt-0.5" style={{ color: "#7A7066" }}>5 results, no filtering</p>
+        <p className="text-[13px] mt-0.5" style={{ color: "#5E554C" }}>5 results, no filtering</p>
       </div>
 
       <div className="divide-y divide-black/[0.04]">
@@ -119,7 +119,7 @@ function SprayPanel({ dimmed }: { dimmed: boolean }) {
           >
             <div className="min-w-0">
               <div className="text-[13px] font-medium truncate" style={{ color: "#1E1916" }}>{entry.name}</div>
-              <div className="text-[11px] mt-0.5" style={{ color: "#7A7066" }}>{entry.signal}</div>
+              <div className="text-[12px] mt-0.5" style={{ color: "#5E554C" }}>{entry.signal}</div>
             </div>
             <ScoreBar score={entry.score} mode="low" />
           </motion.div>
@@ -139,7 +139,7 @@ function PrecisionPanel({ active }: { active: boolean }) {
     >
       <div className="px-5 py-4 border-b border-black/[0.06]">
         <h3 className="text-[15px] font-semibold" style={{ color: "#1E1916" }}>Ranked shortlist</h3>
-        <p className="text-[12px] mt-0.5" style={{ color: "#7A7066" }}>Top 3 thesis-fit matches</p>
+        <p className="text-[13px] mt-0.5" style={{ color: "#5E554C" }}>Top 3 thesis-fit matches</p>
       </div>
 
       <div className="divide-y divide-black/[0.04]">
@@ -178,7 +178,7 @@ function PrecisionPanel({ active }: { active: boolean }) {
                 {entry.fits.map((fit) => (
                   <span
                     key={fit}
-                    className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium"
+                    className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium"
                     style={{ backgroundColor: "rgba(199,155,44,0.1)", color: "#C79B2C" }}
                   >
                     <Check size={10} strokeWidth={2.5} />
@@ -202,7 +202,11 @@ export function Proof() {
   const [isPrecision, setIsPrecision] = useState(false);
 
   return (
-    <Section id="proof">
+    <Section id="proof" className="relative overflow-hidden">
+      {/* Honeycomb background */}
+      <div className="absolute bottom-0 left-0 w-[450px] h-[400px] pointer-events-none -z-10">
+        <HoneycombPattern opacity={0.02} className="text-text-primary" />
+      </div>
       <SectionTitle subtitle="See the difference between mass outreach and thesis-fit targeting.">
         Built for <UnderlineAccent>precision</UnderlineAccent>, not volume
       </SectionTitle>

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { PIPELINE_STATS } from "./constants";
 import { Container } from "./primitives";
+import { HoneycombPattern } from "./icons";
 
 // ─── Microcopy labels ────────────────────────────────
 const MICRO_LABELS = [
@@ -93,12 +94,12 @@ function MetricBlock({
       </span>
 
       {/* Primary label */}
-      <span className="block mt-2 text-xs font-medium text-[#F8F4EC]/70 tracking-wide">
+      <span className="block mt-2 text-[13px] font-medium text-[#F8F4EC]/80 tracking-wide">
         {label}
       </span>
 
       {/* Micro label */}
-      <span className="block mt-1 text-[10px] text-[#F8F4EC]/35 uppercase tracking-widest">
+      <span className="block mt-1 text-[11px] text-[#F8F4EC]/50 uppercase tracking-widest">
         {micro}
       </span>
     </motion.div>
@@ -162,7 +163,9 @@ function Divider() {
 // ─── Main export ─────────────────────────────────────
 export function StatsStrip() {
   return (
-    <div className="bg-[#15110E] border-y border-[#2E2A24]">
+    <div className="bg-[#15110E] border-y border-[#2E2A24] relative overflow-hidden">
+      {/* Honeycomb background */}
+      <HoneycombPattern opacity={0.03} className="text-honey-500" />
       <Container>
         <div className="relative max-w-4xl mx-auto">
           <BackgroundLine count={PIPELINE_STATS.length} />

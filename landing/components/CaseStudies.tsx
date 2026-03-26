@@ -10,16 +10,16 @@ import { Section, SectionTitle } from "./primitives";
 
 function FunnelArtifact() {
   return (
-    <svg viewBox="0 0 260 220" className="w-full max-w-[260px]" aria-label="Funnel compression: 500 funds narrowing to 40 thesis-fit">
+    <svg viewBox="0 0 320 270" className="w-full max-w-[360px]" aria-label="Funnel compression: 500 funds narrowing to 40 thesis-fit">
       {/* Wide top */}
-      <polygon points="10,30 250,30 210,100 50,100" fill="#2E5A58" opacity={0.12} />
-      <polygon points="50,100 210,100 180,170 80,170" fill="#2E5A58" opacity={0.22} />
-      <polygon points="80,170 180,170 160,210 100,210" fill="#C79B2C" opacity={0.35} />
+      <polygon points="12,37 308,37 258,123 62,123" fill="#C79B2C" opacity={0.10} />
+      <polygon points="62,123 258,123 221,209 99,209" fill="#C79B2C" opacity={0.18} />
+      <polygon points="99,209 221,209 196,258 124,258" fill="#C79B2C" opacity={0.35} />
       {/* Labels */}
-      <text x="130" y="22" textAnchor="middle" fontSize="11" fontWeight="600" fill="#2E5A58">500 funds</text>
-      <text x="130" y="72" textAnchor="middle" fontSize="10" fill="#5E554C">Thesis filter</text>
-      <text x="130" y="145" textAnchor="middle" fontSize="10" fill="#5E554C">Stage + check size</text>
-      <text x="130" y="200" textAnchor="middle" fontSize="12" fontWeight="700" fill="#C79B2C">40 thesis-fit</text>
+      <text x="160" y="27" textAnchor="middle" fontSize="14" fontWeight="600" fill="#8B6914">500 funds</text>
+      <text x="160" y="88" textAnchor="middle" fontSize="13" fill="#5E554C">Thesis filter</text>
+      <text x="160" y="178" textAnchor="middle" fontSize="13" fill="#5E554C">Stage + check size</text>
+      <text x="160" y="248" textAnchor="middle" fontSize="15" fontWeight="700" fill="#C79B2C">40 thesis-fit</text>
     </svg>
   );
 }
@@ -27,20 +27,20 @@ function FunnelArtifact() {
 function ScoreDistributionArtifact() {
   const bars = [
     { label: "Poor fit", pct: 60, color: "#DDD1BE" },
-    { label: "Moderate", pct: 25, color: "#2E5A58", opacity: 0.5 },
+    { label: "Moderate", pct: 25, color: "#C79B2C", opacity: 0.4 },
     { label: "Strong", pct: 15, color: "#C79B2C" },
   ];
   return (
-    <svg viewBox="0 0 240 200" className="w-full max-w-[240px]" aria-label="Score distribution: 60% removed as poor fit">
-      <text x="120" y="18" textAnchor="middle" fontSize="11" fontWeight="600" fill="#2E5A58">Score distribution</text>
+    <svg viewBox="0 0 300 240" className="w-full max-w-[360px]" aria-label="Score distribution: 60% removed as poor fit">
+      <text x="150" y="22" textAnchor="middle" fontSize="14" fontWeight="600" fill="#8B6914">Score distribution</text>
       {bars.map((b, i) => {
-        const y = 38 + i * 56;
-        const width = (b.pct / 100) * 190;
+        const y = 46 + i * 68;
+        const width = (b.pct / 100) * 235;
         return (
           <g key={b.label}>
-            <rect x="4" y={y} width={width} height={28} rx="6" fill={b.color} opacity={b.opacity ?? 1} />
-            <text x={width + 12} y={y + 18} fontSize="11" fontWeight="600" fill="#1E1916">{b.pct}%</text>
-            <text x="4" y={y + 46} fontSize="10" fill="#7A7066">{b.label}</text>
+            <rect x="5" y={y} width={width} height={34} rx="7" fill={b.color} opacity={b.opacity ?? 1} />
+            <text x={width + 14} y={y + 22} fontSize="14" fontWeight="600" fill="#1E1916">{b.pct}%</text>
+            <text x="5" y={y + 56} fontSize="13" fill="#5E554C">{b.label}</text>
           </g>
         );
       })}
@@ -50,46 +50,46 @@ function ScoreDistributionArtifact() {
 
 function GeoSplitArtifact() {
   return (
-    <svg viewBox="0 0 260 180" className="w-full max-w-[260px]" aria-label="Geographic split: US and Europe parallel outreach">
+    <svg viewBox="0 0 320 220" className="w-full max-w-[360px]" aria-label="Geographic split: US and Europe parallel outreach">
       {/* Connecting line */}
-      <line x1="80" y1="90" x2="180" y2="90" stroke="#DDD1BE" strokeWidth="2" strokeDasharray="6 4" />
+      <line x1="100" y1="110" x2="220" y2="110" stroke="#DDD1BE" strokeWidth="2" strokeDasharray="6 4" />
       {/* US circle */}
-      <circle cx="80" cy="90" r="44" fill="#2E5A58" opacity={0.14} />
-      <circle cx="80" cy="90" r="44" fill="none" stroke="#2E5A58" strokeWidth="1.5" />
-      <text x="80" y="86" textAnchor="middle" fontSize="16" fontWeight="700" fill="#2E5A58">US</text>
-      <text x="80" y="102" textAnchor="middle" fontSize="10" fill="#5E554C">Primary</text>
+      <circle cx="100" cy="110" r="54" fill="#C79B2C" opacity={0.10} />
+      <circle cx="100" cy="110" r="54" fill="none" stroke="#C79B2C" strokeWidth="1.5" />
+      <text x="100" y="106" textAnchor="middle" fontSize="20" fontWeight="700" fill="#8B6914">US</text>
+      <text x="100" y="124" textAnchor="middle" fontSize="13" fill="#5E554C">Primary</text>
       {/* Europe circle */}
-      <circle cx="180" cy="90" r="44" fill="#C79B2C" opacity={0.12} />
-      <circle cx="180" cy="90" r="44" fill="none" stroke="#C79B2C" strokeWidth="1.5" />
-      <text x="180" y="86" textAnchor="middle" fontSize="16" fontWeight="700" fill="#C79B2C">EU</text>
-      <text x="180" y="102" textAnchor="middle" fontSize="10" fill="#5E554C">Parallel</text>
+      <circle cx="220" cy="110" r="54" fill="#C79B2C" opacity={0.08} />
+      <circle cx="220" cy="110" r="54" fill="none" stroke="#C79B2C" strokeWidth="1.5" />
+      <text x="220" y="106" textAnchor="middle" fontSize="20" fontWeight="700" fill="#C79B2C">EU</text>
+      <text x="220" y="124" textAnchor="middle" fontSize="13" fill="#5E554C">Parallel</text>
       {/* Label */}
-      <text x="130" y="160" textAnchor="middle" fontSize="10" fill="#7A7066">Simultaneous outreach</text>
+      <text x="160" y="196" textAnchor="middle" fontSize="13" fill="#7A7066">Simultaneous outreach</text>
     </svg>
   );
 }
 
 function TimelineArtifact() {
   return (
-    <svg viewBox="0 0 260 140" className="w-full max-w-[260px]" aria-label="Timeline: 4-month hands-free pipeline">
+    <svg viewBox="0 0 320 175" className="w-full max-w-[360px]" aria-label="Timeline: 4-month hands-free pipeline">
       {/* Track */}
-      <rect x="20" y="56" width="220" height="32" rx="16" fill="#2E5A58" opacity={0.1} />
+      <rect x="25" y="70" width="270" height="40" rx="20" fill="#C79B2C" opacity={0.08} />
       {/* Filled bar */}
-      <rect x="20" y="56" width="220" height="32" rx="16" fill="#2E5A58" opacity={0.22} />
+      <rect x="25" y="70" width="270" height="40" rx="20" fill="#C79B2C" opacity={0.18} />
       {/* Month markers */}
       {[0, 1, 2, 3].map((m) => {
-        const x = 40 + m * 55;
+        const x = 50 + m * 68;
         return (
           <g key={m}>
-            <circle cx={x} cy="72" r="6" fill="#C79B2C" />
-            <text x={x} y="104" textAnchor="middle" fontSize="10" fill="#5E554C">M{m + 1}</text>
+            <circle cx={x} cy="90" r="8" fill="#C79B2C" />
+            <text x={x} y="130" textAnchor="middle" fontSize="13" fill="#5E554C">M{m + 1}</text>
           </g>
         );
       })}
       {/* Label */}
-      <text x="130" y="36" textAnchor="middle" fontSize="12" fontWeight="600" fill="#2E5A58">4 months</text>
-      <rect x="80" y="118" width="100" height="20" rx="10" fill="#C79B2C" opacity={0.15} />
-      <text x="130" y="132" textAnchor="middle" fontSize="10" fontWeight="600" fill="#C79B2C">Hands-free</text>
+      <text x="160" y="45" textAnchor="middle" fontSize="15" fontWeight="600" fill="#8B6914">4 months</text>
+      <rect x="100" y="148" width="120" height="24" rx="12" fill="#C79B2C" opacity={0.15} />
+      <text x="160" y="164" textAnchor="middle" fontSize="13" fontWeight="600" fill="#C79B2C">Hands-free</text>
     </svg>
   );
 }
@@ -132,20 +132,20 @@ const STUDY_QUOTES = [
 
 // ─── Animation variants ──────────────────────────────────────
 
-const contentExit = { opacity: 0, x: 20, transition: { duration: 0.25, ease: "easeIn" } };
+const contentExit = { opacity: 0, x: 20, transition: { duration: 0.25, ease: "easeIn" as const } };
 const contentEnter = {
   opacity: 1,
   x: 0,
   scale: 1,
-  transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] },
+  transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
 };
 const contentInitial = { opacity: 0, x: -20, scale: 0.98 };
 
-const artifactExit = { opacity: 0, scale: 0.95, transition: { duration: 0.3, ease: "easeIn" } };
+const artifactExit = { opacity: 0, scale: 0.95, transition: { duration: 0.3, ease: "easeIn" as const } };
 const artifactEnter = {
   opacity: 1,
   scale: 1,
-  transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+  transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
 };
 const artifactInitial = { opacity: 0, scale: 0.92 };
 
@@ -167,10 +167,10 @@ export function CaseStudyCarousel() {
             <button
               key={i}
               onClick={() => setActive(i)}
-              className={`relative px-4 py-2 text-[13px] font-medium rounded-full transition-colors duration-200 ${
+              className={`relative px-4 py-2 text-[14px] font-medium rounded-full transition-colors duration-200 ${
                 active === i
                   ? "text-text-primary"
-                  : "text-text-muted hover:text-text-secondary"
+                  : "text-text-secondary hover:text-text-primary"
               }`}
             >
               {active === i && (
@@ -219,7 +219,7 @@ export function CaseStudyCarousel() {
                   {CASE_STUDIES[active].scenario}
                 </h3>
 
-                <p className="text-[14px] text-text-secondary leading-relaxed mb-5">
+                <p className="text-[15px] text-text-secondary leading-relaxed mb-5">
                   {CASE_STUDIES[active].result}
                 </p>
 
@@ -227,15 +227,15 @@ export function CaseStudyCarousel() {
                 <div className="flex flex-wrap gap-5 mb-6">
                   {STUDY_METRICS[active].map((m, j) => (
                     <div key={j} className="flex flex-col">
-                      <span className="text-[22px] font-[700] text-petrol-600 leading-none">{m.stat}</span>
-                      <span className="text-[11px] text-text-muted uppercase tracking-wider mt-1">{m.label}</span>
+                      <span className="text-[24px] font-[700] text-honey-500 leading-none">{m.stat}</span>
+                      <span className="text-[12px] text-text-secondary uppercase tracking-wider mt-1">{m.label}</span>
                     </div>
                   ))}
                 </div>
 
                 {/* Quote */}
                 <blockquote className="border-l-2 border-honey-500 pl-4 py-1">
-                  <p className="text-[13px] text-text-secondary italic leading-relaxed">
+                  <p className="text-[14px] text-text-secondary italic leading-relaxed">
                     &ldquo;{STUDY_QUOTES[active]}&rdquo;
                   </p>
                 </blockquote>
@@ -245,7 +245,7 @@ export function CaseStudyCarousel() {
                   {CASE_STUDIES[active].chips.map((c) => (
                     <span
                       key={c}
-                      className="inline-flex items-center gap-1 bg-white/70 border border-border-subtle rounded-full px-3 py-1 text-[11px] text-text-muted"
+                      className="inline-flex items-center gap-1 bg-white/70 border border-border-subtle rounded-full px-3 py-1 text-[12px] text-text-secondary"
                     >
                       <Check size={10} strokeWidth={2.5} className="text-honey-500" />
                       {c}
@@ -259,7 +259,7 @@ export function CaseStudyCarousel() {
                 className="flex items-center justify-center"
                 variants={{ initial: artifactInitial, enter: artifactEnter, exit: artifactExit }}
               >
-                <div className="w-full max-w-[280px] aspect-square flex items-center justify-center rounded-2xl bg-surface-warm/60 border border-border-subtle p-6">
+                <div className="w-full max-w-[380px] aspect-square flex items-center justify-center rounded-2xl bg-surface-warm/60 border border-border-subtle p-8">
                   {(() => {
                     const Artifact = ARTIFACTS[active];
                     return <Artifact />;

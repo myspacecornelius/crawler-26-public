@@ -102,7 +102,7 @@ function SubItemRow({ item, hovered }: { item: SubItem; hovered: boolean }) {
         animate={{ y: hovered ? -2 : 0 }}
         transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
       >
-        <BrandIconBadge variant="petrol">
+        <BrandIconBadge variant="accent">
           <Icon className="w-[18px] h-[18px]" />
         </BrandIconBadge>
       </motion.div>
@@ -112,7 +112,7 @@ function SubItemRow({ item, hovered }: { item: SubItem; hovered: boolean }) {
           {label}
         </p>
         <motion.p
-          className="text-[13px] text-[#7A7066] leading-relaxed overflow-hidden"
+          className="text-[14px] text-[#5E554C] leading-relaxed overflow-hidden"
           initial={false}
           animate={{
             height: hovered ? "auto" : 0,

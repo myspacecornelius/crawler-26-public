@@ -23,6 +23,7 @@ import hashlib
 import json
 import logging
 import os
+import shutil
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
@@ -101,8 +102,11 @@ class LeadDeduplicator:
             self.index = {}
 
     def _save_index(self):
-        """Persist the dedup index to disk."""
+        """Persist the dedup index to disk (with backup)."""
         self.index_path.parent.mkdir(parents=True, exist_ok=True)
+        if self.index_path.exists():
+            backup = self.index_path.with_suffix(".json.bak")
+            shutil.copy2(self.index_path, backup)
         with open(self.index_path, "w", encoding="utf-8") as f:
             json.dump(self.index, f, indent=2, default=str)
         logger.info(f"  💾 Saved dedup index: {len(self.index)} entries")

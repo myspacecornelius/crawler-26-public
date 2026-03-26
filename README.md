@@ -426,6 +426,7 @@ If you need to give another AI the best possible understanding of this codebase 
 ### Minimum Viable Briefing
 
 For the fastest possible onboarding, provide just these 4 files plus the tree:
+
 1. **`engine.py`** — full pipeline flow
 2. **`adapters/base.py`** — data model
 3. **`api/main.py`** — API structure
