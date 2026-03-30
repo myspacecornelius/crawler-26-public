@@ -164,7 +164,7 @@ class LinkedInEnricher:
                         self.failed_count += 1
                     await asyncio.sleep(1.5)  # Rate limit
 
-            tasks = [_enrich_lead(lead) for lead in candidates[:50]]  # Cap at 50
+            tasks = [_enrich_lead(lead) for lead in candidates]
             await asyncio.gather(*tasks)
 
         print(f"  🔗  LinkedIn: {self.enriched_count} enriched, {self.failed_count} failed")

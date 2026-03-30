@@ -1,0 +1,292 @@
+  Resuming from checkpoint: data/enriched/checkpoint_smtp_multipattern.csv (25526 leads)
+
+============================================================
+  SMTP MULTI-PATTERN VERIFICATION (proxied)
+============================================================
+  Total leads:          25526
+  Already SMTP-done:    9002
+  Skipped (bad name):   2117
+  Skipped (no domain):  1
+  To verify:            14406
+  Proxies:              5
+  Tasks/proxy:          10
+  Total concurrency:    50
+
+  Testing proxy connectivity...
+  SOCKS5 returned no code, trying direct via proxy...
+  Domains to probe:     679
+  Total candidates:     115248
+
+  Resolving MX records for 679 domains...
+  MX resolved: 674/679 domains
+  Starting verification of 115208 emails...
+
+  Progress:     500/115248 (8 verified, 80 catch-all, 351 bounced) [5.8/s, ~327m left]
+  Progress:    1000/115248 (16 verified, 145 catch-all, 698 bounced) [9.5/s, ~199m left]
+  Progress:    1500/115248 (25 verified, 190 catch-all, 1062 bounced) [12.6/s, ~150m left]
+  Progress:    2000/115248 (28 verified, 242 catch-all, 1413 bounced) [14.7/s, ~128m left]
+  Progress:    2500/115248 (32 verified, 286 catch-all, 1769 bounced) [16.3/s, ~115m left]
+  Progress:    3000/115248 (38 verified, 344 catch-all, 2128 bounced) [17.8/s, ~105m left]
+  Progress:    3500/115248 (44 verified, 401 catch-all, 2474 bounced) [19.2/s, ~97m left]
+  Progress:    4000/115248 (54 verified, 459 catch-all, 2817 bounced) [20.2/s, ~92m left]
+  Progress:    4500/115248 (61 verified, 522 catch-all, 3165 bounced) [21.0/s, ~88m left]
+  Progress:    5000/115248 (69 verified, 593 catch-all, 3511 bounced) [22.1/s, ~83m left]
+  Progress:    5500/115248 (74 verified, 637 catch-all, 3866 bounced) [22.8/s, ~80m left]
+  Progress:    6000/115248 (82 verified, 696 catch-all, 4207 bounced) [23.5/s, ~78m left]
+  Progress:    6500/115248 (84 verified, 746 catch-all, 4549 bounced) [23.7/s, ~77m left]
+  Progress:    7000/115248 (90 verified, 804 catch-all, 4892 bounced) [24.1/s, ~75m left]
+  [checkpoint] Saved 25526 leads (800 updated) → data/enriched/checkpoint_smtp_multipattern.csv
+  Progress:    7500/115248 (99 verified, 859 catch-all, 5238 bounced) [24.5/s, ~73m left]
+  Progress:    8000/115248 (106 verified, 919 catch-all, 5605 bounced) [24.9/s, ~72m left]
+  Progress:    8500/115248 (113 verified, 981 catch-all, 5958 bounced) [25.0/s, ~71m left]
+  Progress:    9000/115248 (120 verified, 1035 catch-all, 6305 bounced) [25.3/s, ~70m left]
+  Progress:    9500/115248 (126 verified, 1097 catch-all, 6652 bounced) [25.7/s, ~69m left]
+  Progress:   10000/115248 (133 verified, 1158 catch-all, 6990 bounced) [26.0/s, ~67m left]
+  Progress:   10500/115248 (139 verified, 1214 catch-all, 7310 bounced) [26.0/s, ~67m left]
+  Progress:   11000/115248 (143 verified, 1276 catch-all, 7655 bounced) [26.4/s, ~66m left]
+  Progress:   11500/115248 (147 verified, 1339 catch-all, 8005 bounced) [26.8/s, ~65m left]
+  Progress:   12000/115248 (156 verified, 1406 catch-all, 8354 bounced) [26.9/s, ~64m left]
+  Progress:   12500/115248 (159 verified, 1454 catch-all, 8712 bounced) [27.0/s, ~63m left]
+  Progress:   13000/115248 (166 verified, 1506 catch-all, 9069 bounced) [27.3/s, ~62m left]
+  Progress:   13500/115248 (171 verified, 1564 catch-all, 9399 bounced) [27.3/s, ~62m left]
+  Progress:   14000/115248 (176 verified, 1617 catch-all, 9747 bounced) [27.4/s, ~62m left]
+  Progress:   14500/115248 (180 verified, 1679 catch-all, 10090 bounced) [27.7/s, ~61m left]
+  Progress:   15000/115248 (185 verified, 1735 catch-all, 10441 bounced) [28.0/s, ~60m left]
+  Progress:   15500/115248 (192 verified, 1781 catch-all, 10785 bounced) [28.3/s, ~59m left]
+  Progress:   16000/115248 (199 verified, 1839 catch-all, 11135 bounced) [28.4/s, ~58m left]
+  Progress:   16500/115248 (203 verified, 1896 catch-all, 11481 bounced) [28.4/s, ~58m left]
+  Progress:   17000/115248 (209 verified, 1952 catch-all, 11827 bounced) [28.5/s, ~57m left]
+  [checkpoint] Saved 25526 leads (1522 updated) → data/enriched/checkpoint_smtp_multipattern.csv
+  Progress:   17500/115248 (212 verified, 1995 catch-all, 12187 bounced) [28.7/s, ~57m left]
+  Progress:   18000/115248 (218 verified, 2037 catch-all, 12525 bounced) [28.6/s, ~57m left]
+  Progress:   18500/115248 (221 verified, 2091 catch-all, 12847 bounced) [28.8/s, ~56m left]
+  Progress:   19000/115248 (223 verified, 2150 catch-all, 13186 bounced) [28.9/s, ~56m left]
+  Progress:   19500/115248 (227 verified, 2203 catch-all, 13526 bounced) [29.0/s, ~55m left]
+  Progress:   20000/115248 (236 verified, 2270 catch-all, 13876 bounced) [29.2/s, ~54m left]
+  Progress:   20500/115248 (245 verified, 2333 catch-all, 14205 bounced) [29.2/s, ~54m left]
+  Progress:   21000/115248 (250 verified, 2387 catch-all, 14551 bounced) [29.2/s, ~54m left]
+  Progress:   21500/115248 (257 verified, 2442 catch-all, 14885 bounced) [29.1/s, ~54m left]
+  Progress:   22000/115248 (258 verified, 2492 catch-all, 15242 bounced) [29.2/s, ~53m left]
+  Progress:   22500/115248 (264 verified, 2553 catch-all, 15576 bounced) [29.3/s, ~53m left]
+  Progress:   23000/115248 (271 verified, 2613 catch-all, 15919 bounced) [29.4/s, ~52m left]
+  Progress:   23500/115248 (277 verified, 2676 catch-all, 16268 bounced) [29.5/s, ~52m left]
+  Progress:   24000/115248 (285 verified, 2743 catch-all, 16604 bounced) [29.5/s, ~52m left]
+  Progress:   24500/115248 (292 verified, 2805 catch-all, 16945 bounced) [29.5/s, ~51m left]
+  Progress:   25000/115248 (301 verified, 2871 catch-all, 17283 bounced) [29.6/s, ~51m left]
+  Progress:   25500/115248 (303 verified, 2925 catch-all, 17617 bounced) [29.6/s, ~51m left]
+  Progress:   26000/115248 (308 verified, 2974 catch-all, 17949 bounced) [29.5/s, ~50m left]
+  Progress:   26500/115248 (315 verified, 3020 catch-all, 18301 bounced) [29.5/s, ~50m left]
+  [checkpoint] Saved 25526 leads (1935 updated) → data/enriched/checkpoint_smtp_multipattern.csv
+  Progress:   27000/115248 (318 verified, 3075 catch-all, 18631 bounced) [29.6/s, ~50m left]
+  Progress:   27500/115248 (326 verified, 3141 catch-all, 18971 bounced) [29.6/s, ~49m left]
+  Progress:   28000/115248 (331 verified, 3208 catch-all, 19291 bounced) [29.6/s, ~49m left]
+  Progress:   28500/115248 (336 verified, 3262 catch-all, 19642 bounced) [29.6/s, ~49m left]
+  Progress:   29000/115248 (341 verified, 3327 catch-all, 19980 bounced) [29.8/s, ~48m left]
+  Progress:   29500/115248 (344 verified, 3368 catch-all, 20342 bounced) [29.9/s, ~48m left]
+  Progress:   30000/115248 (348 verified, 3412 catch-all, 20694 bounced) [29.9/s, ~48m left]
+  Progress:   30500/115248 (359 verified, 3464 catch-all, 21009 bounced) [29.9/s, ~47m left]
+  Progress:   31000/115248 (364 verified, 3520 catch-all, 21358 bounced) [30.0/s, ~47m left]
+  Progress:   31500/115248 (372 verified, 3579 catch-all, 21695 bounced) [30.1/s, ~46m left]
+  Progress:   32000/115248 (378 verified, 3646 catch-all, 22035 bounced) [30.0/s, ~46m left]
+  Progress:   32500/115248 (388 verified, 3703 catch-all, 22374 bounced) [30.0/s, ~46m left]
+  Progress:   33000/115248 (395 verified, 3756 catch-all, 22727 bounced) [30.1/s, ~46m left]
+  Progress:   33500/115248 (399 verified, 3798 catch-all, 23083 bounced) [30.2/s, ~45m left]
+  Progress:   34000/115248 (401 verified, 3853 catch-all, 23419 bounced) [30.2/s, ~45m left]
+  Progress:   34500/115248 (407 verified, 3908 catch-all, 23751 bounced) [30.2/s, ~44m left]
+  Progress:   35000/115248 (409 verified, 3961 catch-all, 24101 bounced) [30.3/s, ~44m left]
+  Progress:   35500/115248 (413 verified, 4010 catch-all, 24475 bounced) [30.3/s, ~44m left]
+  Progress:   36000/115248 (417 verified, 4062 catch-all, 24814 bounced) [30.3/s, ~44m left]
+  [checkpoint] Saved 25526 leads (2208 updated) → data/enriched/checkpoint_smtp_multipattern.csv
+  Progress:   36500/115248 (423 verified, 4114 catch-all, 25153 bounced) [30.3/s, ~43m left]
+  Progress:   37000/115248 (429 verified, 4168 catch-all, 25497 bounced) [30.4/s, ~43m left]
+  Progress:   37500/115248 (430 verified, 4219 catch-all, 25842 bounced) [30.4/s, ~43m left]
+  Progress:   38000/115248 (433 verified, 4271 catch-all, 26182 bounced) [30.4/s, ~42m left]
+  Progress:   38500/115248 (439 verified, 4315 catch-all, 26516 bounced) [30.4/s, ~42m left]
+  Progress:   39000/115248 (443 verified, 4377 catch-all, 26873 bounced) [30.5/s, ~42m left]
+  Progress:   39500/115248 (448 verified, 4442 catch-all, 27223 bounced) [30.5/s, ~41m left]
+  Progress:   40000/115248 (452 verified, 4499 catch-all, 27559 bounced) [30.5/s, ~41m left]
+  Progress:   40500/115248 (457 verified, 4553 catch-all, 27904 bounced) [30.5/s, ~41m left]
+  Progress:   41000/115248 (460 verified, 4609 catch-all, 28239 bounced) [30.5/s, ~41m left]
+  Progress:   41500/115248 (466 verified, 4662 catch-all, 28571 bounced) [30.6/s, ~40m left]
+  Progress:   42000/115248 (470 verified, 4712 catch-all, 28903 bounced) [30.6/s, ~40m left]
+  Progress:   42500/115248 (474 verified, 4757 catch-all, 29263 bounced) [30.7/s, ~40m left]
+  Progress:   43000/115248 (483 verified, 4815 catch-all, 29625 bounced) [30.7/s, ~39m left]
+  Progress:   43500/115248 (492 verified, 4873 catch-all, 29969 bounced) [30.7/s, ~39m left]
+  Progress:   44000/115248 (495 verified, 4938 catch-all, 30297 bounced) [30.7/s, ~39m left]
+  Progress:   44500/115248 (499 verified, 4991 catch-all, 30646 bounced) [30.8/s, ~38m left]
+  Progress:   45000/115248 (501 verified, 5045 catch-all, 31003 bounced) [30.8/s, ~38m left]
+  Progress:   45500/115248 (510 verified, 5098 catch-all, 31345 bounced) [30.8/s, ~38m left]
+  Progress:   46000/115248 (517 verified, 5166 catch-all, 31664 bounced) [30.9/s, ~37m left]
+  [checkpoint] Saved 25526 leads (2385 updated) → data/enriched/checkpoint_smtp_multipattern.csv
+  Progress:   46500/115248 (522 verified, 5216 catch-all, 31990 bounced) [30.9/s, ~37m left]
+  Progress:   47000/115248 (529 verified, 5278 catch-all, 32319 bounced) [30.8/s, ~37m left]
+  Progress:   47500/115248 (537 verified, 5326 catch-all, 32644 bounced) [30.7/s, ~37m left]
+  Progress:   48000/115248 (545 verified, 5377 catch-all, 32960 bounced) [30.6/s, ~37m left]
+  Progress:   48500/115248 (550 verified, 5424 catch-all, 33320 bounced) [30.6/s, ~36m left]
+  Progress:   49000/115248 (552 verified, 5477 catch-all, 33669 bounced) [30.7/s, ~36m left]
+  Progress:   49500/115248 (556 verified, 5538 catch-all, 34009 bounced) [30.7/s, ~36m left]
+  Progress:   50000/115248 (566 verified, 5596 catch-all, 34321 bounced) [30.7/s, ~35m left]
+  Progress:   50500/115248 (569 verified, 5653 catch-all, 34666 bounced) [30.7/s, ~35m left]
+  Progress:   51000/115248 (570 verified, 5710 catch-all, 35025 bounced) [30.8/s, ~35m left]
+  Progress:   51500/115248 (577 verified, 5767 catch-all, 35368 bounced) [30.8/s, ~35m left]
+  Progress:   52000/115248 (581 verified, 5814 catch-all, 35701 bounced) [30.7/s, ~34m left]
+  Progress:   52500/115248 (584 verified, 5865 catch-all, 36056 bounced) [30.8/s, ~34m left]
+  Progress:   53000/115248 (590 verified, 5922 catch-all, 36387 bounced) [30.8/s, ~34m left]
+  Progress:   53500/115248 (597 verified, 5974 catch-all, 36712 bounced) [30.8/s, ~33m left]
+  Progress:   54000/115248 (603 verified, 6030 catch-all, 37053 bounced) [30.8/s, ~33m left]
+  Progress:   54500/115248 (609 verified, 6084 catch-all, 37397 bounced) [30.8/s, ~33m left]
+  Progress:   55000/115248 (615 verified, 6138 catch-all, 37743 bounced) [30.8/s, ~33m left]
+  Progress:   55500/115248 (623 verified, 6194 catch-all, 38099 bounced) [30.9/s, ~32m left]
+  [checkpoint] Saved 25526 leads (2528 updated) → data/enriched/checkpoint_smtp_multipattern.csv
+  Progress:   56000/115248 (626 verified, 6244 catch-all, 38450 bounced) [30.9/s, ~32m left]
+  Progress:   56500/115248 (633 verified, 6312 catch-all, 38800 bounced) [30.9/s, ~32m left]
+  Progress:   57000/115248 (638 verified, 6354 catch-all, 39155 bounced) [30.9/s, ~31m left]
+  Progress:   57500/115248 (640 verified, 6397 catch-all, 39510 bounced) [31.0/s, ~31m left]
+  Progress:   58000/115248 (648 verified, 6455 catch-all, 39849 bounced) [31.0/s, ~31m left]
+  Progress:   58500/115248 (654 verified, 6512 catch-all, 40211 bounced) [31.1/s, ~30m left]
+  Progress:   59000/115248 (659 verified, 6572 catch-all, 40546 bounced) [31.1/s, ~30m left]
+  Progress:   59500/115248 (660 verified, 6628 catch-all, 40890 bounced) [31.1/s, ~30m left]
+  Progress:   60000/115248 (665 verified, 6672 catch-all, 41241 bounced) [31.1/s, ~30m left]
+  Progress:   60500/115248 (671 verified, 6718 catch-all, 41586 bounced) [31.1/s, ~29m left]
+  Progress:   61000/115248 (675 verified, 6768 catch-all, 41933 bounced) [31.1/s, ~29m left]
+  Progress:   61500/115248 (678 verified, 6816 catch-all, 42295 bounced) [31.2/s, ~29m left]
+  Progress:   62000/115248 (681 verified, 6876 catch-all, 42638 bounced) [31.1/s, ~29m left]
+  Progress:   62500/115248 (692 verified, 6933 catch-all, 42987 bounced) [31.1/s, ~28m left]
+  Progress:   63000/115248 (696 verified, 6986 catch-all, 43333 bounced) [31.2/s, ~28m left]
+  Progress:   63500/115248 (704 verified, 7029 catch-all, 43692 bounced) [31.2/s, ~28m left]
+  Progress:   64000/115248 (711 verified, 7087 catch-all, 44028 bounced) [31.2/s, ~27m left]
+  Progress:   64500/115248 (717 verified, 7134 catch-all, 44366 bounced) [31.2/s, ~27m left]
+  Progress:   65000/115248 (724 verified, 7179 catch-all, 44729 bounced) [31.2/s, ~27m left]
+  Progress:   65500/115248 (728 verified, 7226 catch-all, 45075 bounced) [31.3/s, ~27m left]
+  [checkpoint] Saved 25526 leads (2633 updated) → data/enriched/checkpoint_smtp_multipattern.csv
+  Progress:   66000/115248 (731 verified, 7278 catch-all, 45416 bounced) [31.3/s, ~26m left]
+  Progress:   66500/115248 (736 verified, 7337 catch-all, 45767 bounced) [31.2/s, ~26m left]
+  Progress:   67000/115248 (744 verified, 7387 catch-all, 46120 bounced) [31.2/s, ~26m left]
+  Progress:   67500/115248 (750 verified, 7449 catch-all, 46462 bounced) [31.2/s, ~25m left]
+  Progress:   68000/115248 (752 verified, 7498 catch-all, 46814 bounced) [31.3/s, ~25m left]
+  Progress:   68500/115248 (757 verified, 7567 catch-all, 47134 bounced) [31.3/s, ~25m left]
+  Progress:   69000/115248 (758 verified, 7620 catch-all, 47469 bounced) [31.3/s, ~25m left]
+  Progress:   69500/115248 (763 verified, 7670 catch-all, 47801 bounced) [31.3/s, ~24m left]
+  Progress:   70000/115248 (768 verified, 7735 catch-all, 48126 bounced) [31.3/s, ~24m left]
+  Progress:   70500/115248 (771 verified, 7795 catch-all, 48483 bounced) [31.3/s, ~24m left]
+  Progress:   71000/115248 (776 verified, 7844 catch-all, 48844 bounced) [31.3/s, ~24m left]
+  Progress:   71500/115248 (780 verified, 7907 catch-all, 49174 bounced) [31.3/s, ~23m left]
+  Progress:   72000/115248 (787 verified, 7968 catch-all, 49503 bounced) [31.3/s, ~23m left]
+  Progress:   72500/115248 (792 verified, 8011 catch-all, 49842 bounced) [31.3/s, ~23m left]
+  Progress:   73000/115248 (794 verified, 8075 catch-all, 50170 bounced) [31.3/s, ~23m left]
+  Progress:   73500/115248 (797 verified, 8122 catch-all, 50518 bounced) [31.3/s, ~22m left]
+  Progress:   74000/115248 (801 verified, 8181 catch-all, 50872 bounced) [31.3/s, ~22m left]
+  Progress:   74500/115248 (809 verified, 8245 catch-all, 51213 bounced) [31.3/s, ~22m left]
+  Progress:   75000/115248 (817 verified, 8304 catch-all, 51557 bounced) [31.3/s, ~21m left]
+  [checkpoint] Saved 25526 leads (2721 updated) → data/enriched/checkpoint_smtp_multipattern.csv
+  Progress:   75500/115248 (821 verified, 8367 catch-all, 51897 bounced) [31.3/s, ~21m left]
+  Progress:   76000/115248 (825 verified, 8437 catch-all, 52216 bounced) [31.3/s, ~21m left]
+  Progress:   76500/115248 (830 verified, 8478 catch-all, 52578 bounced) [31.4/s, ~21m left]
+  Progress:   77000/115248 (834 verified, 8529 catch-all, 52918 bounced) [31.4/s, ~20m left]
+  Progress:   77500/115248 (838 verified, 8589 catch-all, 53242 bounced) [31.5/s, ~20m left]
+  Progress:   78000/115248 (845 verified, 8624 catch-all, 53592 bounced) [31.5/s, ~20m left]
+  Progress:   78500/115248 (850 verified, 8672 catch-all, 53947 bounced) [31.5/s, ~19m left]
+  Progress:   79000/115248 (855 verified, 8734 catch-all, 54281 bounced) [31.5/s, ~19m left]
+  Progress:   79500/115248 (860 verified, 8787 catch-all, 54630 bounced) [31.6/s, ~19m left]
+  Progress:   80000/115248 (862 verified, 8850 catch-all, 54976 bounced) [31.6/s, ~19m left]
+  Progress:   80500/115248 (864 verified, 8886 catch-all, 55321 bounced) [31.6/s, ~18m left]
+  Progress:   81000/115248 (868 verified, 8926 catch-all, 55679 bounced) [31.6/s, ~18m left]
+  Progress:   81500/115248 (873 verified, 8989 catch-all, 56000 bounced) [31.7/s, ~18m left]
+  Progress:   82000/115248 (878 verified, 9043 catch-all, 56327 bounced) [31.7/s, ~17m left]
+  Progress:   82500/115248 (885 verified, 9089 catch-all, 56675 bounced) [31.7/s, ~17m left]
+  Progress:   83000/115248 (892 verified, 9142 catch-all, 57015 bounced) [31.7/s, ~17m left]
+  Progress:   83500/115248 (900 verified, 9207 catch-all, 57355 bounced) [31.7/s, ~17m left]
+  Progress:   84000/115248 (904 verified, 9266 catch-all, 57702 bounced) [31.7/s, ~16m left]
+  Progress:   84500/115248 (909 verified, 9305 catch-all, 58054 bounced) [31.7/s, ~16m left]
+  Progress:   85000/115248 (912 verified, 9361 catch-all, 58385 bounced) [31.7/s, ~16m left]
+  Progress:   85500/115248 (915 verified, 9417 catch-all, 58717 bounced) [31.8/s, ~16m left]
+  [checkpoint] Saved 25526 leads (2795 updated) → data/enriched/checkpoint_smtp_multipattern.csv
+  Progress:   86000/115248 (923 verified, 9470 catch-all, 59053 bounced) [31.8/s, ~15m left]
+  Progress:   86500/115248 (926 verified, 9536 catch-all, 59365 bounced) [31.7/s, ~15m left]
+  Progress:   87000/115248 (936 verified, 9591 catch-all, 59690 bounced) [31.7/s, ~15m left]
+  Progress:   87500/115248 (939 verified, 9649 catch-all, 60004 bounced) [31.6/s, ~15m left]
+  Progress:   88000/115248 (943 verified, 9693 catch-all, 60331 bounced) [31.5/s, ~14m left]
+  Progress:   88500/115248 (949 verified, 9739 catch-all, 60655 bounced) [31.4/s, ~14m left]
+  Progress:   89000/115248 (949 verified, 9792 catch-all, 60986 bounced) [31.4/s, ~14m left]
+  Progress:   89500/115248 (952 verified, 9850 catch-all, 61315 bounced) [31.4/s, ~14m left]
+  Progress:   90000/115248 (958 verified, 9893 catch-all, 61670 bounced) [31.4/s, ~13m left]
+  Progress:   90500/115248 (962 verified, 9952 catch-all, 62014 bounced) [31.4/s, ~13m left]
+  Progress:   91000/115248 (966 verified, 10014 catch-all, 62348 bounced) [31.4/s, ~13m left]
+  Progress:   91500/115248 (970 verified, 10078 catch-all, 62681 bounced) [31.4/s, ~13m left]
+  Progress:   92000/115248 (978 verified, 10141 catch-all, 63020 bounced) [31.4/s, ~12m left]
+  Progress:   92500/115248 (980 verified, 10183 catch-all, 63376 bounced) [31.4/s, ~12m left]
+  Progress:   93000/115248 (985 verified, 10234 catch-all, 63723 bounced) [31.5/s, ~12m left]
+  Progress:   93500/115248 (987 verified, 10287 catch-all, 64073 bounced) [31.5/s, ~12m left]
+  Progress:   94000/115248 (989 verified, 10349 catch-all, 64429 bounced) [31.6/s, ~11m left]
+  Progress:   94500/115248 (993 verified, 10405 catch-all, 64784 bounced) [31.7/s, ~11m left]
+  [checkpoint] Saved 25526 leads (2853 updated) → data/enriched/checkpoint_smtp_multipattern.csv
+  Progress:   95000/115248 (998 verified, 10459 catch-all, 65114 bounced) [31.6/s, ~11m left]
+  Progress:   95500/115248 (1003 verified, 10502 catch-all, 65442 bounced) [31.6/s, ~10m left]
+  Progress:   96000/115248 (1007 verified, 10539 catch-all, 65772 bounced) [31.5/s, ~10m left]
+  Progress:   96500/115248 (1008 verified, 10586 catch-all, 66094 bounced) [31.5/s, ~10m left]
+  Progress:   97000/115248 (1016 verified, 10649 catch-all, 66428 bounced) [31.5/s, ~10m left]
+  Progress:   97500/115248 (1021 verified, 10708 catch-all, 66773 bounced) [31.5/s, ~9m left]
+  Progress:   98000/115248 (1026 verified, 10759 catch-all, 67095 bounced) [31.5/s, ~9m left]
+  Progress:   98500/115248 (1031 verified, 10807 catch-all, 67437 bounced) [31.5/s, ~9m left]
+  Progress:   99000/115248 (1034 verified, 10869 catch-all, 67762 bounced) [31.5/s, ~9m left]
+  Progress:   99500/115248 (1039 verified, 10927 catch-all, 68096 bounced) [31.5/s, ~8m left]
+  Progress:  100000/115248 (1043 verified, 10978 catch-all, 68432 bounced) [31.6/s, ~8m left]
+  Progress:  100500/115248 (1047 verified, 11028 catch-all, 68771 bounced) [31.6/s, ~8m left]
+  Progress:  101000/115248 (1055 verified, 11073 catch-all, 69119 bounced) [31.6/s, ~8m left]
+  Progress:  101500/115248 (1063 verified, 11139 catch-all, 69458 bounced) [31.6/s, ~7m left]
+  Progress:  102000/115248 (1070 verified, 11187 catch-all, 69807 bounced) [31.7/s, ~7m left]
+  Progress:  102500/115248 (1076 verified, 11240 catch-all, 70166 bounced) [31.7/s, ~7m left]
+  Progress:  103000/115248 (1084 verified, 11296 catch-all, 70499 bounced) [31.7/s, ~6m left]
+  Progress:  103500/115248 (1089 verified, 11356 catch-all, 70819 bounced) [31.7/s, ~6m left]
+  Progress:  104000/115248 (1095 verified, 11404 catch-all, 71170 bounced) [31.7/s, ~6m left]
+  Progress:  104500/115248 (1100 verified, 11457 catch-all, 71506 bounced) [31.8/s, ~6m left]
+  [checkpoint] Saved 25526 leads (2937 updated) → data/enriched/checkpoint_smtp_multipattern.csv
+  Progress:  105000/115248 (1106 verified, 11507 catch-all, 71850 bounced) [31.8/s, ~5m left]
+  Progress:  105500/115248 (1112 verified, 11568 catch-all, 72182 bounced) [31.7/s, ~5m left]
+  Progress:  106000/115248 (1118 verified, 11615 catch-all, 72534 bounced) [31.7/s, ~5m left]
+  Progress:  106500/115248 (1123 verified, 11662 catch-all, 72890 bounced) [31.8/s, ~5m left]
+  Progress:  107000/115248 (1126 verified, 11717 catch-all, 73245 bounced) [31.8/s, ~4m left]
+  Progress:  107500/115248 (1128 verified, 11771 catch-all, 73591 bounced) [31.8/s, ~4m left]
+  Progress:  108000/115248 (1129 verified, 11830 catch-all, 73946 bounced) [31.8/s, ~4m left]
+  Progress:  108500/115248 (1130 verified, 11882 catch-all, 74283 bounced) [31.8/s, ~4m left]
+  Progress:  109000/115248 (1134 verified, 11929 catch-all, 74629 bounced) [31.8/s, ~3m left]
+  Progress:  109500/115248 (1142 verified, 11988 catch-all, 74973 bounced) [31.9/s, ~3m left]
+  Progress:  110000/115248 (1145 verified, 12047 catch-all, 75311 bounced) [31.9/s, ~3m left]
+  Progress:  110500/115248 (1150 verified, 12098 catch-all, 75645 bounced) [31.9/s, ~2m left]
+  Progress:  111000/115248 (1156 verified, 12150 catch-all, 75986 bounced) [31.9/s, ~2m left]
+  Progress:  111500/115248 (1159 verified, 12207 catch-all, 76314 bounced) [31.9/s, ~2m left]
+  Progress:  112000/115248 (1163 verified, 12263 catch-all, 76652 bounced) [31.9/s, ~2m left]
+  Progress:  112500/115248 (1168 verified, 12324 catch-all, 76996 bounced) [31.9/s, ~1m left]
+  Progress:  113000/115248 (1176 verified, 12369 catch-all, 77326 bounced) [31.9/s, ~1m left]
+  Progress:  113500/115248 (1178 verified, 12425 catch-all, 77658 bounced) [31.9/s, ~1m left]
+  Progress:  114000/115248 (1184 verified, 12477 catch-all, 78024 bounced) [32.0/s, ~1m left]
+  Progress:  114500/115248 (1192 verified, 12536 catch-all, 78346 bounced) [32.0/s, ~0m left]
+  Progress:  115000/115248 (1198 verified, 12599 catch-all, 78683 bounced) [32.0/s, ~0m left]
+  [checkpoint] Saved 25526 leads (2996 updated) → data/enriched/checkpoint_smtp_multipattern.csv
+
+============================================================
+  VERIFICATION COMPLETE
+============================================================
+  Time:          3610s (1.0h)
+  Checked:       115208
+  Rate:          31.9/s
+  Verified:      1199
+  Catch-all:     12619
+  Bounced:       78806
+  Leads updated: 2996
+
+  Leads with verified/catch-all: 2996
+  Leads marked undeliverable:    11410
+
+  Saved 25526 leads → data/enriched/leads_20260326_smtp_verified.csv
+
+  Final email status breakdown:
+    undeliverable         18032
+    catch_all              3840
+    verified               1536
+    guessed                1264
+    unknown                 767
+    js_scrape                67
+    scraped                  14
+    github                    5
+    dns_harvest               1

@@ -24,7 +24,7 @@ sites:
       website: ""
     pagination:
       type: "infinite_scroll"
-      scroll_count: 100
+      scroll_count: 500
       scroll_delay_ms: 1200
       extract_interval: 3
       load_indicator: ".loading-spinner"
@@ -49,7 +49,7 @@ sites:
     pagination:
       type: "load_more_button"
       button_selector: "button[class*='load'], button[class*='more'], button[class*='Load'], a[class*='load'], [class*='pagination'] button, button:has-text('Load More'), button:has-text('Show More')"
-      max_clicks: 100
+      max_clicks: 300
       click_delay_ms: 1500
 
   visible_vc:
@@ -151,11 +151,11 @@ sites:
       type: "load_more_button"
       # Signal uses a "Load More" or infinite scroll pattern for its investor list
       button_selector: "button[class*='load-more'], button[class*='LoadMore'], button:has-text('Load More'), button:has-text('Show More'), [class*='load-more'] button"
-      max_clicks: 50
+      max_clicks: 150
       click_delay_ms: 2500
 
   crunchbase:
-    enabled: false # Enable when ready to scrape (free tier)
+    enabled: true
     url: "https://www.crunchbase.com/discover/organization.investors"
     adapter: "crunchbase"
     description: "Crunchbase — free tier org/person pages for investor data"
@@ -174,7 +174,7 @@ sites:
     pagination:
       type: "numbered_pages"
       next_button: "a[rel='next'], button.next-page, [class*='pagination'] a:last-child"
-      max_pages: 30
+      max_pages: 100
 
 # ──────────────────────────────────────────────────
 #  Global Defaults

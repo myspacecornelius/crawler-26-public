@@ -70,6 +70,8 @@ from enrichment.dedup import LeadDeduplicator
 from enrichment.email_waterfall import EmailWaterfall
 from enrichment.hunter_domain_finder import HunterDomainFinder
 from enrichment.edgar_bulk import run_edgar_bulk_discovery
+from enrichment.apollo_enricher import ApolloEnricher
+from discovery.reverse_portfolio import ReversePortfolioLookup
 
 logger = get_logger("crawl.engine")
 
@@ -101,6 +103,7 @@ class CrawlEngine:
         self.hunter_finder = HunterDomainFinder(
             pattern_store=self.email_guesser.pattern_store,
         )
+        self.apollo_enricher = ApolloEnricher()
         self.scorer = LeadScorer(str(settings.scoring_config))
         self.csv_writer = CSVWriter(str(settings.data_dir))
         self.webhook = WebhookNotifier(
@@ -602,7 +605,8 @@ class CrawlEngine:
             self.args.discover = True
             self.args.headless = True
             self.args.edgar = True
-            logger.info("SCALE MODE: auto-enabling --deep --discover --headless --edgar")
+            self.args.portfolio = True
+            logger.info("SCALE MODE: auto-enabling --deep --discover --headless --edgar --portfolio")
 
         self._print_banner()
 
@@ -617,6 +621,37 @@ class CrawlEngine:
                 init_tasks.append(self._run_edgar_bulk())
             if init_tasks:
                 await asyncio.gather(*init_tasks)
+
+            # ── Stage 2.5: Reverse portfolio discovery (snowball) ──
+            if getattr(self.args, 'portfolio', False) or getattr(self.args, 'scale', False):
+                try:
+                    rpl = ReversePortfolioLookup()
+                    rpl_leads = await rpl.discover()
+                    if rpl_leads:
+                        existing_names = {lead.name.lower() for lead in self.all_leads}
+                        new_count = 0
+                        for lead in rpl_leads:
+                            if lead.name.lower() not in existing_names:
+                                self.all_leads.append(lead)
+                                existing_names.add(lead.name.lower())
+                                new_count += 1
+                        # Append new domains to target_funds.txt
+                        target_file = Path("data/target_funds.txt")
+                        existing_domains = set()
+                        if target_file.exists():
+                            existing_domains = {l.strip() for l in target_file.read_text().splitlines() if l.strip()}
+                        new_domains = [
+                            lead.website for lead in rpl_leads
+                            if lead.website and lead.website not in ("N/A", "") and lead.website not in existing_domains
+                        ]
+                        if new_domains:
+                            with open(target_file, "a") as fh:
+                                for d in new_domains:
+                                    fh.write(d + "\n")
+                        print(f"  Reverse portfolio: {new_count} new leads, {len(new_domains)} new domains added")
+                except Exception as e:
+                    logger.warning(f"Reverse portfolio discovery failed: {e}")
+                    print(f"  Reverse portfolio failed (continuing): {e}")
 
             # ── Stage 3: Adapter-based site crawling ──
             sites = self.config.get("sites", {})
@@ -876,6 +911,50 @@ class CrawlEngine:
                 print(f"  Hunter domain finder failed (continuing): {e}")
         else:
             logger.debug("Hunter domain finder disabled (no HUNTER_API_KEY)")
+
+        # ── Apollo.io bulk enrichment (email + phone + title) ──
+        if self.apollo_enricher.enabled:
+            try:
+                self.all_leads = await self.apollo_enricher.enrich_batch(self.all_leads)
+                self._checkpoint("apollo")
+            except Exception as e:
+                self._error_count += 1
+                logger.error(
+                    f"Apollo enrichment failed: {e}",
+                    extra={"phase": "apollo"}, exc_info=True,
+                )
+                print(f"  Apollo enrichment failed (continuing): {e}")
+        else:
+            logger.debug("Apollo enrichment disabled (no APOLLO_API_KEY)")
+
+        # ── DNS provider detection → pattern hint injection ──
+        try:
+            dns_harvester = DNSHarvester()
+            # Quick pre-scan to detect email providers and generate pattern hints
+            from urllib.parse import urlparse as _urlparse
+            domains_to_scan = set()
+            for lead in self.all_leads:
+                if lead.website and lead.website not in ("N/A", ""):
+                    try:
+                        parsed = _urlparse(lead.website if "://" in lead.website else f"https://{lead.website}")
+                        d = parsed.netloc.lower().replace("www.", "")
+                        if d:
+                            domains_to_scan.add(d)
+                    except Exception:
+                        pass
+            if domains_to_scan:
+                scan_tasks = [dns_harvester.search_domain(d) for d in list(domains_to_scan)[:500]]
+                await asyncio.gather(*scan_tasks, return_exceptions=True)
+                hints_applied = 0
+                for domain, hint in dns_harvester._pattern_hint_cache.items():
+                    if hint and domain not in self.email_guesser.pattern_store._patterns:
+                        self.email_guesser.pattern_store.record(domain, hint, weight=2)
+                        hints_applied += 1
+                if hints_applied:
+                    print(f"  DNS provider hints: {hints_applied} domains got pattern suggestions "
+                          f"({dns_harvester._stats['providers_detected']} providers detected)")
+        except Exception as e:
+            logger.debug(f"DNS provider hint scan failed: {e}")
 
         # ── Email guessing (for leads still missing an email) ──
         try:

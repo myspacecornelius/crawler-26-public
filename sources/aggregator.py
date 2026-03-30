@@ -1,7 +1,8 @@
 """
 CRAWL — Source Aggregator
 Orchestrates multiple lead sources into a unified pipeline.
-Sources: seed database, GitHub VC lists, HTTP-based discovery.
+Sources: seed database, GitHub VC lists, HTTP-based discovery,
+pension LP disclosures, conference speakers, content mining.
 This is the primary lead generation engine — deterministic and reliable.
 """
 
@@ -29,6 +30,9 @@ class SourceAggregator:
             "seed_db": 0,
             "github_lists": 0,
             "http_directories": 0,
+            "pension_lp": 0,
+            "conferences": 0,
+            "content_mining": 0,
             "total_deduped": 0,
         }
 
@@ -49,36 +53,72 @@ class SourceAggregator:
         Run all source collectors and return deduplicated leads.
         """
         print(f"\n{'='*60}")
-        print("  📡  SOURCE AGGREGATOR")
+        print("  SOURCE AGGREGATOR")
         print(f"{'='*60}\n")
 
         # ── Source 1: Curated seed database ──
         seed_leads = load_seed_leads()
         seed_count = self._dedup_add(seed_leads, "seed_db")
-        print(f"  📂  Seed database: {seed_count} firms")
+        print(f"  Seed database: {seed_count} firms")
 
         # ── Source 2: GitHub VC lists (HTTP-based, no browser) ──
         try:
             from sources.github_lists import fetch_github_vc_lists
             github_leads = await fetch_github_vc_lists()
             gh_count = self._dedup_add(github_leads, "github_lists")
-            print(f"  🐙  GitHub lists: {gh_count} new firms")
+            print(f"  GitHub lists: {gh_count} new firms")
         except Exception as e:
-            logger.warning(f"  ⚠️  GitHub lists failed: {e}")
+            logger.warning(f"  GitHub lists failed: {e}")
 
         # ── Source 3: HTTP directory fetchers (public VC directories) ──
         try:
             from sources.directory_fetchers import fetch_all_directories
             dir_leads = await fetch_all_directories()
             dir_count = self._dedup_add(dir_leads, "http_directories")
-            print(f"  🌐  HTTP directories: {dir_count} new firms")
+            print(f"  HTTP directories: {dir_count} new firms")
         except Exception as e:
-            logger.warning(f"  ⚠️  HTTP directories failed: {e}")
+            logger.warning(f"  HTTP directories failed: {e}")
+
+        # ── Source 4: Pension fund LP disclosures ──
+        try:
+            from sources.pension_lp_scraper import PensionLPScraper
+            pension_scraper = PensionLPScraper()
+            pension_leads = await pension_scraper.discover()
+            pension_count = self._dedup_add(pension_leads, "pension_lp")
+            print(f"  Pension LP disclosures: {pension_count} new firms")
+        except Exception as e:
+            logger.warning(f"  Pension LP scraper failed: {e}")
+
+        # ── Source 5: Conference speaker directories ──
+        try:
+            from sources.conference_scraper import ConferenceSpeakerScraper
+            conf_scraper = ConferenceSpeakerScraper()
+            conf_leads = await conf_scraper.discover()
+            conf_count = self._dedup_add(conf_leads, "conferences")
+            print(f"  Conference speakers: {conf_count} new contacts")
+        except Exception as e:
+            logger.warning(f"  Conference scraper failed: {e}")
+
+        # ── Source 6: Content mining (Substack/Medium/podcasts) ──
+        try:
+            from sources.content_miner import InvestorContentMiner
+            content_miner = InvestorContentMiner()
+            content_leads = await content_miner.discover()
+            content_count = self._dedup_add(content_leads, "content_mining")
+            print(f"  Content mining: {content_count} new contacts")
+        except Exception as e:
+            logger.warning(f"  Content miner failed: {e}")
 
         self._stats["total_deduped"] = len(self.all_leads)
 
-        print(f"\n  ✅  Aggregator complete: {len(self.all_leads)} unique target firms")
-        print(f"      Seed: {self._stats['seed_db']} | GitHub: {self._stats['github_lists']} | Directories: {self._stats['http_directories']}")
+        print(f"\n  Aggregator complete: {len(self.all_leads)} unique target firms")
+        print(
+            f"      Seed: {self._stats['seed_db']} | GitHub: {self._stats['github_lists']} | "
+            f"Directories: {self._stats['http_directories']} | "
+            f"Pension: {self._stats['pension_lp']} | "
+            f"Conferences: {self._stats['conferences']} | "
+            f"Content: {self._stats['content_mining']}"
+        )
 
         return self.all_leads
 
