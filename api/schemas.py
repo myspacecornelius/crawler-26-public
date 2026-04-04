@@ -99,6 +99,8 @@ class LeadResponse(BaseModel):
     tier: str
     source: str
     opted_out: bool = False
+    archived: bool = False
+    tags: str = ""
     scraped_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -147,6 +149,20 @@ class LeadFilters(BaseModel):
     check_size: Optional[str] = None
     hq: Optional[str] = None
     search: Optional[str] = None
+
+
+class BulkActionRequest(BaseModel):
+    lead_ids: List[UUID] = Field(..., min_length=1, max_length=5000, description="Lead IDs to act on")
+    action: str = Field(..., pattern=r"^(tag|archive|export|reverify)$", description="Bulk action type")
+    value: Optional[str] = Field(None, max_length=500, description="Value for the action (required for 'tag')")
+
+
+class BulkActionResponse(BaseModel):
+    action: str
+    affected: int
+    lead_ids: List[UUID]
+    message: str
+    leads: Optional[List[LeadResponse]] = None  # Populated only for 'export' action
 
 
 # ── Credits ──────────────────────────────────────

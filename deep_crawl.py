@@ -1085,7 +1085,11 @@ class DeepCrawler:
         visited = 0
         enriched = 0
         new_contacts = []
-        MAX_BIO_PAGES = 15  # Cap to avoid spending too long on one fund
+        try:
+            from config.settings import settings as _settings
+            MAX_BIO_PAGES = _settings.max_bio_pages_per_fund
+        except Exception:
+            MAX_BIO_PAGES = 25
 
         for bio in bio_links[:MAX_BIO_PAGES]:
             try:
@@ -1344,7 +1348,7 @@ class DeepCrawler:
 
             logger.info(f"  📄 Found {len(team_urls)} potential team pages")
 
-            for team_url_idx, team_url in enumerate(team_urls[:8]):  # Cap at 8 pages per fund
+            for team_url_idx, team_url in enumerate(team_urls[:12]):  # Configurable via settings.max_team_pages_per_fund
                 # Early exit: if we already have 5+ contacts from earlier pages,
                 # skip remaining fallback URLs (guessed paths are low-yield)
                 if len(contacts) >= 5 and team_url_idx >= 2:

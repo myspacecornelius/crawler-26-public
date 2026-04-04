@@ -150,19 +150,22 @@ class TestIssue3_MissingScoringDimensions:
         scorer = make_scorer()
         week_ago = (datetime.now() - timedelta(days=4)).isoformat()
         score = scorer._score_recency(week_ago)
-        assert score == int(10 * 0.7), f"Expected 7 for week-old lead, got {score}"
+        # Exponential decay: exp(-0.693 * 4/14) * 10 ≈ 8
+        assert 7 <= score <= 9, f"Expected ~8 for 4-day-old lead (time-decay), got {score}"
 
     def test_recency_month_old(self):
         scorer = make_scorer()
         month_ago = (datetime.now() - timedelta(days=20)).isoformat()
         score = scorer._score_recency(month_ago)
-        assert score == int(10 * 0.4), f"Expected 4 for month-old lead, got {score}"
+        # Exponential decay: exp(-0.693 * 20/14) * 10 ≈ 3.7
+        assert 3 <= score <= 5, f"Expected ~4 for 20-day-old lead (time-decay), got {score}"
 
     def test_recency_stale(self):
         scorer = make_scorer()
         old = (datetime.now() - timedelta(days=90)).isoformat()
         score = scorer._score_recency(old)
-        assert score == int(10 * 0.1), f"Expected 1 for stale lead, got {score}"
+        # Exponential decay: exp(-0.693 * 90/14) * 10 → clamped to 1
+        assert score == 1, f"Expected 1 for 90-day stale lead, got {score}"
 
     def test_recency_missing(self):
         scorer = make_scorer()

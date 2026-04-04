@@ -247,6 +247,22 @@ class PatternStore:
         logger.debug("Learned pattern for %s: %s (count=%d)", domain, pattern, self._patterns[domain][pattern])
         return pattern
 
+    def record(self, domain: str, pattern: str, weight: int = 1) -> None:
+        """
+        Directly record a pattern for a domain with a given weight.
+        Used by external enrichers (e.g., DNS harvester provider hints)
+        to inject pattern suggestions without needing a concrete email+name pair.
+        """
+        if domain not in self._patterns:
+            self._patterns[domain] = {}
+
+        self._patterns[domain][pattern] = self._patterns[domain].get(pattern, 0) + weight
+
+        # Recalculate best pattern
+        self._best_pattern[domain] = max(self._patterns[domain], key=self._patterns[domain].get)
+
+        logger.debug("Recorded pattern for %s: %s (weight=%d)", domain, pattern, weight)
+
     def apply(self, name: str, domain: str) -> Optional[str]:
         """Apply the best learned pattern to generate an email."""
         pattern = self._best_pattern.get(domain)

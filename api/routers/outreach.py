@@ -3,12 +3,14 @@ API routes for outreach campaign management.
 """
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import List, Optional
 
 from ..auth import get_current_user_id
 
 router = APIRouter(prefix="/outreach", tags=["outreach"])
+
+SUPPORTED_PROVIDERS = {"instantly", "smartlead"}
 
 
 class OutreachCampaignCreate(BaseModel):
@@ -23,11 +25,25 @@ class OutreachCampaignCreate(BaseModel):
     api_key: Optional[str] = None  # Provider API key (or use env var)
     custom_vars: Optional[dict] = None  # Extra template variables
 
+    @field_validator("provider")
+    @classmethod
+    def validate_provider(cls, v: str) -> str:
+        if v not in SUPPORTED_PROVIDERS:
+            raise ValueError(f"Unsupported provider '{v}'. Must be one of: {', '.join(sorted(SUPPORTED_PROVIDERS))}")
+        return v
+
 
 class OutreachCampaignAction(BaseModel):
     provider: str = "instantly"
     provider_campaign_id: str
     api_key: Optional[str] = None
+
+    @field_validator("provider")
+    @classmethod
+    def validate_provider(cls, v: str) -> str:
+        if v not in SUPPORTED_PROVIDERS:
+            raise ValueError(f"Unsupported provider '{v}'. Must be one of: {', '.join(sorted(SUPPORTED_PROVIDERS))}")
+        return v
 
 
 @router.post("/launch")
@@ -38,7 +54,7 @@ async def launch_outreach(
     """Launch an outreach campaign from a LeadFactory campaign's leads."""
     from ..database import async_session
     from ..models import Campaign, Lead
-    from sqlalchemy import select
+    from sqlalchemy import select, and_
 
     from outreach.manager import OutreachManager
     from outreach.base import OutreachLead
@@ -54,23 +70,25 @@ async def launch_outreach(
         if campaign.status != "completed":
             raise HTTPException(status_code=400, detail="Campaign must be completed before launching outreach")
 
-        # Fetch leads
-        result = await session.execute(
-            select(Lead).where(Lead.campaign_id == data.campaign_id)
+        # Fetch only usable leads: not opted out, with valid email, meeting score/tier criteria
+        lead_query = select(Lead).where(
+            Lead.campaign_id == data.campaign_id,
+            Lead.opted_out == False,
+            Lead.email != "N/A",
+            Lead.email != "",
+            Lead.email.contains("@"),
         )
+        if data.min_score > 0:
+            lead_query = lead_query.where(Lead.score >= data.min_score)
+        if data.tiers:
+            lead_query = lead_query.where(Lead.tier.in_(data.tiers))
+
+        result = await session.execute(lead_query)
         db_leads = result.scalars().all()
 
     # Convert to OutreachLead objects
     outreach_leads = []
     for lead in db_leads:
-        if not lead.email or lead.email == "N/A" or "@" not in lead.email:
-            continue
-        score = lead.score or 0
-        if score < data.min_score:
-            continue
-        if data.tiers and lead.tier not in data.tiers:
-            continue
-
         parts = (lead.name or "").split(None, 1)
         outreach_leads.append(OutreachLead(
             email=lead.email,
@@ -138,6 +156,11 @@ async def get_outreach_stats(
     user_id: str = Depends(get_current_user_id),
 ):
     """Get outreach campaign analytics."""
+    if provider not in SUPPORTED_PROVIDERS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported provider '{provider}'. Must be one of: {', '.join(sorted(SUPPORTED_PROVIDERS))}",
+        )
     from outreach.manager import OutreachManager
     try:
         manager = OutreachManager(provider_name=provider, api_key=api_key)

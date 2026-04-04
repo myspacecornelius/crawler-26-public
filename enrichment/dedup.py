@@ -24,6 +24,7 @@ import json
 import logging
 import os
 import shutil
+import unicodedata
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
@@ -43,14 +44,23 @@ EMAIL_PRIORITY = {
 
 
 def _normalize_name(name: str) -> str:
-    """Normalize a name for dedup: lowercase, strip whitespace, remove middle initials."""
+    """Normalize a name for dedup: lowercase, strip whitespace, remove middle initials,
+    generational suffixes (Jr/Sr/III), and normalize unicode (é→e, ñ→n)."""
     if not name:
         return ""
+    # Unicode normalize: decompose accents then strip combining marks (é→e, ñ→n)
+    name = unicodedata.normalize("NFD", name)
+    name = "".join(c for c in name if unicodedata.category(c) != "Mn")
     name = name.lower().strip()
     # Remove common titles
     for prefix in ["dr.", "dr ", "mr.", "mr ", "mrs.", "mrs ", "ms.", "ms ", "prof."]:
         if name.startswith(prefix):
             name = name[len(prefix):].strip()
+    # Remove generational suffixes
+    for suffix in [" jr.", " jr", " sr.", " sr", " iii", " iv", " ii", " esq.", " esq",
+                   " ph.d.", " phd", " md", " m.d.", " cfa"]:
+        if name.endswith(suffix):
+            name = name[:-len(suffix)].strip()
     # Remove middle initials (single letter, optionally followed by period)
     parts = name.split()
     if len(parts) > 2:

@@ -143,6 +143,8 @@ class Lead(Base):
     # Metadata
     source = Column(String(500), default="N/A")  # URL where lead was found
     opted_out = Column(Boolean, default=False)
+    archived = Column(Boolean, default=False)
+    tags = Column(String(1000), default="")  # Comma-separated tags
     scraped_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     last_verified = Column(DateTime(timezone=True), nullable=True)  # Last SMTP/email re-verification
     last_crawled_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
@@ -151,8 +153,10 @@ class Lead(Base):
 
     __table_args__ = (
         Index("ix_leads_campaign_score", "campaign_id", "score"),
+        Index("ix_leads_campaign_id", "campaign_id"),
         Index("ix_leads_email", "email"),
         Index("ix_leads_fund", "fund"),
+        Index("ix_leads_tier", "tier"),
         Index("ix_leads_name_fund", "name", "fund"),
         Index("ix_leads_email_fund", "email", "fund", unique=True),
     )
@@ -257,6 +261,21 @@ class PipelineLead(Base):
         Index("ix_pipeline_leads_run", "run_id"),
         Index("ix_pipeline_leads_email_fund", "email", "fund_normalized"),
     )
+
+
+class ProcessedStripeEvent(Base):
+    """
+    Idempotency guard for Stripe webhooks.
+
+    Stores processed event IDs so retried webhooks are not handled twice
+    (e.g., preventing double-credit on a checkout.session.completed replay).
+    """
+    __tablename__ = "processed_stripe_events"
+
+    id = Column(GUID(), primary_key=True, default=uuid.uuid4)
+    stripe_event_id = Column(String(255), unique=True, nullable=False, index=True)
+    event_type = Column(String(100), nullable=False)
+    processed_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
 
 class PipelineRun(Base):

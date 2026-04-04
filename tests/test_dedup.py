@@ -327,3 +327,53 @@ class TestDedupStats:
             assert stats["total_unique_leads"] == 2
             assert stats["with_email"] == 1
             assert stats["seen_multiple_times"] == 1
+
+
+# ── Generational Suffix & Unicode Normalization ──
+
+class TestNormalizeNameExtended:
+    def test_removes_jr_suffix(self):
+        assert _normalize_name("John Smith Jr.") == "john smith"
+
+    def test_removes_jr_no_period(self):
+        assert _normalize_name("John Smith Jr") == "john smith"
+
+    def test_removes_sr_suffix(self):
+        assert _normalize_name("Robert Brown Sr.") == "robert brown"
+
+    def test_removes_iii(self):
+        assert _normalize_name("William Ford III") == "william ford"
+
+    def test_removes_iv(self):
+        assert _normalize_name("James Walton IV") == "james walton"
+
+    def test_removes_esq(self):
+        assert _normalize_name("Alice Green Esq.") == "alice green"
+
+    def test_removes_phd(self):
+        assert _normalize_name("Dr. Emily Chen Ph.D.") == "emily chen"
+
+    def test_unicode_accents_normalized(self):
+        assert _normalize_name("José García") == "jose garcia"
+
+    def test_unicode_umlaut(self):
+        # ð (eth) is a distinct letter, not a diacritic, so NFD normalization preserves it
+        assert _normalize_name("Björk Guðmundsdóttir") == "bjork guðmundsdottir"
+
+    def test_unicode_cedilla(self):
+        assert _normalize_name("François Müller") == "francois muller"
+
+    def test_jr_and_unicode_combined(self):
+        assert _normalize_name("José García Jr.") == "jose garcia"
+
+    def test_dedup_key_matches_across_accents(self):
+        """Same person with/without accents should get the same dedup key."""
+        k1 = _dedup_key("José García", "Acme Capital")
+        k2 = _dedup_key("Jose Garcia", "Acme Capital")
+        assert k1 == k2
+
+    def test_dedup_key_matches_across_suffixes(self):
+        """Same person with/without Jr. should get the same dedup key."""
+        k1 = _dedup_key("John Smith Jr.", "Benchmark")
+        k2 = _dedup_key("John Smith", "Benchmark")
+        assert k1 == k2

@@ -11,12 +11,12 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-from sqlalchemy import select, func, or_, and_
+from sqlalchemy import select, func, or_, and_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..database import get_db
 from ..models import Campaign, Lead
-from ..schemas import LeadResponse, LeadList, OptOutResponse
+from ..schemas import LeadResponse, LeadList, OptOutResponse, BulkActionRequest, BulkActionResponse
 from ..auth import get_current_user_id
 
 _limiter = Limiter(key_func=get_remote_address)
@@ -125,7 +125,11 @@ async def export_leads_csv(
     user_id: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
 ):
-    """Export campaign leads as a CSV file."""
+    """Export campaign leads as a streaming CSV file.
+
+    Fetches leads in pages of 1000 rows and yields CSV rows incrementally
+    to avoid loading the entire result set into memory.
+    """
     # Verify ownership
     camp_result = await db.execute(
         select(Campaign).where(Campaign.id == campaign_id, Campaign.user_id == UUID(user_id))
@@ -134,46 +138,66 @@ async def export_leads_csv(
     if not campaign:
         raise HTTPException(status_code=404, detail="Campaign not found")
 
-    query = select(Lead).where(Lead.campaign_id == campaign_id, Lead.opted_out == False)
-    if tier:
-        query = query.where(Lead.tier == tier.upper())
-    if min_score is not None:
-        query = query.where(Lead.score >= min_score)
-    if has_email is True:
-        query = query.where(and_(Lead.email != "N/A", Lead.email != ""))
-    if sector:
-        query = query.where(Lead.sectors.ilike(f"%{sector}%"))
-    if stage:
-        query = query.where(Lead.stage.ilike(f"%{stage}%"))
-    if check_size:
-        query = query.where(Lead.check_size.ilike(f"%{check_size}%"))
-    if hq:
-        query = query.where(Lead.hq.ilike(f"%{hq}%"))
-
-    query = query.order_by(Lead.score.desc())
-    result = await db.execute(query)
-    leads = result.scalars().all()
-
-    # Build CSV
-    output = io.StringIO()
-    writer = csv.writer(output)
-    writer.writerow([
-        "Name", "Email", "Email Verified", "LinkedIn", "Phone",
-        "Fund", "Role", "Website", "Sectors", "Check Size",
-        "Stage", "HQ", "Score", "Tier", "Source",
-    ])
-    for lead in leads:
-        writer.writerow([
-            lead.name, lead.email, lead.email_verified, lead.linkedin,
-            lead.phone, lead.fund, lead.role, lead.website, lead.sectors,
-            lead.check_size, lead.stage, lead.hq, lead.score, lead.tier,
-            lead.source,
-        ])
-
-    output.seek(0)
     filename = f"{campaign.name.replace(' ', '_')}_{campaign.vertical}_leads.csv"
+
+    # Build the base query with filters (but no fetch yet)
+    base_query = select(Lead).where(Lead.campaign_id == campaign_id, Lead.opted_out == False)
+    if tier:
+        base_query = base_query.where(Lead.tier == tier.upper())
+    if min_score is not None:
+        base_query = base_query.where(Lead.score >= min_score)
+    if has_email is True:
+        base_query = base_query.where(and_(Lead.email != "N/A", Lead.email != ""))
+    if sector:
+        base_query = base_query.where(Lead.sectors.ilike(f"%{sector}%"))
+    if stage:
+        base_query = base_query.where(Lead.stage.ilike(f"%{stage}%"))
+    if check_size:
+        base_query = base_query.where(Lead.check_size.ilike(f"%{check_size}%"))
+    if hq:
+        base_query = base_query.where(Lead.hq.ilike(f"%{hq}%"))
+
+    base_query = base_query.order_by(Lead.score.desc())
+
+    async def _generate_csv():
+        """Yield CSV rows in pages of 1000 to keep memory bounded."""
+        page_size = 1000
+
+        # Yield header row
+        buf = io.StringIO()
+        writer = csv.writer(buf)
+        writer.writerow([
+            "Name", "Email", "Email Verified", "LinkedIn", "Phone",
+            "Fund", "Role", "Website", "Sectors", "Check Size",
+            "Stage", "HQ", "Score", "Tier", "Source",
+        ])
+        yield buf.getvalue()
+
+        offset = 0
+        while True:
+            page_query = base_query.offset(offset).limit(page_size)
+            result = await db.execute(page_query)
+            leads = result.scalars().all()
+            if not leads:
+                break
+
+            buf = io.StringIO()
+            writer = csv.writer(buf)
+            for lead in leads:
+                writer.writerow([
+                    lead.name, lead.email, lead.email_verified, lead.linkedin,
+                    lead.phone, lead.fund, lead.role, lead.website, lead.sectors,
+                    lead.check_size, lead.stage, lead.hq, lead.score, lead.tier,
+                    lead.source,
+                ])
+            yield buf.getvalue()
+
+            if len(leads) < page_size:
+                break
+            offset += page_size
+
     return StreamingResponse(
-        iter([output.getvalue()]),
+        _generate_csv(),
         media_type="text/csv",
         headers={"Content-Disposition": f"attachment; filename={filename}"},
     )
@@ -318,6 +342,99 @@ async def lead_freshness(
         "stale_leads": total - crawled_7d,
         "freshness_pct": round(crawled_7d / total * 100, 1) if total > 0 else 0,
     }
+
+
+# ── Bulk Operations ────────────────────────────
+
+@router.patch("/bulk/{campaign_id}", response_model=BulkActionResponse)
+@_limiter.limit("30/minute")
+async def bulk_lead_action(
+    campaign_id: UUID,
+    body: BulkActionRequest,
+    request: Request,
+    user_id: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    """Perform bulk operations on leads within a campaign.
+
+    Actions:
+    - tag: Append comma-separated tags to matching leads
+    - archive: Set archived=True on matching leads
+    - export: Return matching leads as JSON (subset export)
+    - reverify: Reset email_status to 'unknown' for matching leads
+    """
+    # Verify campaign ownership
+    camp_result = await db.execute(
+        select(Campaign).where(Campaign.id == campaign_id, Campaign.user_id == UUID(user_id))
+    )
+    if not camp_result.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    # Validate action-specific requirements
+    if body.action == "tag" and not body.value:
+        raise HTTPException(status_code=422, detail="'value' is required for 'tag' action")
+
+    # Fetch matching leads scoped to this campaign
+    result = await db.execute(
+        select(Lead).where(
+            Lead.campaign_id == campaign_id,
+            Lead.id.in_(body.lead_ids),
+        )
+    )
+    leads = result.scalars().all()
+
+    if not leads:
+        raise HTTPException(status_code=404, detail="No matching leads found in this campaign")
+
+    matched_ids = [lead.id for lead in leads]
+
+    if body.action == "tag":
+        for lead in leads:
+            existing = lead.tags or ""
+            existing_set = {t.strip() for t in existing.split(",") if t.strip()}
+            new_tags = {t.strip() for t in body.value.split(",") if t.strip()}
+            merged = sorted(existing_set | new_tags)
+            lead.tags = ",".join(merged)
+        await db.commit()
+        return BulkActionResponse(
+            action="tag",
+            affected=len(leads),
+            lead_ids=matched_ids,
+            message=f"Tagged {len(leads)} lead(s) with: {body.value}",
+        )
+
+    elif body.action == "archive":
+        for lead in leads:
+            lead.archived = True
+        await db.commit()
+        return BulkActionResponse(
+            action="archive",
+            affected=len(leads),
+            lead_ids=matched_ids,
+            message=f"Archived {len(leads)} lead(s)",
+        )
+
+    elif body.action == "export":
+        return BulkActionResponse(
+            action="export",
+            affected=len(leads),
+            lead_ids=matched_ids,
+            message=f"Exported {len(leads)} lead(s)",
+            leads=[LeadResponse.model_validate(l) for l in leads],
+        )
+
+    elif body.action == "reverify":
+        for lead in leads:
+            lead.email_status = "unknown"
+            lead.email_verified = False
+            lead.last_verified = None
+        await db.commit()
+        return BulkActionResponse(
+            action="reverify",
+            affected=len(leads),
+            lead_ids=matched_ids,
+            message=f"Reset verification status for {len(leads)} lead(s)",
+        )
 
 
 # ── Opt-out ────────────────────────────────────

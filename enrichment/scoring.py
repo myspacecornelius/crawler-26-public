@@ -216,9 +216,10 @@ class LeadScorer:
 
     def _score_recency(self, scraped_at: str) -> int:
         """
-        Score recency based on whether the lead was freshly scraped.
-        Leads scraped within the current run always get full recency credit.
-        A missing/unparseable timestamp gets partial credit (not penalised).
+        Score recency using exponential time-decay.
+        Half-life of 14 days: data loses half its recency value every 2 weeks.
+        This gives a smooth gradient rather than hard cutoffs, rewarding
+        the freshest data proportionally.
         """
         weight = self.weights.get("recency", 10)
         if not scraped_at:
@@ -226,16 +227,16 @@ class LeadScorer:
 
         try:
             scraped = datetime.fromisoformat(scraped_at)
-            now = datetime.now()
-            age_hours = (now - scraped).total_seconds() / 3600
-            if age_hours < 24:
-                return weight          # Fresh from this run
-            elif age_hours < 24 * 7:
-                return int(weight * 0.7)   # Within a week
-            elif age_hours < 24 * 30:
-                return int(weight * 0.4)   # Within a month
-            else:
-                return int(weight * 0.1)   # Stale
+            age_days = (datetime.now() - scraped).total_seconds() / 86400
+            if age_days < 0:
+                age_days = 0
+            # Same-day leads get full credit (avoids penalizing current-run data)
+            if age_days < 1:
+                return weight
+            # Exponential decay with 14-day half-life
+            import math
+            decay = math.exp(-0.693 * age_days / 14)  # ln(2) ≈ 0.693
+            return max(1, int(weight * decay))
         except (ValueError, TypeError):
             return weight // 2
 
@@ -279,15 +280,24 @@ class LeadScorer:
         """
         Score engagement signals that indicate a more actionable lead.
         Higher engagement = more likely to get a response.
+
+        Email deliverability is the strongest signal — a verified email
+        is worth far more than a guessed one because it directly determines
+        whether outreach will land.
         """
         score = 0
 
-        # Verified email is a strong signal
+        # Email deliverability — graduated scale
         email_status = getattr(lead, 'email_status', 'unknown')
-        if email_status == 'verified':
-            score += 5
-        elif email_status == 'catch_all':
-            score += 2
+        status_scores = {
+            'verified': 8,      # confirmed deliverable → highest value
+            'scraped': 5,       # found on page → likely valid
+            'catch_all': 3,     # domain accepts all → will land but may be ignored
+            'guessed': 1,       # pattern-based → risky
+            'unknown': 0,
+            'undeliverable': -3,  # known bad → penalize
+        }
+        score += status_scores.get(email_status, 0)
 
         # Seen across multiple crawl runs = persistent, reliable data
         times_seen = getattr(lead, 'times_seen', 1)

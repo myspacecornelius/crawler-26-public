@@ -13,7 +13,7 @@ import stripe
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .models import User, CreditTransaction
+from .models import User, CreditTransaction, ProcessedStripeEvent
 from .settings import settings
 
 logger = logging.getLogger("leadfactory.billing")
@@ -142,7 +142,12 @@ async def create_portal_session(user: User, db: AsyncSession) -> str:
 # ── Webhook handling ───────────────────────────
 
 async def handle_webhook(payload: bytes, sig_header: str, db: AsyncSession) -> dict:
-    """Process a Stripe webhook event. Returns a status dict."""
+    """Process a Stripe webhook event. Returns a status dict.
+
+    Uses the processed_stripe_events table as an idempotency guard:
+    if the event ID has already been recorded, return 200 immediately
+    so Stripe treats the retry as successful without double-processing.
+    """
     try:
         event = stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEBHOOK_SECRET)
     except stripe.error.SignatureVerificationError:
@@ -152,8 +157,18 @@ async def handle_webhook(payload: bytes, sig_header: str, db: AsyncSession) -> d
         logger.error(f"Stripe webhook error: {e}")
         raise ValueError(f"Webhook error: {e}")
 
+    event_id = event["id"]
     event_type = event["type"]
-    logger.info(f"Processing Stripe event: {event_type}")
+
+    # ── Idempotency guard ─────────────────────
+    existing = await db.execute(
+        select(ProcessedStripeEvent).where(ProcessedStripeEvent.stripe_event_id == event_id)
+    )
+    if existing.scalar_one_or_none() is not None:
+        logger.info(f"Skipping already-processed Stripe event {event_id} ({event_type})")
+        return {"status": "already_processed", "event_type": event_type}
+
+    logger.info(f"Processing Stripe event: {event_id} ({event_type})")
 
     if event_type == "checkout.session.completed":
         await _handle_checkout_completed(event["data"]["object"], db)
@@ -165,6 +180,10 @@ async def handle_webhook(payload: bytes, sig_header: str, db: AsyncSession) -> d
         await _handle_invoice_paid(event["data"]["object"], db)
     else:
         logger.debug(f"Unhandled event type: {event_type}")
+
+    # Record event as processed (after successful handling)
+    db.add(ProcessedStripeEvent(stripe_event_id=event_id, event_type=event_type))
+    await db.commit()
 
     return {"status": "ok", "event_type": event_type}
 

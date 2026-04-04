@@ -37,7 +37,8 @@ class ApolloEnricher:
 
     def __init__(self, concurrency: int = 5):
         self.api_key = os.environ.get("APOLLO_API_KEY", "")
-        self._sem = asyncio.Semaphore(concurrency)
+        self._concurrency = concurrency
+        self._sem: Optional[asyncio.Semaphore] = None
         self._stats = {
             "leads_attempted": 0,
             "leads_enriched": 0,
@@ -51,11 +52,17 @@ class ApolloEnricher:
     def enabled(self) -> bool:
         return bool(self.api_key)
 
+    def _get_sem(self) -> asyncio.Semaphore:
+        """Lazily create semaphore inside an event loop context."""
+        if self._sem is None:
+            self._sem = asyncio.Semaphore(self._concurrency)
+        return self._sem
+
     async def _enrich_single(
         self, session: aiohttp.ClientSession, lead
     ) -> Optional[dict]:
         """Enrich a single lead via Apollo people/match endpoint."""
-        async with self._sem:
+        async with self._get_sem():
             self._stats["leads_attempted"] += 1
             self._stats["api_calls"] += 1
 

@@ -220,10 +220,16 @@ class EmailWaterfall:
     """
     Multi-provider email verification waterfall.
     Falls through providers until a definitive deliverable/undeliverable answer.
+
+    Domain-level caching: when a domain is confirmed as catch-all by one provider,
+    subsequent emails at that domain skip the waterfall entirely (saves API credits).
+    When a domain is confirmed as having valid individual mailboxes, provider results
+    are trusted for the whole domain's pattern.
     """
 
     def __init__(self):
         self.providers: List[VerificationProvider] = []
+        self._domain_cache: Dict[str, Dict] = {}  # domain → {"catch_all": bool, "provider": str}
         for cls in PROVIDER_CLASSES:
             env_key = f"{cls.name.upper()}_API_KEY"
             api_key = os.environ.get(env_key)
@@ -240,11 +246,40 @@ class EmailWaterfall:
         """
         Verify a single email through the provider waterfall.
         Returns the best result from the first provider with a definitive answer.
+
+        Uses domain-level caching: if a domain is already known to be catch-all,
+        skip the waterfall entirely and return inconclusive (saves API credits).
         """
+        domain = email.rsplit("@", 1)[1].lower() if "@" in email else ""
+        if not hasattr(self, '_domain_cache'):
+            self._domain_cache = {}
+        cached_domain = self._domain_cache.get(domain)
+        if cached_domain and cached_domain.get("catch_all"):
+            return {
+                "deliverable": None,
+                "provider": "waterfall_cache",
+                "confidence": 0.4,
+                "reason": f"Domain {domain} is catch-all (cached from {cached_domain.get('provider', 'unknown')})",
+            }
+
         for provider in self.providers:
             result = await provider.verify(session, email)
             if result and result.get("deliverable") is not None:
+                # Cache domain-level insight
+                if domain and domain not in self._domain_cache:
+                    self._domain_cache[domain] = {
+                        "provider": result.get("provider", ""),
+                        "catch_all": False,
+                    }
                 return result
+            # If provider returned catch-all, cache it
+            if result and result.get("reason") and "catch-all" in result.get("reason", "").lower():
+                if domain:
+                    self._domain_cache[domain] = {
+                        "provider": result.get("provider", ""),
+                        "catch_all": True,
+                    }
+                    logger.debug("Domain %s cached as catch-all via %s", domain, result.get("provider"))
             # If inconclusive, continue to next provider
             await asyncio.sleep(0.2)  # Polite delay between providers
 

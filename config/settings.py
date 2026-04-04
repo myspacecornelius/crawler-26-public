@@ -98,6 +98,19 @@ class CrawlSettings(BaseSettings):
     target_lead_count: int = Field(150000, description="Target total lead count")
     lead_batch_size: int = Field(100, description="Batch size for DB persistence of leads")
 
+    # ── Deep Crawl Caps ─────────────────────────────────────────
+    max_bio_pages_per_fund: int = Field(25, description="Max bio pages to follow per fund")
+    max_team_pages_per_fund: int = Field(12, description="Max team pages to try per fund")
+
+    # ── Waterfall ─────────────────────────────────────────────
+    waterfall_max_concurrent: int = Field(5, description="Max concurrent waterfall verification requests")
+    waterfall_cache_by_domain: bool = Field(True, description="Cache waterfall results by domain to reduce API calls")
+
+    # ── WHOIS Enrichment ──────────────────────────────────────
+    whois_enabled: bool = Field(False, description="Enable WHOIS enricher in greyhat phase (set WHOIS_ENABLED=true)")
+    whois_rate_limit: float = Field(1.0, description="Seconds between WHOIS queries to avoid rate limiting")
+    whois_max_domains: int = Field(500, description="Max domains to query via WHOIS per run")
+
     # ── Config file paths ────────────────────────────────────────
     sites_config: Path = Field(Path("config/sites.yaml"), description="Sites config YAML")
     scoring_config: Path = Field(Path("config/scoring.yaml"), description="Scoring config YAML")

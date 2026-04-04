@@ -71,6 +71,7 @@ from enrichment.email_waterfall import EmailWaterfall
 from enrichment.hunter_domain_finder import HunterDomainFinder
 from enrichment.edgar_bulk import run_edgar_bulk_discovery
 from enrichment.apollo_enricher import ApolloEnricher
+from enrichment.whois_extractor import async_extract_whois_contacts, whois_to_investor_leads
 from discovery.reverse_portfolio import ReversePortfolioLookup
 
 logger = get_logger("crawl.engine")
@@ -1218,9 +1219,71 @@ class CrawlEngine:
                    lead.linkedin and lead.linkedin not in ("N/A", ""):
                     orig.linkedin = lead.linkedin
 
-        # ── Phase 7: Catch-All & JS Scraper (runs after others to skip already-found) ──
+        # ── Phase 7: WHOIS enrichment (optional, gated by WHOIS_ENABLED env var) ──
+        if settings.whois_enabled:
+            try:
+                print("  Phase 7: WHOIS domain contact extraction...")
+                # Collect domains from leads that still lack emails
+                whois_domains = set()
+                for lead in self.all_leads:
+                    if (not lead.email or lead.email in ("N/A", "N/A (invalid)")) and \
+                       lead.website and lead.website not in ("N/A", ""):
+                        try:
+                            parsed = urlparse(
+                                lead.website if "://" in lead.website else f"https://{lead.website}"
+                            )
+                            domain = parsed.netloc.lower().replace("www.", "")
+                            if domain:
+                                whois_domains.add(domain)
+                        except Exception:
+                            continue
+
+                if whois_domains:
+                    whois_results = await async_extract_whois_contacts(
+                        list(whois_domains),
+                        rate_limit_seconds=settings.whois_rate_limit,
+                        max_domains=settings.whois_max_domains,
+                    )
+                    # Map WHOIS emails back to leads by domain
+                    domain_email_map = {}
+                    for rec in whois_results:
+                        d = rec.get("domain", "")
+                        email = rec.get("primary_email", "")
+                        if d and email:
+                            domain_email_map[d] = rec
+
+                    whois_enriched = 0
+                    for lead in self.all_leads:
+                        if lead.email and lead.email not in ("N/A", "N/A (invalid)"):
+                            continue
+                        if lead.website and lead.website not in ("N/A", ""):
+                            try:
+                                parsed = urlparse(
+                                    lead.website if "://" in lead.website else f"https://{lead.website}"
+                                )
+                                domain = parsed.netloc.lower().replace("www.", "")
+                            except Exception:
+                                continue
+                            if domain in domain_email_map:
+                                rec = domain_email_map[domain]
+                                lead.email = rec["primary_email"]
+                                lead.email_status = "whois"
+                                whois_enriched += 1
+
+                    print(f"  WHOIS: {whois_enriched} leads enriched from {len(whois_results)} domain contacts "
+                          f"({len(whois_domains)} domains queried)")
+                else:
+                    print("  WHOIS: no domains to query (all leads already have emails)")
+            except Exception as e:
+                greyhat_errors += 1
+                logger.error(f"WHOIS enrichment failed: {e}", extra={"phase": "greyhat", "stage": "whois"})
+                print(f"  WHOIS enrichment failed (continuing): {e}")
+        else:
+            logger.debug("WHOIS enrichment disabled (set WHOIS_ENABLED=true to enable)")
+
+        # ── Phase 8: Catch-All & JS Scraper (runs after others to skip already-found) ──
         try:
-            print("  Phase 7: Catch-All Detection & JS Scraping...")
+            print("  Phase 8: Catch-All Detection & JS Scraping...")
             catchall = CatchAllDetector(browser_timeout=settings.browser_timeout_ms)
             self.all_leads = await catchall.enrich_batch(self.all_leads)
             cs = catchall.stats
