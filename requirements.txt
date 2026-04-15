@@ -25,7 +25,7 @@ pydantic[email]>=2.5.0
 pydantic-settings>=2.1.0
 python-jose[cryptography]>=3.3.0
 passlib[bcrypt]>=1.7.4
-bcrypt>=4.0.0,<5.0.0  # passlib 1.7.4 is incompatible with bcrypt>=5 (missing __about__)
+bcrypt>=4.0.0,<6.0.0  # passlib 1.7.4 is incompatible with bcrypt>=5 (missing __about__)
 python-multipart>=0.0.6
 
 # Rate limiting
