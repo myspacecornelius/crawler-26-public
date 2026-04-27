@@ -10,7 +10,7 @@ pandas>=2.1.0
 
 # Async HTTP and SMTP
 aiohttp>=3.9.0
-aiosmtplib>=3.0.0
+aiosmtplib>=5.1.0
 
 # Email validation (optional, for MX lookups)
 dnspython>=2.4.0
